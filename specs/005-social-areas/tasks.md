@@ -30,7 +30,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 
 ---
 
-**Input**: Design documents from `/specs/001-social-areas/`
+**Input**: Design documents from `/specs/005-social-areas/`
 **Prerequisites**: `plan.md`, `spec.md`, `research.md`, `data-model.md`, `contracts/openapi.yaml`, `quickstart.md`
 
 **Tests**: Tests are **MANDATORY**. Write failing tests first for every user story, then implement code to satisfy them per the constitution’s TDD mandate.

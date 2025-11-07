@@ -24,8 +24,8 @@
 
 ---
 
-**Branch**: `001-social-areas` | **Date**: 2025-11-07 | **Spec**: [`spec.md`](./spec.md)
-**Input**: Feature specification from `/specs/001-social-areas/spec.md`
+**Branch**: `005-social-areas` | **Date**: 2025-11-07 | **Spec**: [`spec.md`](./spec.md)
+**Input**: Feature specification from `/specs/005-social-areas/spec.md`
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
 

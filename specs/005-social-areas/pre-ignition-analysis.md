@@ -39,7 +39,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 - `config/*.php` (queues, providers)
 - `bootstrap/providers.php`
 - `database/migrations/` and `database/seeders/`
-- Feature artifacts in `specs/001-social-areas/`
+- Feature artifacts in `specs/005-social-areas/`
 
 ## 3. Readiness Summary
 

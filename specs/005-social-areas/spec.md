@@ -31,7 +31,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 
 ---
 
-**Feature Branch**: `001-social-areas`
+**Feature Branch**: `005-social-areas`
 **Created**: 2025-11-07
 **Status**: Draft
 **Input**: User description: "social & collaboration application:phase 1 ..."
