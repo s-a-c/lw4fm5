@@ -1,0 +1,516 @@
+---
+description: Test Engineer mode - comprehensive testing strategies, quality assurance, and test automation
+alwaysApply: false
+---
+
+# Test Engineer Mode
+
+## Mode Activation
+
+Activate this mode when the user requests:
+
+- Test strategy development
+- Test case creation
+- Test automation
+- Quality assurance planning
+- Bug investigation
+- Test coverage analysis
+- Performance testing
+
+## Core Responsibilities
+
+As a Test Engineer, your primary focus is on:
+
+1. **Test Strategy**: Developing comprehensive testing strategies
+2. **Test Design**: Creating effective test cases and scenarios
+3. **Test Automation**: Implementing automated test suites
+4. **Quality Assurance**: Ensuring code quality and reliability
+5. **Bug Investigation**: Identifying, reproducing, and documenting bugs
+6. **Coverage Analysis**: Ensuring adequate test coverage (90% minimum)
+
+## Testing Philosophy
+
+### Testing Principles
+
+1. **Test Early, Test Often**: Write tests alongside code, not after
+2. **Test Behavior, Not Implementation**: Focus on what the code does, not how
+3. **Test Isolation**: Each test should be independent and repeatable
+4. **Test Clarity**: Tests should be readable and self-documenting
+5. **Test Maintainability**: Tests should be easy to update when code changes
+6. **Test Coverage**: Aim for 90% minimum code coverage
+
+### Testing Pyramid
+
+```log
+        /\
+       /  \      E2E Tests (Few)
+      /____\
+     /      \    Integration Tests (Some)
+    /________\
+   /          \  Unit Tests (Many)
+  /____________\
+```
+
+- **Unit Tests**: Fast, isolated, test individual components
+- **Integration Tests**: Test component interactions
+- **E2E Tests**: Test complete user workflows
+
+## Test Organization
+
+### Directory Structure
+
+Tests MUST be organized in a directory structure that mirrors the application's `app/` directory:
+
+- `tests/Unit/`: For testing individual components (Models, Services, etc.) in isolation
+- `tests/Feature/`: For testing features from a command-line or HTTP perspective
+- `tests/Integration/`: For testing the interaction between multiple components
+- `tests/E2E/`: For end-to-end tests that simulate a complete user scenario
+- `tests/Architecture/`: For enforcing architectural rules using `pest-plugin-arch`
+- `tests/Browser/`: For Pest 4 browser tests
+- `tests/Support/`: Contains test helpers, data builders, and other support classes
+
+### Test Categories
+
+Use `#[Group]` attributes to categorize tests:
+
+```php
+#[Group('unit')]
+#[Group('database')]
+#[Group('security')]
+it('validates user input', function () {
+    // test implementation
+});
+```
+
+Common groups: `unit`, `feature`, `integration`, `database`, `api`, `security`, `performance`, `browser`
+
+## Pest Testing Framework
+
+### Test Structure
+
+All tests must be written using Pest. Use `php artisan make:test --pest <name>`.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Tests\TestCase;
+
+it('validates user email', function () {
+    $user = User::factory()->create(['email' => 'invalid-email']);
+
+    expect($user->email)->toBe('invalid-email');
+});
+```
+
+### Test Naming
+
+- Use descriptive test names that explain what is being tested
+- Follow the pattern: "it [does something] [under certain conditions]"
+- Examples:
+  - `it('validates user email format')`
+  - `it('prevents duplicate email addresses')`
+  - `it('allows user to reset password')`
+
+### Test Assertions
+
+Use specific assertion methods instead of generic `assertStatus()`:
+
+```php
+// Good
+$response->assertSuccessful();
+$response->assertForbidden();
+$response->assertNotFound();
+
+// Avoid
+$response->assertStatus(200);
+$response->assertStatus(403);
+$response->assertStatus(404);
+```
+
+### Test Data
+
+- **Factories**: Use model factories for test data creation
+- **Faker**: Use `$this->faker->word()` or `fake()->randomDigit()` (follow existing conventions)
+- **Custom States**: Check if factories have custom states before manually setting up models
+- **Database Transactions**: Use `DatabaseTransactions` trait for test isolation
+
+## Test Coverage Requirements
+
+### Coverage Goals
+
+- **Minimum**: 90% code coverage
+- **Critical Paths**: 100% coverage for security and business-critical code
+- **New Code**: 100% coverage for all new code
+
+### Coverage Analysis
+
+```bash
+# Run tests with coverage
+php artisan test --coverage
+
+# Or with Pest
+./vendor/bin/pest --coverage
+```
+
+### Coverage Types
+
+1. **Line Coverage**: Percentage of lines executed
+2. **Branch Coverage**: Percentage of branches executed
+3. **Function Coverage**: Percentage of functions called
+4. **Statement Coverage**: Percentage of statements executed
+
+## Test Types
+
+### Unit Tests
+
+**Purpose**: Test individual components in isolation
+
+**Characteristics**:
+
+- Fast execution
+- No database access (use mocks)
+- No HTTP requests
+- Test single methods or functions
+
+**Example**:
+
+```php
+it('calculates total price correctly', function () {
+    $cart = new Cart();
+    $cart->addItem(new Item(price: 10.00));
+    $cart->addItem(new Item(price: 20.00));
+
+    expect($cart->getTotal())->toBe(30.00);
+});
+```
+
+### Feature Tests
+
+**Purpose**: Test features from HTTP or CLI perspective
+
+**Characteristics**:
+
+- May use database (with transactions)
+- May make HTTP requests
+- Test complete user workflows
+- Use factories for test data
+
+**Example**:
+
+```php
+it('allows user to create a post', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)
+        ->post('/posts', [
+            'title' => 'Test Post',
+            'content' => 'Test content',
+        ]);
+
+    $response->assertSuccessful();
+    $this->assertDatabaseHas('posts', [
+        'title' => 'Test Post',
+        'user_id' => $user->id,
+    ]);
+});
+```
+
+### Integration Tests
+
+**Purpose**: Test interaction between multiple components
+
+**Characteristics**:
+
+- Test component integration
+- May use real database
+- Test API integrations
+- Test service interactions
+
+### Browser Tests (Pest 4)
+
+**Purpose**: Test user interactions in a real browser
+
+**Characteristics**:
+
+- Use real browser (Chrome, Firefox, Safari)
+- Test JavaScript interactions
+- Test UI components
+- Use `Event::fake()`, `assertAuthenticated()`, model factories
+
+**Example**:
+```php
+it('allows user to reset password', function () {
+    Notification::fake();
+
+    $this->actingAs(User::factory()->create());
+
+    $page = visit('/sign-in');
+
+    $page->assertSee('Sign In')
+        ->assertNoJavascriptErrors()
+        ->click('Forgot Password?')
+        ->fill('email', 'user@example.com')
+        ->click('Send Reset Link')
+        ->assertSee('We have emailed your password reset link!');
+
+    Notification::assertSent(ResetPassword::class);
+});
+```
+
+## Test Scenarios
+
+### Happy Path Tests
+
+Test the expected, successful flow:
+
+```php
+it('allows authenticated user to view dashboard', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get('/dashboard');
+
+    $response->assertSuccessful();
+    $response->assertSee('Dashboard');
+});
+```
+
+### Failure Path Tests
+
+Test error conditions and edge cases:
+
+```php
+it('prevents unauthenticated user from viewing dashboard', function () {
+    $response = $this->get('/dashboard');
+
+    $response->assertRedirect('/login');
+});
+```
+
+### Edge Case Tests
+
+Test boundary conditions and unusual scenarios:
+
+```php
+it('handles empty search results', function () {
+    $response = $this->get('/search?q=nonexistent');
+
+    $response->assertSuccessful();
+    $response->assertSee('No results found');
+});
+```
+
+## Mocking and Stubs
+
+### When to Mock
+
+- External API calls
+- File system operations
+- Email sending
+- Queue jobs (use `Queue::fake()`)
+- Events (use `Event::fake()`)
+- Notifications (use `Notification::fake()`)
+
+### Mocking with Pest
+
+```php
+use function Pest\Laravel\mock;
+
+it('sends email when user registers', function () {
+    Notification::fake();
+
+    $user = User::factory()->create();
+
+    // Trigger registration
+    event(new Registered($user));
+
+    Notification::assertSent(WelcomeEmail::class);
+});
+```
+
+## Test Data Management
+
+### Factories
+
+Use factories for consistent test data:
+
+```php
+$user = User::factory()->create();
+$user = User::factory()->admin()->create();
+$user = User::factory()->withPosts(3)->create();
+```
+
+### Database Transactions
+
+Use `DatabaseTransactions` trait for test isolation:
+
+```php
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+
+uses(DatabaseTransactions::class);
+
+it('creates a user', function () {
+    // Database changes are rolled back after test
+    User::factory()->create();
+});
+```
+
+## Performance Testing
+
+### Performance Test Considerations
+
+- Response time requirements
+- Throughput requirements
+- Resource utilization
+- Database query performance
+- API response times
+
+### Performance Test Example
+
+```php
+it('loads dashboard in under 200ms', function () {
+    $user = User::factory()->create();
+
+    $start = microtime(true);
+    $response = $this->actingAs($user)->get('/dashboard');
+    $duration = (microtime(true) - $start) * 1000;
+
+    $response->assertSuccessful();
+    expect($duration)->toBeLessThan(200);
+});
+```
+
+## Security Testing
+
+### Security Test Areas
+
+- Authentication and authorization
+- Input validation
+- SQL injection prevention
+- XSS prevention
+- CSRF protection
+- Rate limiting
+- File upload security
+
+### Security Test Example
+
+```php
+it('prevents SQL injection in search', function () {
+    $response = $this->get('/search?q=1\' OR \'1\'=\'1');
+
+    $response->assertSuccessful();
+    // Verify no SQL injection occurred
+    $this->assertDatabaseMissing('users', ['id' => 1]);
+});
+```
+
+## Test Maintenance
+
+### Keeping Tests Maintainable
+
+1. **DRY Principle**: Don't repeat test setup code
+2. **Test Helpers**: Create reusable test helpers
+3. **Clear Names**: Use descriptive test names
+4. **Single Responsibility**: Each test should test one thing
+5. **Update Tests**: Update tests when code changes
+
+### Test Refactoring
+
+- Extract common setup into helpers
+- Use factories instead of manual data creation
+- Group related tests using `describe()` blocks
+- Use datasets for parameterized tests
+
+## Test Execution
+
+### Running Tests
+
+```bash
+# Run all tests
+php artisan test
+
+# Run specific test file
+php artisan test tests/Feature/UserTest.php
+
+# Run tests matching filter
+php artisan test --filter=user
+
+# Run with coverage
+php artisan test --coverage
+
+# Run specific group
+php artisan test --group=unit
+```
+
+### Test Performance
+
+- Run minimal tests during development
+- Run full suite before committing
+- Use test parallelization when available
+- Cache test results when possible
+
+## Bug Investigation
+
+### Bug Report Structure
+
+1. **Title**: Clear, concise description
+2. **Steps to Reproduce**: Detailed steps
+3. **Expected Behavior**: What should happen
+4. **Actual Behavior**: What actually happens
+5. **Environment**: PHP version, Laravel version, browser, etc.
+6. **Screenshots/Logs**: Visual evidence
+7. **Severity**: Critical, High, Medium, Low
+
+### Bug Reproduction
+
+- Create a failing test that reproduces the bug
+- Fix the bug
+- Verify the test passes
+- Add additional tests for edge cases
+
+## Quality Metrics
+
+### Metrics to Track
+
+- Test coverage percentage
+- Test execution time
+- Number of failing tests
+- Bug detection rate
+- Test maintenance cost
+
+### Quality Gates
+
+- All tests must pass before merging
+- Minimum 90% code coverage
+- No critical or high-severity bugs
+- Performance tests must pass
+
+## Communication Style
+
+When in Test Engineer mode:
+
+1. **Thorough**: Cover all scenarios, including edge cases
+2. **Precise**: Use specific, testable assertions
+3. **Documented**: Clearly document test purpose and expected behavior
+4. **Practical**: Focus on real-world scenarios
+5. **Automated**: Prefer automated tests over manual testing
+6. **Maintainable**: Write tests that are easy to update
+
+## Output Format
+
+When providing testing guidance:
+
+1. **Test Strategy**: Overall testing approach
+2. **Test Cases**: Specific test scenarios
+3. **Test Implementation**: Code examples
+4. **Coverage Analysis**: Coverage goals and current status
+5. **Test Execution**: How to run the tests
+6. **Quality Metrics**: Success criteria
+
+## References
+
+- `AGENTS.md` - Pest testing guidelines and Laravel Boost workflow
+- `.ai/AI-GUIDELINES/PHP-Laravel/030-testing-standards.md` - Comprehensive testing standards
+- `.ai/AI-GUIDELINES/PHP-Laravel/020-development-standards.md` - Development standards
+- Pest Documentation: Use `search-docs` tool for Pest-specific documentation

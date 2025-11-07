@@ -1,0 +1,176 @@
+= Project Overview and Architecture
+
+:docinfo shared:
+:toc:
+:toc-title: Table of Contents
+
+== 1. Introduction
+
+This document provides a comprehensive overview of the Laravel Livewire Starter Kit project, including its architecture, package ecosystem, and design principles.
+
+== 2. Project Overview
+
+The Laravel Livewire Starter Kit is the official starter kit for building Laravel applications with Livewire. It provides a modern, type-safe foundation with comprehensive tooling for development, testing, and deployment.
+
+=== 2.1. Key Characteristics
+
+* **Framework**: Laravel 12.x
+* **Frontend**: Livewire 4 with Volt (Single File Components)
+* **PHP Version**: 8.5+
+* **Package Manager**: Bun (exclusive - do not use npm, npx, or yarn)
+* **Styling**: Tailwind CSS 4
+* **Testing**: Pest 4 with browser testing capabilities
+* **Type Safety**: PHPStan Level 10 (max) compliance required
+
+=== 2.2. Project Structure
+
+The project follows Laravel 12's streamlined structure:
+
+* `bootstrap/app.php` - Application bootstrap and configuration
+* `bootstrap/providers.php` - Service provider registration
+* `app/` - Application code following PSR-4 autoloading
+* `routes/` - Route definitions
+* `resources/` - Views, assets, and frontend resources
+* `tests/` - Test suite organized by type (Feature, Unit, Browser, etc.)
+
+== 3. Package Ecosystem Overview
+
+=== 3.1. Production Dependencies (27 packages)
+
+The application includes 27 production dependencies organized into categories:
+
+* **Laravel Core** (3 packages): Framework, Folio (file-based routing), Tinker
+* **Livewire Ecosystem** (4 packages): Livewire 4, Volt, Flux, Flux Pro
+* **Admin Panel** (1 package): Filament 5.x-dev
+* **Authentication** (2 packages): Fortify, WorkOS
+* **Queue & Performance** (3 packages): Horizon, Octane, Scout
+* **Observability** (4 packages): Telescope, Activity Log, Health, Schedule Monitor
+* **Spatie Packages** (8 packages): Activity Log, Analytics, Backup, Event Sourcing, Health, Markdown, Media Library, Schedule Monitor, Settings
+* **Search** (1 package): Typesense
+* **Runtime** (1 package): FrankenPHP Symfony Runtime
+
+=== 3.2. Development Dependencies (39 packages)
+
+The development environment includes 39 packages organized into categories:
+
+* **Debugging Tools** (4 packages): Debugbar, IDE Helper, Ray, Web Tinker
+* **Code Quality** (7 packages): Larastan (PHPStan), Pint, Rector, Type Perfect, and related extensions
+* **Testing Framework** (10 packages): Pest 4, PHPUnit, Mockery, Laravel Test Assertions, Pest plugins
+* **Development Tools** (5 packages): Boost, Pail, Sail, Blueprint, Solo
+* **Spatie Dev Tools** (6 packages): Blade Comments, Horizon Watcher, Login Link, Missing Page Redirector, Queueable Action, Snapshots
+* **Other Dev Tools** (7 packages): Composer Normalize, Faker, Security Advisories, etc.
+
+=== 3.3. Frontend Dependencies
+
+The frontend build system includes:
+
+* **Build Tools**: Vite 7, Rolldown Vite, Laravel Vite Plugin
+* **Styling**: Tailwind CSS 4, Autoprefixer, Tailwind Vite plugin
+* **Code Quality**: Prettier 3 with plugins (organize-imports, tailwindcss, packagejson)
+* **Testing**: Playwright, Vitest
+* **Utilities**: Axios, Bun Git Hooks, Concurrently
+* **Optional Dependencies**: Platform-specific binaries for Rollup, Tailwind CSS Oxide, and Lightning CSS
+
+== 4. Architectural Patterns
+
+=== 4.1. Domain-Driven Design
+
+The application follows Domain-Driven Design principles with clear layer separation:
+
+* **Application Layer**: Business logic and use cases
+* **Domain Layer**: Core business entities and value objects
+* **Infrastructure Layer**: External integrations and implementations
+* **Presentation Layer**: UI components and user interactions
+
+=== 4.2. Component Architecture
+
+* **Livewire Components**: Server-side rendered interactive components
+* **Volt Single File Components**: Simplified component syntax combining PHP and Blade
+* **Flux UI Components**: Pre-built, accessible UI component library
+* **Blade Templates**: Server-side templating with Livewire integration
+
+=== 4.3. State Management
+
+* **State Machines**: Spatie Laravel Model States for complex state transitions
+* **Model Status**: Spatie Laravel Model Status for status tracking
+* **Feature Flags**: Spatie Laravel Model Flags for feature toggles
+
+== 5. Design Principles
+
+=== 5.1. Type Safety
+
+* **PHPStan Level 10**: Maximum strictness for static analysis
+* **Strict Types**: All PHP files use `declare(strict_types=1)`
+* **Type Coverage**: 100% type coverage target for tests
+* **Explicit Return Types**: All methods must have explicit return types
+
+=== 5.2. Code Quality
+
+* **Laravel Pint**: Automated code formatting (PSR-12)
+* **Rector**: Automated code refactoring and modernization
+* **PHPStan**: Static analysis at maximum level
+* **Type Perfect**: Additional type checking for Rector
+
+=== 5.3. Testing Standards
+
+* **Pest 4**: Modern testing framework with browser testing
+* **100% Coverage**: Target for unit tests
+* **Browser Testing**: Real browser testing with Playwright
+* **Type Coverage**: 100% type coverage requirement
+
+== 6. Integration Points
+
+=== 6.1. Laravel Integration
+
+All packages integrate with Laravel's service container:
+
+* **Service Providers**: Auto-discovery enabled for most packages
+* **Facades**: Available where appropriate
+* **Events**: Event-driven architecture throughout
+* **Middleware**: Request/response processing
+* **Queues**: Background job processing with Horizon
+
+=== 6.2. Frontend Integration
+
+* **Bun**: Fast JavaScript runtime and package manager (exclusive - use `bun` and `bunx`, never `npm`/`npx`/`yarn`)
+* **Vite**: Modern build tool with HMR (Hot Module Replacement)
+* **Livewire**: Server-side components with client-side interactivity
+* **Tailwind CSS 4**: Utility-first CSS framework
+
+== 7. Custom Repositories
+
+The project uses two custom Composer repositories:
+
+* **Flux Pro**: `https://composer.fluxui.dev` - Commercial Flux UI components
+* **Laravel Comments**: `https://satis.spatie.be` - Spatie's private packages
+
+== 8. Version Constraints
+
+The project uses a hybrid approach to version constraints:
+
+=== 8.1. Core Packages (Stable)
+
+Core packages use stable versions for stability:
+* `laravel/framework: ^12.36` - Stable Laravel 12
+* `livewire/livewire: ^4.0` - Stable Livewire 4
+
+=== 8.2. Development Packages
+
+Some newer packages use development versions for cutting-edge features:
+* `filament/filament: ^5.x-dev` - Development version of Filament 5
+* `laravel/folio: dev-master` - Development version of Folio
+* `livewire/volt: dev-main` - Development version of Volt
+* `roave/security-advisories: dev-latest` - Latest security advisories
+
+This hybrid approach balances stability for core packages with access to latest features for newer packages.
+
+== 9. Next Steps
+
+After reading this overview, proceed to:
+
+* xref:030-php-runtime.adoc[php-runtime.adoc] - Set up PHP 8.5+ runtime
+* xref:040-laravel-core.adoc[laravel-core.adoc] - Configure Laravel Framework 12.x
+
+== 10. Navigation
+
+xref:README.adoc[← README] | xref:030-php-runtime.adoc[Next: PHP Runtime →]

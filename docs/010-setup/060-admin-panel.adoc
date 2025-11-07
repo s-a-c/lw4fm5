@@ -1,0 +1,544 @@
+= Filament 5.x-dev Admin Panel Setup
+
+:docinfo shared:
+:toc:
+:toc-title: Table of Contents
+
+== 1. Introduction
+
+This document covers the installation and configuration of Filament 5.x-dev, a modern admin panel framework for Laravel.
+
+== 2. Filament 5.x-dev
+
+=== 2.1. Package Overview
+
+**Package Name**: `filament/filament`
+**Version**: `^5.x-dev`
+**Purpose**: Admin panel framework for Laravel applications
+**Architectural Role**: Provides complete admin interface with resource management, forms, tables, and more
+
+**What is Filament?**
+Filament is a powerful admin panel framework that allows you to quickly build beautiful, feature-rich admin interfaces for your Laravel application without writing much code. It provides a complete set of tools for managing your application's data.
+
+**Why use Filament?**
+* **Fast Development**: Create full admin panels in minutes instead of hours
+* **Beautiful UI**: Modern, responsive interface out of the box
+* **No Frontend Required**: Everything is built with PHP and Blade - no React, Vue, or JavaScript knowledge needed
+* **Fully Integrated**: Works seamlessly with Laravel's Eloquent models, validation, and authentication
+* **Extensible**: Easy to customize and extend with plugins
+* **Production Ready**: Used by many large-scale applications
+
+**What can you build with Filament?**
+* **Admin Dashboards**: Complete admin interfaces for managing your application
+* **CRUD Operations**: Create, Read, Update, Delete operations for any model
+* **Data Tables**: Sortable, filterable, searchable data tables
+* **Forms**: Complex forms with validation and file uploads
+* **Reports**: Generate reports and export data
+* **User Management**: Manage users, roles, and permissions
+* **Content Management**: Manage blog posts, products, or any content
+
+**Real-World Examples:**
+* **E-commerce Admin**: Manage products, orders, customers
+* **Blog Admin**: Manage posts, categories, comments
+* **SaaS Admin**: Manage subscriptions, users, settings
+* **CRM Admin**: Manage contacts, deals, activities
+
+=== 2.2. Key Features
+
+* **Resource Management (CRUD)**: Full Create, Read, Update, Delete operations for Eloquent models
+* **Form Builder**: Declarative form building with validation, file uploads, and complex fields
+* **Table Builder**: Powerful tables with sorting, filtering, searching, and pagination
+* **Action System**: Bulk actions, row actions, and header actions
+* **Widget System**: Dashboard widgets for statistics, charts, and data visualization
+* **Multi-tenancy Support**: Build multi-tenant applications
+* **Media Library Integration**: Manage file uploads with Spatie Media Library
+* **Permission Integration**: Role-based access control with Spatie Permission
+* **Authentication**: Built-in authentication system
+* **Notifications**: Toast notifications and alerts
+* **Modals**: Modal dialogs for forms and confirmations
+* **Dark Mode**: Automatic dark mode support
+
+=== 2.3. Principles and Patterns
+
+* **Resource Pattern**: Each Eloquent model gets a resource class
+* **Form Builder Pattern**: Declarative form definitions
+* **Table Builder Pattern**: Declarative table definitions
+* **Widget Pattern**: Reusable dashboard widgets
+
+**Source**: https://filamentphp.com/docs/getting-started[Filament Getting Started] | https://filamentphp.com/docs/resources[Filament Resources Documentation]
+
+=== 2.4. Installation Verification
+
+[source,bash]
+----
+# Verify Filament installation
+composer show filament/filament
+
+# Check Filament version
+php artisan filament:version
+----
+
+=== 2.4. Installation Using Artisan Command
+
+Use the `php artisan filament:install` command to install Filament. This command sets up everything you need to get started.
+
+**Installation Command:**
+
+[source,bash]
+----
+php artisan filament:install --panels
+----
+
+**What Happens During Installation:**
+
+1. **Creates Panel Provider**: Creates `app/Providers/Filament/AdminPanelProvider.php`
+2. **Registers Panel**: Automatically registers the panel in `bootstrap/providers.php`
+3. **Publishes Configuration**: Creates configuration files (if needed)
+4. **Sets Up Routes**: Creates admin panel routes (typically at `/admin`)
+5. **Installs Assets**: Sets up CSS and JavaScript assets
+
+**Expected Output:**
+
+[source,text]
+----
+  INFO  Installing Filament panels...
+
+  INFO  Creating AdminPanelProvider...
+
+  INFO  Filament panel [admin] has been created.
+
+  INFO  Admin panel URL: http://localhost/admin
+
+  SUCCESS  Filament installed successfully.
+----
+
+=== 2.5. What Gets Installed
+
+==== 2.5.1. Files Created
+
+* `app/Providers/Filament/AdminPanelProvider.php` - Main panel configuration file
+* `config/filament.php` - Filament configuration (if published)
+* Assets in `public/build/filament/` - CSS and JavaScript files
+
+==== 2.5.2. Configuration Updates
+
+* `bootstrap/providers.php` - AdminPanelProvider automatically registered
+* Routes automatically registered at `/admin` (configurable)
+
+==== 2.5.3. Database Requirements
+
+Filament uses Laravel's existing User model for authentication. No additional migrations are required unless you're using Filament Shield for permissions.
+
+=== 2.6. Configuration Steps
+
+[cols="1,3,3,2,2"]
+|===
+|Step # |Task/Configuration Item |Command/File/Code |Expected Result |Verification Method
+
+|1
+|Verify installation
+|`composer show filament/filament`
+|Package version displayed
+|^5.x-dev shown
+
+|2
+|Install Filament with admin panel
+|`php artisan filament:install --panels`
+|Filament installed, AdminPanelProvider created
+|File exists at `app/Providers/Filament/AdminPanelProvider.php`
+
+|3
+|Create admin user
+|`php artisan make:filament-user`
+|Admin user created with email and password
+|Can login at `/admin`
+
+|4
+|Access admin panel
+|Visit `http://localhost/admin` in browser
+|Login page displayed
+|Can login with created user
+
+|5
+|Configure panel (optional)
+|Edit `app/Providers/Filament/AdminPanelProvider.php`
+|Panel customized (name, logo, etc.)
+|Changes reflected in admin panel
+
+|6
+|Publish assets (optional)
+|`php artisan filament:assets`
+|Assets published to public directory
+|Assets accessible
+|===
+
+=== 2.7. Creating Your First Admin User
+
+After installing Filament, you need to create an admin user to access the admin panel:
+
+[source,bash]
+----
+php artisan make:filament-user
+----
+
+**What This Command Does:**
+
+The command will prompt you for:
+1. **Name**: The user's full name
+2. **Email**: The user's email address (used for login)
+3. **Password**: The user's password (you'll be prompted to enter it twice)
+
+**Example Interaction:**
+
+[source,text]
+----
+Name:
+> Admin User
+
+Email address:
+> admin@example.com
+
+Password:
+>
+
+Confirm password:
+>
+
+  SUCCESS  User [admin@example.com] created successfully.
+
+You may now log in at http://localhost/admin
+----
+
+**Important Notes:**
+* The email address is used for login
+* Make sure to use a strong password
+* You can create multiple admin users
+* Users are stored in your `users` table (standard Laravel User model)
+
+=== 2.8. Creating Your First Resource
+
+Resources in Filament represent your Eloquent models in the admin panel. Each resource provides a complete CRUD (Create, Read, Update, Delete) interface for a model.
+
+==== 2.8.1. Create a Resource
+
+To create a resource for a model (e.g., User model):
+
+[source,bash]
+----
+php artisan make:filament-resource User
+----
+
+**What This Command Creates:**
+
+* `app/Filament/Resources/UserResource.php` - Main resource class (defines forms, tables, etc.)
+* `app/Filament/Resources/UserResource/Pages/ListUsers.php` - List/table page
+* `app/Filament/Resources/UserResource/Pages/CreateUser.php` - Create page
+* `app/Filament/Resources/UserResource/Pages/EditUser.php` - Edit page
+
+**After Creation:**
+
+Once created, the resource automatically appears in your admin panel's navigation menu. You can:
+* View all users in a table
+* Create new users
+* Edit existing users
+* Delete users
+
+==== 2.8.2. Understanding the Resource File
+
+The main resource file (`UserResource.php`) defines how your model appears in the admin panel:
+
+=== 2.9. Resource Configuration Example
+
+[source,php]
+----
+<?php
+
+declare(strict_types=1);
+
+namespace App\Filament\Resources;
+
+use App\Models\User;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+
+class UserResource extends Resource
+{
+    // The Eloquent model this resource manages
+    protected static ?string $model = User::class;
+
+    // Icon shown in the navigation menu
+    protected static ?string $navigationIcon = 'heroicon-o-users';
+
+    // Defines the form fields for creating/editing users
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                // Name field - required, max 255 characters
+                Forms\Components\TextInput::make('name')
+                    ->required()  // Field is required
+                    ->maxLength(255),  // Maximum length
+
+                // Email field - must be valid email, required
+                Forms\Components\TextInput::make('email')
+                    ->email()  // Validates email format
+                    ->required()  // Field is required
+                    ->maxLength(255),  // Maximum length
+
+                // Password field (optional - add if needed)
+                // Forms\Components\TextInput::make('password')
+                //     ->password()  // Hides input
+                //     ->required()
+                //     ->minLength(8),
+            ]);
+    }
+
+    // Defines the table columns and actions
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                // Name column - searchable
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable(),  // Can search by name
+
+                // Email column - searchable
+                Tables\Columns\TextColumn::make('email')
+                    ->searchable(),  // Can search by email
+
+                // Created at column - formatted date
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()  // Format as date/time
+                    ->sortable(),  // Can sort by this column
+            ])
+            ->filters([
+                // Add filters here (e.g., filter by role, date range)
+                // Tables\Filters\SelectFilter::make('role')
+                //     ->options([
+                //         'admin' => 'Admin',
+                //         'user' => 'User',
+                //     ]),
+            ])
+            ->actions([
+                // Actions available for each row
+                Tables\Actions\EditAction::make(),  // Edit button
+                Tables\Actions\DeleteAction::make(),  // Delete button (optional)
+            ])
+            ->bulkActions([
+                // Actions available when multiple rows are selected
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),  // Delete selected
+                ]),
+            ]);
+    }
+}
+----
+
+== 3. Environment Variables
+
+[cols="2,3,2"]
+|===
+|Variable |Description |Default
+
+|FILAMENT_DOMAIN
+|Filament admin domain (optional)
+|(empty)
+
+|FILAMENT_PATH
+|Admin panel path
+|admin
+|===
+
+== 4. Integration Points
+
+=== 4.1. With Laravel
+
+* Uses Laravel's authentication system
+* Integrates with Eloquent models
+* Uses Laravel's validation
+* Leverages Laravel's file storage
+
+=== 4.2. With Spatie Packages
+
+* **Media Library**: File uploads and media management
+* **Permission**: Role-based access control
+* **Settings**: Application settings management
+
+=== 2.10. Understanding Filament Components
+
+**Forms**: Filament forms are built using components. Each component represents a form field:
+
+* `TextInput` - Text input fields
+* `Textarea` - Multi-line text inputs
+* `Select` - Dropdown selects
+* `Checkbox` - Checkboxes
+* `Toggle` - Toggle switches
+* `DatePicker` - Date selection
+* `FileUpload` - File uploads
+* And many more...
+
+**Tables**: Filament tables display data in columns:
+
+* `TextColumn` - Text data
+* `ImageColumn` - Images
+* `BooleanColumn` - True/false values
+* `BadgeColumn` - Colored badges
+* `SelectColumn` - Dropdown selects in tables
+* And more...
+
+**Actions**: Actions are buttons that perform operations:
+
+* `EditAction` - Edit a record
+* `DeleteAction` - Delete a record
+* `ViewAction` - View a record
+* `CreateAction` - Create a new record
+* Custom actions - Your own custom actions
+
+=== 2.11. Customizing the Panel
+
+Edit `app/Providers/Filament/AdminPanelProvider.php` to customize your panel:
+
+[source,php]
+----
+use Filament\Http\Middleware\Authenticate;
+use Filament\Panel;
+use Filament\PanelProvider;
+
+class AdminPanelProvider extends PanelProvider
+{
+    public function panel(Panel $panel): Panel
+    {
+        return $panel
+            ->default()
+            ->id('admin')  // Panel ID
+            ->path('admin')  // URL path (/admin)
+            ->login()  // Enable login page
+            ->brandName('My App')  // Change brand name
+            ->brandLogo(asset('images/logo.png'))  // Add logo
+            ->darkMode(true)  // Enable dark mode
+            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->middleware([
+                Authenticate::class,
+            ]);
+    }
+}
+----
+
+== 3. Environment Variables
+
+[cols="2,3,2"]
+|===
+|Variable |Description |Default
+
+|FILAMENT_DOMAIN
+|Filament admin domain (optional, for subdomain setup)
+|(empty)
+
+|FILAMENT_PATH
+|Admin panel URL path
+|admin
+
+|APP_URL
+|Application URL (required for asset URLs)
+|http://localhost
+|===
+
+== 4. Integration Points
+
+=== 4.1. With Laravel
+
+* **Authentication**: Uses Laravel's authentication system
+* **Eloquent Models**: Works directly with your Eloquent models
+* **Validation**: Uses Laravel's validation rules
+* **File Storage**: Uses Laravel's file storage system
+* **Events**: Fires Laravel events for extensibility
+
+=== 4.2. With Spatie Packages
+
+* **Media Library**: File uploads and media management with `spatie/laravel-medialibrary`
+* **Permission**: Role-based access control with `spatie/laravel-permission`
+* **Settings**: Application settings management with `spatie/laravel-settings`
+
+=== 4.3. With Livewire
+
+* **Built on Livewire**: Filament is built on top of Livewire
+* **Reactive Components**: All Filament components are reactive
+* **Real-time Updates**: Tables and forms update in real-time
+
+== 5. Troubleshooting
+
+=== 5.1. Issue: Admin Panel Not Accessible
+
+**Symptom**: Cannot access `/admin` route, getting 404 error
+
+**Solution**:
+
+1. Verify panel is registered:
+[source,bash]
+----
+php artisan route:list | grep filament
+----
+
+2. Check that `AdminPanelProvider` is in `bootstrap/providers.php`
+
+3. Clear route cache:
+[source,bash]
+----
+php artisan route:clear
+php artisan config:clear
+----
+
+=== 5.2. Issue: Assets Not Loading
+
+**Symptom**: Admin panel styling missing, looks broken
+
+**Solution**:
+
+1. Publish assets:
+[source,bash]
+----
+php artisan filament:assets
+----
+
+2. Clear all caches:
+[source,bash]
+----
+php artisan optimize:clear
+----
+
+3. Check `APP_URL` in `.env` is correct
+
+=== 5.3. Issue: Cannot Create Admin User
+
+**Symptom**: `make:filament-user` command fails
+
+**Solution**:
+
+1. Verify User model exists: `app/Models/User.php`
+2. Check database connection is working: `php artisan migrate:status`
+3. Ensure users table exists: `php artisan migrate`
+
+=== 5.4. Issue: Resource Not Appearing in Navigation
+
+**Symptom**: Created resource doesn't show in admin panel menu
+
+**Solution**:
+
+1. Verify resource file exists: `app/Filament/Resources/UserResource.php`
+2. Check resource extends `Resource` class correctly
+3. Clear config cache: `php artisan config:clear`
+4. Check navigation group configuration in resource
+
+== 6. Next Steps
+
+After configuring Filament:
+
+* xref:070-auth-security.adoc[auth-security.adoc] - Set up Fortify and WorkOS authentication
+
+== 7. Navigation
+
+xref:050-livewire-ecosystem.adoc[← Livewire Ecosystem] | xref:070-auth-security.adoc[Next: Auth & Security →]

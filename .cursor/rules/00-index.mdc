@@ -1,0 +1,130 @@
+---
+description: Index and quick reference for all cursorrules
+alwaysApply: true
+---
+
+# Cursor Rules Index
+
+This file provides a quick reference to all available cursorrules and their purposes.
+
+## Always Applied Rules
+
+These rules are automatically applied to all AI interactions:
+
+1. **00-persona.mdc**: Core AI persona, communication style, and decision-making protocols
+2. **01-ai-guidelines.mdc**: AI-GUIDELINES orchestration policy and compliance requirements
+3. **byterover-rules.mdc**: ByteRover MCP knowledge management tools
+4. **laravel-boost.mdc**: Laravel Boost workflow guidelines and tool usage
+
+## Mode-Specific Rules
+
+These rules are applied on-demand when the user requests specific expertise:
+
+### Architect Mode (`.cursor/rules/modes/architect.mdc`)
+
+**When to use**: System design, scalability, integration patterns, architecture documentation
+
+**Key capabilities**:
+
+- System architecture design
+- Scalability planning
+- Technology evaluation
+- Integration patterns
+- Risk assessment
+- Architecture documentation (ADRs, diagrams)
+
+**Activation**: "Please use architect mode" or "I need architectural guidance"
+
+### Product Manager Mode (`.cursor/rules/modes/product-manager.mdc`)
+
+**When to use**: PRDs, user stories, feature prioritization, roadmap planning
+
+**Key capabilities**:
+
+- Product Requirements Documents (PRDs)
+- User story creation
+- Feature prioritization
+- Roadmap planning
+- Success metrics definition
+- Stakeholder communication
+
+**Activation**: "Please use product manager mode" or "I need to create a PRD"
+
+### Test Engineer Mode (`.cursor/rules/modes/tester.mdc`)
+
+**When to use**: Test strategy, test cases, test automation, quality assurance
+
+**Key capabilities**:
+
+- Test strategy development
+- Test case creation (unit, feature, integration, E2E, browser)
+- Test automation
+- Quality assurance planning
+- Bug investigation
+- Test coverage analysis (90% minimum)
+- Performance testing
+
+**Activation**: "Please use tester mode" or "I need help with testing"
+
+## Quick Reference
+
+### Common Tasks
+
+| Task | Recommended Mode | Additional Rules |
+|------|-----------------|------------------|
+| Create PRD | Product Manager | - |
+| Design Architecture | Architect | - |
+| Implement Feature | Standard (Laravel Boost) | - |
+| Create Tests | Tester | - |
+| Full Feature Workflow | All modes (sequential) | - |
+| Code Review | Standard | - |
+| Bug Investigation | Tester | - |
+| Performance Optimization | Architect + Standard | - |
+| Security Review | Standard (Security guidelines) | - |
+
+### Mode Activation Examples
+
+```markdown
+# Architect Mode
+
+"Please use architect mode to design the system architecture"
+"I need architectural guidance for scaling this application"
+
+# Product Manager Mode
+
+"Please use product manager mode to create a PRD"
+"I need help prioritizing features - use product manager mode"
+
+# Tester Mode
+
+"Please use tester mode to create comprehensive tests"
+"I need a test strategy - use tester mode"
+```
+
+## Rule Hierarchy
+
+1. **Always Applied Rules** (00-persona, 01-ai-guidelines, byterover-rules, laravel-boost)
+2. **Mode-Specific Rules** (activated on-demand)
+3. **Project-Specific Guidelines** (AGENTS.md, AI-GUIDELINES.md)
+
+## Compliance Checklist
+
+All AI interactions should:
+
+- [ ] Follow core persona and communication style
+- [ ] Comply with AI-GUIDELINES orchestration policy
+- [ ] Use ByteRover MCP tools appropriately
+- [ ] Follow Laravel Boost workflow guidelines
+- [ ] Apply mode-specific expertise when requested
+- [ ] Maintain junior developer focus
+- [ ] Ensure 90%+ test coverage
+- [ ] Apply security principles
+- [ ] Consider performance implications
+- [ ] Document decisions and patterns
+
+## Getting Help
+
+- Review `.cursor/rules/README.md` for detailed documentation
+- Check mode-specific `.mdc` files for detailed capabilities
+- Refer to `AGENTS.md` for Laravel Boost workflow
+- Consult `.ai/AI-GUIDELINES.md` for comprehensive standards

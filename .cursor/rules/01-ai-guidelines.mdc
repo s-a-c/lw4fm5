@@ -1,0 +1,105 @@
+---
+description: AI-GUIDELINES.md orchestration policy and compliance requirements
+alwaysApply: true
+---
+
+# AI-GUIDELINES Orchestration Policy
+
+## Policy Context
+
+This project follows comprehensive guidelines defined in:
+
+- **AI-GUIDELINES.md**: Main guidelines document with orchestration policy, security principles, and decision-making protocols
+- **AGENTS.md**: Laravel Boost-specific workflow guidelines, tool usage, and framework-specific conventions
+- **AI-GUIDELINES/**: Detailed, technology-specific implementation guides
+
+## Policy Acknowledgement
+
+All AI-authored artifacts (files, commit messages, documentation, etc.) MUST include an acknowledgment header:
+
+```markdown
+Compliant with [AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v<checksum>
+```
+
+The checksum MUST match the current composite checksum at the time of authoring (computed by `./.ai/scripts/policy-check.php`).
+
+## Sensitive Actions Rule Citation
+
+When performing sensitive actions (security-affecting changes, code execution, external access, CI configuration), you MUST cite the exact rule(s) you are following with clickable references to the specific file and line number.
+
+**Example Format**:
+
+- `rule [AI-GUIDELINES/PHP-Laravel/040-security-standards.md#L41](.ai/AI-GUIDELINES/PHP-Laravel/040-security-standards.md#L41)`
+
+This ensures transparency and traceability for all sensitive operations.
+
+## Core Principles
+
+### Clarity for Junior Developers
+
+All documents, code, and responses should be clear, actionable, and suitable for a junior developer to understand and implement.
+
+### Generality over Specificity
+
+General principles take precedence over specific instructions. Inconsistencies should be documented with recommendations.
+
+### Hybrid Format
+
+- **Standard Markdown (.md)**: For human-readable principles and guidelines
+- **Markdown Context (.mdc)**: For machine-actionable, project-specific instructions
+
+## Security Principles
+
+### No Secrets in Repository
+
+- **Rule**: Do not include secrets, API keys, passwords, tokens, or any other bearer credentials in the repository
+- **Action**: If a scanning tool detects a secret-like token, the task MUST fail, and the secret must be remediated immediately
+
+### Path Policy
+
+- **Rule**: Disallow committing files that match sensitive patterns, such as `tests/Support/Fixtures/*.secrets.*`, unless they are explicitly exempted with a documented risk acceptance
+
+## Guideline Structure Reference
+
+All detailed, project-specific, and technology-specific guidelines are organized within the `.ai/AI-GUIDELINES/` directory:
+
+- **PHP-Laravel/**: Laravel 12, PHP 8.4, development standards, testing, security, performance
+- **JavaScript-TypeScript/**: Frontend development standards
+- **Shell-CLI/**: Command-line tool standards
+- **Documentation/**: Documentation creation and maintenance standards
+- **RD-Analysis/**: Research and development analysis guidelines
+- **Workflows/**: Workflow-specific guidelines and templates
+
+## Document Hierarchy
+
+When working with Laravel projects:
+
+1. **Start with AGENTS.md**: For Laravel Boost tool usage and workflow patterns
+2. **Reference AI-GUIDELINES.md**: For comprehensive development standards and decision-making protocols
+3. **Use AI-GUIDELINES/PHP-Laravel/**: For detailed implementation guides
+
+## Compliance Checklist
+
+Before finalizing any changes:
+
+- [ ] Policy acknowledgement header included (if creating new files)
+- [ ] Sensitive actions have rule citations
+- [ ] Security principles followed (no secrets, path policy)
+- [ ] Guidelines reviewed for relevant patterns
+- [ ] Testing strategy planned (90% coverage minimum)
+- [ ] Documentation needs identified
+- [ ] Knowledge stored/retrieved as appropriate
+
+## Drift Detection
+
+If the `guidelinesChecksum` changes since the last recorded run, you MUST re-acknowledge the new guidelines before proceeding. CI and pre-commit checks will fail if drift is detected without an updated acknowledgement.
+
+## Enforcement
+
+This policy is enforced by:
+
+- **CLI Validator**: `php ./.ai/scripts/policy-check.php` - Validates compliance and checksums
+- **Pre-commit Hooks**: Automated validation before commits
+- **GitHub Actions Workflow**: CI/CD pipeline enforcement
+
+Violations produce actionable, clickable output and a non-zero exit status, enabling immediate remediation.

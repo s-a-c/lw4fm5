@@ -1,0 +1,621 @@
+= Livewire 4, Volt, Flux, and Flux Pro Setup
+
+:docinfo shared:
+:toc:
+:toc-title: Table of Contents
+
+== 1. Introduction
+
+This document covers the installation and configuration of the Livewire ecosystem packages: Livewire 4, Volt, Flux, and Flux Pro.
+
+== 2. Livewire 4
+
+=== 2.1. Package Overview
+
+**Package Name**: `livewire/livewire`
+**Version**: `^4.0`
+**Purpose**: Server-side rendered interactive components for Laravel
+**Architectural Role**: Frontend interactivity layer providing reactive UI without writing JavaScript
+
+**What is Livewire?**
+Livewire is a full-stack framework for building dynamic, reactive user interfaces in Laravel applications without writing custom JavaScript. It allows you to create interactive components using only PHP and Blade templates.
+
+**How Livewire Works:**
+1. You create a PHP class (component) that holds the component's state and logic
+2. You create a Blade view that displays the UI
+3. When users interact with the component (click buttons, fill forms, etc.), Livewire sends AJAX requests to the server
+4. The server processes the request, updates the state, and returns the updated HTML
+5. Livewire automatically updates the page without a full refresh
+
+**Why use Livewire?**
+* **No JavaScript Required**: Build interactive UIs using only PHP and Blade
+* **Familiar Syntax**: Uses Laravel's existing patterns (controllers, models, Blade)
+* **Real-time Updates**: Components update automatically when state changes
+* **Easy Learning Curve**: If you know Laravel, you can learn Livewire quickly
+* **Full Laravel Integration**: Access all Laravel features (Eloquent, validation, authentication, etc.)
+
+**Real-World Examples:**
+* **Forms**: Create dynamic forms with validation that updates in real-time
+* **Counters**: Build counters, toggles, and interactive buttons
+* **Search**: Implement live search that filters results as you type
+* **Dashboards**: Create dashboards that update without page refreshes
+* **File Uploads**: Upload files with progress bars
+* **Data Tables**: Build sortable, filterable data tables
+
+=== 2.2. Key Features
+
+* **Server-Side Rendered Components**: Components render on the server, reducing JavaScript complexity
+* **Real-Time Updates**: UI updates automatically without page refresh
+* **Two-Way Data Binding**: Changes in the UI automatically update component properties and vice versa
+* **File Uploads**: Upload files with progress tracking
+* **Polling**: Automatically refresh component data at intervals
+* **Lazy Loading**: Load components only when they're visible
+* **Event System**: Components can communicate with each other via events
+* **Validation**: Built-in form validation with error display
+* **Lifecycle Hooks**: Methods that run at specific points in a component's lifecycle
+
+=== 2.3. Principles and Patterns
+
+* **Server-Side Rendering**: Components render on the server, reducing JavaScript complexity
+* **Reactive Pattern**: Components automatically update when state changes
+* **Component-Based Architecture**: Reusable UI components
+* **Event-Driven Communication**: Components communicate via events
+
+**Source**: https://livewire.laravel.com/docs/quickstart[Livewire Quickstart] | https://livewire.laravel.com/docs/components[Livewire Components Documentation]
+
+=== 2.4. Installation Verification
+
+[source,bash]
+----
+# Verify Livewire installation
+composer show livewire/livewire
+
+# Check Livewire version
+php artisan livewire:version
+----
+
+=== 2.5. Configuration Steps
+
+[cols="1,3,3,2,2"]
+|===
+|Step # |Task/Configuration Item |Command/File/Code |Expected Result |Verification Method
+
+|1
+|Verify installation
+|`composer show livewire/livewire`
+|Package version displayed
+|Version ^4.0 shown
+
+|2
+|Publish Livewire config
+|`php artisan livewire:publish --config`
+|Config file created at `config/livewire.php`
+|File exists
+
+|3
+|Include Livewire assets
+|Add `@livewireStyles` and `@livewireScripts` to layout
+|Livewire assets loaded
+|Check browser network tab
+
+|4
+|Create Livewire component
+|`php artisan make:livewire ComponentName`
+|Component created with view and class
+|Files exist in `app/Livewire/` and `resources/views/livewire/`
+
+|5
+|Configure Livewire paths
+|Edit `config/livewire.php` → `view_path`
+|View path configured
+|Config file updated
+|===
+
+=== 2.6. Example Component
+
+Let's create a simple counter component to understand how Livewire works. This component will have increment and decrement buttons.
+
+==== 2.6.1. Create the Component
+
+Use the artisan command to create a Livewire component:
+
+[source,bash]
+----
+php artisan make:livewire Counter
+----
+
+**What this command does:**
+* Creates the component class at `app/Livewire/Counter.php`
+* Creates the component view at `resources/views/livewire/counter.blade.php`
+
+==== 2.6.2. Component Class
+
+The component class (`app/Livewire/Counter.php`) contains the component's state and logic:
+
+[source,php]
+----
+<?php
+
+declare(strict_types=1);
+
+namespace App\Livewire;
+
+use Livewire\Component;
+
+class Counter extends Component
+{
+    // Public properties are automatically available in the view
+    // Changes to these properties trigger UI updates
+    public int $count = 0;
+
+    // Methods that handle user actions
+    // Called when user clicks the increment button
+    public function increment(): void
+    {
+        $this->count++; // Increase count by 1
+    }
+
+    // Called when user clicks the decrement button
+    public function decrement(): void
+    {
+        $this->count--; // Decrease count by 1
+    }
+
+    // Required method that returns the view
+    public function render(): \Illuminate\Contracts\View\View
+    {
+        return view('livewire.counter');
+    }
+}
+----
+
+**Understanding the Component Class:**
+* **`public int $count = 0`**: This is a public property that holds the counter's value. Public properties are automatically available in the Blade view and can be bound to form inputs.
+* **`increment()` and `decrement()`**: These are methods that handle user actions. When a user clicks a button in the view, these methods are called.
+* **`render()`**: This method returns the Blade view that displays the component's UI.
+
+==== 2.6.3. Component View
+
+The component view (`resources/views/livewire/counter.blade.php`) displays the UI:
+
+[source,blade]
+----
+<div>
+    <h1>Count: {{ $count }}</h1>
+
+    <button wire:click="increment">+</button>
+    <button wire:click="decrement">-</button>
+</div>
+----
+
+**Understanding the View:**
+* **`{{ $count }}`**: Displays the current count value. This is automatically updated when `$count` changes.
+* **`wire:click="increment"`**: This is a Livewire directive that calls the `increment()` method when the button is clicked. No JavaScript needed!
+* **`wire:click="decrement"`**: Similarly, this calls the `decrement()` method.
+
+==== 2.6.4. Using the Component
+
+To use the component in a Blade template, use the `@livewire` directive:
+
+[source,blade]
+----
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Counter Example</title>
+    @livewireStyles
+</head>
+<body>
+    <h1>My Counter Component</h1>
+
+    @livewire('counter')
+
+    @livewireScripts
+</body>
+</html>
+----
+
+**Important Notes:**
+* **`@livewireStyles`**: Includes Livewire's CSS (required)
+* **`@livewire('counter')`**: Renders the Counter component
+* **`@livewireScripts`**: Includes Livewire's JavaScript (required)
+
+==== 2.6.5. How It Works
+
+When a user interacts with the component:
+
+1. **User clicks the "+" button**
+2. **Livewire sends an AJAX request** to the server with the action "increment"
+3. **Server calls the `increment()` method**, which increases `$count`
+4. **Server renders the updated view** with the new count value
+5. **Livewire updates only the changed parts** of the page (the count display)
+6. **No page refresh** - the update happens seamlessly!
+
+**What's Special:**
+* No JavaScript code needed - Livewire handles all the AJAX
+* No API endpoints needed - Livewire handles routing automatically
+* The component state is maintained on the server
+* Updates happen in real-time without page refreshes
+
+== 3. Laravel Volt
+
+=== 3.1. Package Overview
+
+**Package Name**: `livewire/volt`
+**Version**: `dev-main`
+**Purpose**: Single File Components (SFC) for Livewire
+**Architectural Role**: Simplifies component creation by combining PHP and Blade in one file
+
+=== 3.2. Key Features
+
+* Single file components (PHP + Blade in one file)
+* Automatic route generation
+* Simplified component syntax
+* Type-safe properties and methods
+* Full Livewire functionality
+
+=== 3.3. Principles and Patterns
+
+* **Single File Component Pattern**: Co-locate component logic and template
+* **Convention over Configuration**: Automatic routing based on file structure
+* **Type Safety**: Full PHP type support
+
+**Source**: https://livewire.laravel.com/docs/volt[Laravel Volt Documentation]
+
+=== 3.4. Installation Verification
+
+[source,bash]
+----
+# Verify Volt installation
+composer show livewire/volt
+
+# Check Volt mount points
+php artisan tinker
+>>> Volt::mount()
+----
+
+=== 3.5. Configuration Steps
+
+[cols="1,3,3,2,2"]
+|===
+|Step # |Task/Configuration Item |Command/File/Code |Expected Result |Verification Method
+
+|1
+|Verify Volt package
+|`composer show livewire/volt`
+|Package version displayed
+|dev-main shown
+
+|2
+|Register Volt service provider
+|Ensure `VoltServiceProvider` is in `bootstrap/providers.php`
+|Provider registered
+|Check providers file
+
+|3
+|Configure mount points
+|Edit `app/Providers/VoltServiceProvider.php`
+|Mount points configured
+|Check provider file
+
+|4
+|Create Volt component (Folio page)
+|`php artisan folio:page example`
+|Volt component created at `resources/views/pages/example.blade.php`
+|File exists
+|===
+
+=== 3.6. Example Volt Component
+
+Create a Volt component using the Folio artisan command:
+
+[source,bash]
+----
+php artisan folio:page counter
+----
+
+This creates a page at `resources/views/pages/counter.blade.php`:
+
+[source,php]
+----
+<?php
+
+use Livewire\Volt\Component;
+
+new class extends Component
+{
+    public int $count = 0;
+
+    public function increment(): void
+    {
+        $this->count++;
+    }
+
+    public function decrement(): void
+    {
+        $this->count--;
+    }
+};
+
+?>
+
+<div>
+    <h1>{{ $count }}</h1>
+    <button wire:click="increment">+</button>
+    <button wire:click="decrement">-</button>
+</div>
+----
+
+=== 3.7. Volt Routing
+
+Volt components can be routed directly:
+
+[source,php]
+----
+// In routes/web.php
+use Livewire\Volt\Volt;
+
+Volt::route('settings/profile', 'settings.profile')
+    ->name('profile.edit');
+----
+
+== 4. Flux UI
+
+=== 4.1. Package Overview
+
+**Package Name**: `livewire/flux`
+**Version**: `^2.6`
+**Purpose**: Open-source UI component library for Livewire
+**Architectural Role**: Provides pre-built, accessible UI components
+
+=== 4.2. Key Features
+
+* Pre-built UI components (buttons, forms, modals, etc.)
+* Accessible by default (WCAG compliant)
+* Tailwind CSS styling
+* Dark mode support
+* Form components with validation
+* Data tables and lists
+
+=== 4.3. Principles and Patterns
+
+* **Component Composition**: Build complex UIs from simple components
+* **Accessibility First**: All components meet WCAG standards
+* **Design System Pattern**: Consistent styling and behavior
+
+**Source**: https://fluxui.dev/docs[Flux UI Documentation]
+
+=== 4.4. Installation Verification
+
+[source,bash]
+----
+# Verify Flux installation
+composer show livewire/flux
+
+# Check Flux components
+php artisan vendor:publish --tag=flux-components
+----
+
+=== 4.5. Configuration Steps
+
+[cols="1,3,3,2,2"]
+|===
+|Step # |Task/Configuration Item |Command/File/Code |Expected Result |Verification Method
+
+|1
+|Verify Flux package
+|`composer show livewire/flux`
+|Package version displayed
+|^2.6 shown
+
+|2
+|Publish Flux assets
+|`php artisan vendor:publish --tag=flux-assets`
+|Assets published
+|Assets in public directory
+
+|3
+|Include Flux styles
+|Add Flux CSS to layout
+|Flux styles loaded
+|Check browser
+
+|4
+|Use Flux components
+|Use Flux components in Blade templates
+|Components render correctly
+|Visual verification
+|===
+
+=== 4.6. Example Flux Component
+
+[source,blade]
+----
+<x-flux::button wire:click="save">
+    Save Changes
+</x-flux::button>
+
+<x-flux::input
+    label="Email"
+    type="email"
+    wire:model="email"
+/>
+
+<x-flux::modal name="confirm-delete">
+    <x-flux::heading>Confirm Deletion</x-flux::heading>
+    <x-flux::text>Are you sure?</x-flux::text>
+</x-flux::modal>
+----
+
+== 5. Flux Pro
+
+=== 5.1. Package Overview
+
+**Package Name**: `livewire/flux-pro`
+**Version**: `^2.6`
+**Purpose**: Commercial premium components for Flux UI
+**Architectural Role**: Extended component library with advanced features
+
+=== 5.2. Key Features
+
+* Advanced data tables
+* Advanced form builders
+* Charts and graphs
+* Calendar components
+* File upload with preview
+* Rich text editor
+
+**Source**: https://fluxui.dev/pro[Flux Pro Documentation]
+
+=== 5.3. Installation Verification
+
+[source,bash]
+----
+# Verify Flux Pro installation
+composer show livewire/flux-pro
+
+# Note: Requires authentication to custom repository
+----
+
+=== 5.4. Configuration Steps
+
+[cols="1,3,3,2,2"]
+|===
+|Step # |Task/Configuration Item |Command/File/Code |Expected Result |Verification Method
+
+|1
+|Configure custom repository
+|Ensure `flux-pro` repository in `composer.json`
+|Repository configured
+|Check composer.json
+
+|2
+|Authenticate with repository
+|Configure authentication token
+|Authentication successful
+|Composer install works
+
+|3
+|Install Flux Pro
+|`composer require livewire/flux-pro`
+|Package installed
+|Package in vendor
+
+|4
+|Use Flux Pro components
+|Use Pro components in templates
+|Pro components render
+|Visual verification
+|===
+
+=== 5.5. Custom Repository Configuration
+
+The project uses a custom Composer repository for Flux Pro:
+
+[source,json]
+----
+"repositories": {
+    "flux-pro": {
+        "type": "composer",
+        "url": "https://composer.fluxui.dev"
+    }
+}
+----
+
+=== 5.6. Authentication Configuration
+
+Flux Pro requires authentication. Configure credentials using environment variables:
+
+. Create `auth.json` file (gitignored):
+[source,bash]
+----
+touch auth.json
+echo "auth.json" >> .gitignore
+----
+
+. Add credentials to `auth.json`:
+[source,json]
+----
+{
+    "http-basic": {
+        "composer.fluxui.dev": {
+            "username": "${FLUX_PRO_USERNAME}",
+            "password": "${FLUX_PRO_PASSWORD}"
+        }
+    }
+}
+----
+
+. Set environment variables in `.env`:
+[source,env]
+----
+FLUX_PRO_USERNAME=your-username
+FLUX_PRO_PASSWORD=your-password
+----
+
+NOTE: The `auth.json` file should be gitignored. Store credentials securely in environment variables.
+
+== 6. Environment Variables
+
+No specific environment variables required for Livewire ecosystem packages.
+
+== 7. Integration Points
+
+=== 7.1. With Laravel
+
+* Uses Laravel's service container for dependency injection
+* Integrates with Laravel's validation system
+* Uses Laravel's event system
+* Leverages Laravel's file storage
+
+=== 7.2. With Tailwind CSS
+
+* Flux components use Tailwind CSS classes
+* Customizable via Tailwind configuration
+* Dark mode support via Tailwind dark mode
+
+=== 7.3. With Vite
+
+* Livewire assets are bundled with Vite
+* Hot Module Replacement (HMR) support
+* Production builds optimized
+
+== 8. Troubleshooting
+
+=== 8.1. Issue: Components Not Updating
+
+**Symptom**: Changes to components not reflected in browser
+
+**Solution**:
+[source,bash]
+----
+# Clear Livewire cache
+php artisan livewire:discover
+
+# Clear application cache
+php artisan cache:clear
+----
+
+=== 8.2. Issue: Volt Components Not Routing
+
+**Symptom**: Volt routes return 404
+
+**Solution**: Verify mount points in `VoltServiceProvider`:
+
+[source,php]
+----
+Volt::mount([
+    resource_path('views/livewire'),
+    resource_path('views/pages'),
+]);
+----
+
+== 9. Next Steps
+
+After configuring the Livewire ecosystem:
+
+* xref:060-admin-panel.adoc[admin-panel.adoc] - Set up Filament 5.x-dev admin panel
+
+== 10. Navigation
+
+xref:040-laravel-core.adoc[← Laravel Core] | xref:060-admin-panel.adoc[Next: Admin Panel →]

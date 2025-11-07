@@ -1,0 +1,385 @@
+= Setup Documentation
+
+:docinfo shared:
+:toc:
+:toc-title: Table of Contents
+
+== 1. Introduction
+
+This directory contains comprehensive setup and configuration documentation for the Laravel Livewire Starter Kit. All documentation follows AsciiDoc format and provides detailed, step-by-step guidance suitable for developers of all experience levels.
+
+=== 1.1. Official Documentation Sources
+
+This documentation references and builds upon official sources:
+
+* **Laravel**: https://laravel.com/docs/12.x[Laravel 12.x Documentation]
+* **Livewire**: https://livewire.laravel.com/docs[Livewire Documentation]
+* **Pest**: https://pestphp.com/docs[Pest Testing Framework Documentation]
+* **Bun**: https://bun.sh/docs[Bun Documentation]
+* **Tailwind CSS**: https://tailwindcss.com/docs[Tailwind CSS Documentation]
+* **Vite**: https://vitejs.dev/guide[Vite Documentation]
+* **Filament**: https://filamentphp.com/docs[Filament Documentation]
+* **Laravel Starter Kits**: https://laravel.com/docs/starter-kits[Laravel Starter Kits Documentation]
+
+For package-specific documentation, see the individual package documentation files.
+
+== 2. Setup Order and Workflow
+
+=== 2.1. Recommended Setup Order
+
+For new installations, follow this order:
+
+. **PHP Runtime** (xref:030-php-runtime.adoc[php-runtime.adoc])
+   .. Install PHP 8.5+
+   .. Verify required extensions
+   .. Configure PHP settings
+
+. **Laravel Core** (xref:040-laravel-core.adoc[laravel-core.adoc])
+   .. Verify Laravel installation
+   .. Configure environment file
+   .. Generate application key
+   .. Set up database (SQLite recommended for development)
+   .. Enable API routes and broadcasting
+
+. **Database Setup** (xref:040-laravel-core.adoc#database-configuration[laravel-core.adoc])
+   .. Configure SQLite for development
+   .. Enable WAL mode (recommended)
+   .. Run migrations
+
+. **Frontend Build** (xref:130-frontend-build.adoc[frontend-build.adoc])
+   .. Install Bun
+   .. Install frontend dependencies (`bun install`)
+   .. Build assets (`bun run build`)
+
+. **Livewire Ecosystem** (xref:050-livewire-ecosystem.adoc[livewire-ecosystem.adoc])
+   .. Configure Livewire
+   .. Set up Volt
+   .. Configure Flux Pro (if using)
+
+. **Packages** - Install and configure remaining packages as needed:
+   .. xref:060-admin-panel.adoc[Filament Admin Panel]
+   .. xref:070-auth-security.adoc[Authentication & Security]
+   .. xref:080-queue-monitoring.adoc[Queue & Monitoring]
+   .. xref:090-observability.adoc[Observability Tools]
+   .. xref:100-spatie-packages.adoc[Spatie Packages]
+   .. xref:110-search-analytics.adoc[Search & Analytics]
+
+. **Development Tools** (xref:120-development-tools.adoc[development-tools.adoc])
+   .. Set up debugging tools
+   .. Configure code quality tools
+   .. Set up testing framework (Pest 4)
+   .. Install Playwright browsers
+
+=== 2.2. Quick Setup Commands
+
+For experienced developers, here's a condensed setup:
+
+[source,bash]
+----
+# 1. Install PHP dependencies
+composer install
+
+# 2. Set up environment
+cp .env.example .env
+php artisan key:generate
+
+# 3. Set up database (SQLite)
+touch database/database.sqlite
+php artisan migrate
+
+# 4. Install frontend dependencies
+bun install
+bun run build
+
+# 5. Install Playwright browsers (for testing)
+bunx playwright install --with-deps
+----
+
+=== 2.3. Verification Checklist
+
+After setup, verify:
+
+* [ ] PHP 8.5+ installed and configured
+* [ ] Laravel application key generated
+* [ ] Database connection working
+* [ ] Frontend assets building
+* [ ] All migrations run successfully
+* [ ] Tests passing (`php artisan test`)
+
+== 3. Documentation Structure
+
+The documentation is organized into the following sections:
+
+* xref:010-quick-start.adoc[quick-start.adoc] - Quick start guide for experienced developers
+* xref:020-overview.adoc[overview.adoc] - Project overview, architecture, and package ecosystem
+* xref:030-php-runtime.adoc[php-runtime.adoc] - PHP 8.5+ runtime requirements and setup
+* xref:040-laravel-core.adoc[laravel-core.adoc] - Laravel Framework 12.x core setup
+* xref:050-livewire-ecosystem.adoc[livewire-ecosystem.adoc] - Livewire 4, Volt, Flux, and Flux Pro
+* xref:060-admin-panel.adoc[admin-panel.adoc] - Filament 5.x-dev admin panel setup
+* xref:070-auth-security.adoc[auth-security.adoc] - Fortify, WorkOS, and authentication setup
+* xref:080-queue-monitoring.adoc[queue-monitoring.adoc] - Horizon, Octane, and queue management
+* xref:090-observability.adoc[observability.adoc] - Telescope, Activity Log, Health checks
+* xref:100-spatie-packages.adoc[spatie-packages.adoc] - All Spatie Laravel packages configuration
+* xref:110-search-analytics.adoc[search-analytics.adoc] - Scout, Typesense, Analytics setup
+* xref:120-development-tools.adoc[development-tools.adoc] - Dev dependencies (Debugbar, IDE Helper, Rector, Pest, etc.)
+* xref:130-frontend-build.adoc[frontend-build.adoc] - Bun, Vite, Tailwind CSS 4, and frontend tooling
+* xref:140-outstanding-questions.adoc[outstanding-questions.adoc] - Outstanding questions, decisions, and inconsistencies
+* xref:150-troubleshooting.adoc[troubleshooting.adoc] - Centralized troubleshooting index
+
+== 4. Important Notes
+
+=== 4.1. Package Manager
+
+This project uses **Bun exclusively** for JavaScript/TypeScript package management.
+
+IMPORTANT:
+* Always use `bun` instead of `npm`
+* Always use `bunx` instead of `npx`
+* Never use `yarn`
+* See xref:130-frontend-build.adoc#bun-package-manager[frontend-build.adoc] for details
+
+== 5. How to Use This Documentation
+
+=== 5.1. For New Developers
+
+Start with `020-overview.adoc` to understand the project structure and architecture, then proceed through the numbered sections in order.
+
+=== 5.1.1. Quick Start Option
+
+For experienced developers, you can use xref:010-quick-start.adoc[quick-start.adoc] for a condensed setup guide.
+
+=== 5.2. For Specific Package Setup
+
+Each document covers a specific set of packages. Use the table of contents in each document to find the package you need to configure.
+
+=== 5.3. Quick Reference
+
+Configuration steps are provided in tabular format for easy scanning. Each package includes:
+
+* Package overview and purpose
+* Installation verification steps
+* Configuration steps table
+* Example configurations
+* Integration points with other packages
+
+=== 5.4. Troubleshooting
+
+If you encounter issues during setup, see xref:150-troubleshooting.adoc[troubleshooting.adoc] for a centralized troubleshooting guide with links to specific solutions.
+
+== 6. Environment Variables Quick Reference
+
+This is a quick reference for all environment variables used across the project. For detailed documentation, see the specific package documentation.
+
+[cols="3,3,2,2"]
+|===
+|Variable |Purpose |Document |Default
+
+|APP_NAME
+|Application name
+|xref:040-laravel-core.adoc[laravel-core.adoc]
+|Laravel
+
+|APP_ENV
+|Application environment
+|xref:040-laravel-core.adoc[laravel-core.adoc]
+|local
+
+|APP_KEY
+|Application encryption key
+|xref:040-laravel-core.adoc[laravel-core.adoc]
+|(generated)
+
+|APP_URL
+|Application URL
+|xref:040-laravel-core.adoc[laravel-core.adoc]
+|http://localhost
+
+|DB_CONNECTION
+|Database driver (sqlite/mysql/pgsql)
+|xref:040-laravel-core.adoc[laravel-core.adoc]
+|sqlite
+
+|DB_DATABASE
+|Database path or name
+|xref:040-laravel-core.adoc[laravel-core.adoc]
+|database/database.sqlite
+
+|BROADCAST_DRIVER
+|Broadcasting driver
+|xref:040-laravel-core.adoc[laravel-core.adoc]
+|log
+
+|QUEUE_CONNECTION
+|Queue driver
+|xref:080-queue-monitoring.adoc[queue-monitoring.adoc]
+|sync
+
+|REDIS_HOST
+|Redis server host
+|xref:080-queue-monitoring.adoc[queue-monitoring.adoc]
+|127.0.0.1
+
+|TYPESENSE_HOST
+|Typesense server host
+|xref:110-search-analytics.adoc[search-analytics.adoc]
+|localhost
+
+|TYPESENSE_API_KEY
+|Typesense API key
+|xref:110-search-analytics.adoc[search-analytics.adoc]
+|(required)
+
+|ANALYTICS_PROPERTY_ID
+|Google Analytics property ID
+|xref:100-spatie-packages.adoc[spatie-packages.adoc]
+|(empty)
+
+|FLUX_PRO_USERNAME
+|Flux Pro username
+|xref:050-livewire-ecosystem.adoc[livewire-ecosystem.adoc]
+|(required)
+
+|FLUX_PRO_PASSWORD
+|Flux Pro password
+|xref:050-livewire-ecosystem.adoc[livewire-ecosystem.adoc]
+|(required)
+|===
+
+NOTE: This is a quick reference. For complete configuration details, see the specific package documentation.
+
+== 7. Package Update Strategy
+
+=== 7.1. Stable Packages
+
+For packages with stable versions (e.g., `^12.36`, `^4.0`):
+
+[source,bash]
+----
+# Update all stable packages
+composer update
+
+# Update specific package
+composer update laravel/framework
+
+# Update frontend dependencies
+bun update
+----
+
+**Best Practices:**
+* Review changelogs before updating
+* Test after updates
+* Update packages regularly for security patches
+
+=== 7.2. Development Packages
+
+For packages using development versions (e.g., `^5.x-dev`, `dev-master`):
+
+[source,bash]
+----
+# Update development packages (careful!)
+composer update filament/filament laravel/folio livewire/volt
+
+# Update to latest commit
+composer update laravel/folio --prefer-source
+----
+
+**WARNING**: Development packages may have breaking changes. Always:
+
+* Check the package's changelog or commit history
+* Test thoroughly after updates
+* Consider pinning to specific commits if stability is critical
+* Update one package at a time to isolate issues
+
+=== 7.3. Update Verification
+
+After updating packages:
+
+[source,bash]
+----
+# Run tests
+php artisan test
+
+# Check for deprecated code
+composer analyse
+
+# Format code
+composer cs-fix
+
+# Check frontend builds
+bun run build
+----
+
+=== 7.4. Version Constraints
+
+The project uses different version constraints:
+
+* **Stable**: `^12.36` - Allows minor updates (12.36, 12.37, etc.)
+* **Development**: `^5.x-dev` - Allows any development version
+* **Specific**: `dev-master` - Uses latest master branch
+
+See xref:020-overview.adoc#version-constraints[overview.adoc] for details.
+
+== 8. CI/CD Integration
+
+=== 8.1. GitHub Actions Workflows
+
+The project includes GitHub Actions workflows in `.github/workflows/`:
+
+* **tests.yml** - Runs PHP tests, static analysis, and browser tests
+* **browser-tests.yml** - Dedicated browser testing workflow
+
+=== 8.2. CI/CD Setup
+
+The workflows automatically:
+
+* Set up PHP 8.5
+* Set up Bun and Node.js
+* Install dependencies (Composer and Bun)
+* Configure Flux Pro authentication from secrets
+* Run tests and static analysis
+* Build frontend assets
+
+=== 8.3. Required Secrets
+
+For CI/CD to work, configure these GitHub secrets:
+
+* `FLUX_USERNAME` - Flux Pro username
+* `FLUX_LICENSE_KEY` - Flux Pro license key
+
+=== 8.4. Local Testing
+
+Test CI/CD workflows locally using https://act.sh[act] or by running the commands manually:
+
+[source,bash]
+----
+# Install dependencies
+composer install --no-interaction --prefer-dist --optimize-autoloader
+bun install
+
+# Run tests
+php artisan test
+
+# Run static analysis
+composer analyse
+
+# Build assets
+bun run build
+----
+
+== 9. Documentation Standards
+
+All documentation follows these principles:
+
+* **Clarity for Junior Developers**: All content is written to be clear and actionable for developers at any experience level
+* **Complete Coverage**: Every package in `composer.json` and `package.json` is documented
+* **Actionable Steps**: All configuration steps are testable and verifiable
+* **Cross-References**: Related packages are cross-referenced for easy navigation
+
+== 10. Contributing
+
+When updating this documentation:
+
+* Ensure all code examples are tested and working
+* Update cross-references when adding new packages
+* Maintain consistent formatting and structure
+* Verify all configuration steps are still accurate

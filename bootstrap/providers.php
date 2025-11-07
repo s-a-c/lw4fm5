@@ -2,6 +2,8 @@
 
 return [
     App\Providers\AppServiceProvider::class,
+    App\Providers\BroadcastServiceProvider::class,
+    App\Providers\FolioServiceProvider::class,
     App\Providers\FortifyServiceProvider::class,
     App\Providers\VoltServiceProvider::class,
 ];

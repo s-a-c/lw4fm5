@@ -1,0 +1,138 @@
+<meta charset="UTF-8">
+<meta name="color-scheme" content="light dark">
+<noscript>
+    <style>
+        /* Ensure content is readable without JS */
+        .no-js-note { position: fixed; bottom: 8px; right: 8px; background: #444; color: #fff; padding: 6px 8px; border-radius: 6px; font-size: 12px; }
+    </style>
+    <div class="no-js-note">JavaScript disabled: theme switching and collapsible TOC are unavailable.</div>
+</noscript>
+<style>
+    /* Catppuccin CSS variables for 4 themes */
+    /* Values are applied to :root at runtime via JS */
+
+    /* Toolbar and menu-like UI styles (mimic Asciidoctor menu macro) */
+    .doc-theme-toolbar {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 1000;
+        background: var(--ctp-base, #1e1e2e);
+        border: 1px solid var(--ctp-surface0, #313244);
+        border-radius: 8px;
+        padding: 6px 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        font-size: 12px;
+        color: var(--ctp-text, #cdd6f4);
+    }
+    .doc-theme-toolbar .menuseq { white-space: nowrap; }
+    .doc-theme-toolbar .menu { font-weight: 600; }
+    .doc-theme-toolbar .caret { padding: 0 4px; opacity: 0.8; }
+    .doc-theme-toolbar .menuitem { cursor: pointer; padding: 2px 4px; border-radius: 4px; }
+    .doc-theme-toolbar .menuitem:hover, .doc-theme-toolbar .menuitem:focus { background: var(--ctp-surface0, #313244); outline: none; }
+    .doc-theme-toolbar .menuitem[aria-current="true"] { text-decoration: underline; }
+
+    /* Accessible hiding for aria-live region */
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+</style>
+<script>
+    // Catppuccin palettes
+    const themes = {
+        latte: {
+            '--ctp-rosewater': '#dc8a78', '--ctp-flamingo': '#dd7878', '--ctp-pink': '#ea76cb', '--ctp-mauve': '#8839ef', '--ctp-red': '#d20f39', '--ctp-maroon': '#e64553', '--ctp-peach': '#fe8019', '--ctp-yellow': '#df8e1d', '--ctp-green': '#40a02b', '--ctp-teal': '#179299', '--ctp-sky': '#04a5e5', '--ctp-sapphire': '#209fb5', '--ctp-blue': '#1e66f5', '--ctp-lavender': '#7287fd', '--ctp-text': '#4c4f69', '--ctp-subtext1': '#5c5f77', '--ctp-subtext0': '#6c6f85', '--ctp-overlay2': '#7c7f93', '--ctp-overlay1': '#8c8fa1', '--ctp-overlay0': '#9ca0b0', '--ctp-surface2': '#acb0be', '--ctp-surface1': '#bcc0cc', '--ctp-surface0': '#ccd0da', '--ctp-base': '#eff1f5', '--ctp-mantle': '#e6e9ef', '--ctp-crust': '#dce0e8'
+        },
+        frappe: {
+            '--ctp-rosewater': '#f2d5cf', '--ctp-flamingo': '#eebebe', '--ctp-pink': '#f4b8e4', '--ctp-mauve': '#ca9ee6', '--ctp-red': '#e78284', '--ctp-maroon': '#ea999c', '--ctp-peach': '#ef9f76', '--ctp-yellow': '#e5c890', '--ctp-green': '#a6d189', '--ctp-teal': '#81c8be', '--ctp-sky': '#99d1db', '--ctp-sapphire': '#85c1dc', '--ctp-blue': '#8caaee', '--ctp-lavender': '#babbf1', '--ctp-text': '#c6d0f5', '--ctp-subtext1': '#b5bfe2', '--ctp-subtext0': '#a5adce', '--ctp-overlay2': '#949cbb', '--ctp-overlay1': '#838ba7', '--ctp-overlay0': '#737994', '--ctp-surface2': '#626880', '--ctp-surface1': '#51576d', '--ctp-surface0': '#414559', '--ctp-base': '#303446', '--ctp-mantle': '#292c3c', '--ctp-crust': '#232634'
+        },
+        macchiato: {
+            '--ctp-rosewater': '#f4dbd6', '--ctp-flamingo': '#f0c6c6', '--ctp-pink': '#f5bde6', '--ctp-mauve': '#c6a0f6', '--ctp-red': '#ed8796', '--ctp-maroon': '#ee99a0', '--ctp-peach': '#f5a97f', '--ctp-yellow': '#eed49f', '--ctp-green': '#a6da95', '--ctp-teal': '#8bd5ca', '--ctp-sky': '#91d7e3', '--ctp-sapphire': '#7dc4e4', '--ctp-blue': '#8aadf4', '--ctp-lavender': '#b7bdf8', '--ctp-text': '#cad3f5', '--ctp-subtext1': '#b8c0e0', '--ctp-subtext0': '#a5adcb', '--ctp-overlay2': '#939ab7', '--ctp-overlay1': '#8087a2', '--ctp-overlay0': '#6e738d', '--ctp-surface2': '#5b6078', '--ctp-surface1': '#494d64', '--ctp-surface0': '#363a4f', '--ctp-base': '#24273a', '--ctp-mantle': '#1e2030', '--ctp-crust': '#181926'
+        },
+        mocha: {
+            '--ctp-rosewater': '#f5e0dc', '--ctp-flamingo': '#f2cdcd', '--ctp-pink': '#f5c2e7', '--ctp-mauve': '#cba6f7', '--ctp-red': '#f38ba8', '--ctp-maroon': '#eba0ac', '--ctp-peach': '#fab387', '--ctp-yellow': '#f9e2af', '--ctp-green': '#a6e3a1', '--ctp-teal': '#94e2d5', '--ctp-sky': '#89dceb', '--ctp-sapphire': '#74c7ec', '--ctp-blue': '#89b4fa', '--ctp-lavender': '#b4befe', '--ctp-text': '#cdd6f4', '--ctp-subtext1': '#bac2de', '--ctp-subtext0': '#a6adc8', '--ctp-overlay2': '#9399b2', '--ctp-overlay1': '#7f849c', '--ctp-overlay0': '#6c7086', '--ctp-surface2': '#585b70', '--ctp-surface1': '#45475a', '--ctp-surface0': '#313244', '--ctp-base': '#1e1e2e', '--ctp-mantle': '#181825', '--ctp-crust': '#11111b'
+        }
+    };
+
+    function applyTheme(themeName) {
+        const theme = themes[themeName];
+        if (!theme) return;
+        const root = document.documentElement;
+        Object.entries(theme).forEach(([key, value]) => root.style.setProperty(key, value));
+        localStorage.setItem('catppuccin-theme', themeName);
+        const items = document.querySelectorAll('.doc-theme-toolbar .menuitem');
+        items.forEach(i => i.setAttribute('aria-current', i.getAttribute('data-theme') === themeName ? 'true' : 'false'));
+        const live = document.getElementById('theme-live');
+        if (live) live.textContent = `Theme set to ${themeName}`;
+    }
+
+    function buildThemeMenu(container) {
+        const menuseq = document.createElement('span');
+        menuseq.className = 'menuseq';
+
+        const menu = document.createElement('span');
+        menu.className = 'menu';
+        menu.textContent = 'Theme';
+        menuseq.appendChild(menu);
+
+        const caret = document.createElement('span');
+        caret.className = 'caret';
+        caret.textContent = ' ▸ ';
+        menuseq.appendChild(caret);
+
+        ['latte','frappe','macchiato','mocha'].forEach(name => {
+            const item = document.createElement('span');
+            item.className = 'menuitem';
+            item.setAttribute('tabindex', '0');
+            item.setAttribute('role', 'menuitemradio');
+            item.setAttribute('aria-checked', 'false');
+            item.dataset.theme = name;
+            item.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+            item.addEventListener('click', () => applyTheme(name));
+            item.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); applyTheme(name); }
+            });
+            menuseq.appendChild(item);
+        });
+
+        container.appendChild(menuseq);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Determine initial theme
+        let initial = localStorage.getItem('catppuccin-theme');
+        if (!initial) {
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            initial = prefersDark ? 'mocha' : 'latte';
+        }
+        applyTheme(initial);
+
+        // Inject toolbar
+        const toolbar = document.createElement('div');
+        toolbar.className = 'doc-theme-toolbar';
+        toolbar.setAttribute('role', 'menubar');
+        toolbar.setAttribute('aria-label', 'Theme selection');
+        buildThemeMenu(toolbar);
+
+        // Live region for announcements
+        const live = document.createElement('div');
+        live.id = 'theme-live';
+        live.className = 'sr-only';
+        live.setAttribute('aria-live', 'polite');
+        toolbar.appendChild(live);
+
+        document.body.appendChild(toolbar);
+
+        // Keep TOC collapsible (wrap in <details> with <summary>)
+        const toc = document.getElementById('toc');
+        if (toc && !toc.querySelector('details')) {
+            const details = document.createElement('details');
+            details.open = false;
+            const summary = document.createElement('summary');
+            const title = toc.querySelector('.toc-title');
+            if (title) { summary.appendChild(title); }
+            details.appendChild(summary);
+            const nodes = Array.from(toc.childNodes);
+            nodes.forEach(n => { if (n !== details) details.appendChild(n); });
+            toc.appendChild(details);
+        }
+    });
+</script>

@@ -1,0 +1,113 @@
+= Quick Start Guide
+:docinfo shared:
+:toc:
+:toc-title: Table of Contents
+
+== 1. Introduction
+
+This is a condensed setup guide for experienced developers. For detailed documentation, see xref:README.adoc[README.adoc].
+
+== 2. Prerequisites
+
+* PHP 8.5+
+* Composer 2.x
+* Bun 1.1.0+
+* Git
+
+== 3. Installation
+
+=== 3.1. Clone and Install
+
+[source,bash]
+----
+# Clone the repository
+git clone <repository-url>
+cd <project-directory>
+
+# Install PHP dependencies
+composer install
+
+# Install frontend dependencies
+bun install
+----
+
+=== 3.2. Environment Setup
+
+[source,bash]
+----
+# Copy environment file
+cp .env.example .env
+
+# Generate application key
+php artisan key:generate
+
+# Create SQLite database (development)
+touch database/database.sqlite
+
+# Run migrations
+php artisan migrate
+----
+
+=== 3.3. Frontend Build
+
+[source,bash]
+----
+# Build assets
+bun run build
+
+# Or start dev server
+bun run dev
+----
+
+=== 3.4. Install Playwright (for testing)
+
+[source,bash]
+----
+bunx playwright install --with-deps
+----
+
+=== 3.5. Configure Flux Pro (if using)
+
+[source,bash]
+----
+# Create auth.json (gitignored)
+touch auth.json
+
+# Add credentials (see 04-livewire-ecosystem.adoc for details)
+# Set FLUX_PRO_USERNAME and FLUX_PRO_PASSWORD in .env
+----
+
+== 4. Verification
+
+Run these commands to verify installation:
+
+[source,bash]
+----
+# Check PHP version
+php -v  # Should be 8.5+
+
+# Check Laravel
+php artisan --version  # Should be Laravel Framework 12.x
+
+# Check Bun
+bun --version  # Should be 1.1.0+
+
+# Run tests
+php artisan test
+
+# Check database
+php artisan migrate:status
+----
+
+== 5. Next Steps
+
+For detailed setup instructions, see:
+
+* xref:README.adoc[README.adoc] - Main documentation index
+* xref:030-php-runtime.adoc[php-runtime.adoc] - PHP setup details
+* xref:040-laravel-core.adoc[laravel-core.adoc] - Laravel configuration
+* xref:130-frontend-build.adoc[frontend-build.adoc] - Frontend setup
+
+== 6. Navigation
+
+xref:README.adoc[← README] | xref:030-php-runtime.adoc[Next: PHP Runtime →]
