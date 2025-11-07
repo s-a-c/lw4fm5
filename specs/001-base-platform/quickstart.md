@@ -9,6 +9,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 - Composer 2.7+
 - PostgreSQL 15+, Redis 7+
 - GitHub CLI (for fetching Actions secrets when onboarding additional contributors)
+- QA verification: confirm GitHub Actions secrets exist (`gh secret list`), Bun ≥1.1 is installed, Docker or Herd is running, and encrypted `.env` values have been provisioned.
 
 ## 1. Clone & Environment Selection
 1. `git clone git@github.com:lw4fm5/app.git`
@@ -79,10 +80,17 @@ Verify:
 - Policy checksum monitor scheduled nightly; confirm recent run in CI logs or via `php artisan policy:checksum-monitor --once`
 - Environment validation command scheduled weekly; confirm latest run in CI workflow results or via `php artisan platform:validate-profiles --once`
 
-## 8. CI Verification
+## 8. QA Validation Workflow
+- Run native validation: `php artisan platform:validate-profiles --profile=native` and archive the report in `storage/app/base-platform/validation/`.
+- Run container validation: `php artisan platform:validate-profiles --profile=container` and archive alongside the native report.
+- Execute checksum monitor dry run: `php artisan policy:checksum-monitor --once`; store output together with validation reports.
+- Confirm nightly heavy-suite and validation jobs passed in GitHub Actions before release tagging.
+- Record support-ticket metrics before launch and weekly after launch following `docs/base-platform/support-metrics.md`.
+
+## 9. CI Verification
 Push a branch; ensure GitHub workflows `lint`, `tests`, and `browser-tests` complete in <25 minutes. Heavy suites execute nightly—monitor Actions dashboard for results before tagging releases.
 
-## 9. Updating Tooling
+## 10. Updating Tooling
 - Run `composer update:requirements` monthly (opens PR with toolchain bumps)
 - Review parity test output; if drift detected, align native/container scripts immediately
 

@@ -96,6 +96,7 @@ Technical leads want a governed process that documents which backend and fronten
 - The designated JavaScript runtime is Bun and is expected to remain standard across local and CI environments; any future change must preserve the guarantees defined in this specification.
 - Containerized and native development paths must remain functionally equivalent, with automated parity checks ensuring neither path lags behind.
 - Current scope assumes a solo developer managing local credentials via encrypted `.env` files; future team expansion must revisit access provisioning and auditing needs.
+- Base Platform automation lives entirely within the Storefront service; it must not introduce cross-service integrations, and ongoing maintenance ownership resides with the Platform Engineering team.
 
 ## Success Criteria *(mandatory)*
 

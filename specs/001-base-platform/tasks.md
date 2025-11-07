@@ -46,7 +46,7 @@
 - [ ] T018 Establish base metrics helper in `app/Support/BasePlatformMetrics.php`
 - [ ] T019 Document parity routines in `docs/base-platform/parity-overview.md`
 
-**Checkpoint**: Foundation ready—user story implementation can now begin in parallel.
+**Checkpoint**: Foundation ready—QA confirms setup docs, migrations, and tooling prerequisites are satisfied before user story work begins.
 
 ---
 
@@ -88,7 +88,7 @@
 - [ ] T044 [US1] Schedule environment validation command weekly in `bootstrap/app.php`
 - [ ] T045 [US1] Document environment validation workflow in `docs/base-platform/environment-validation.md`
 
-**Checkpoint**: User Story 1 functional and testable independently.
+**Checkpoint**: User Story 1 functional—QA archives native/container validation reports, recovery documentation, and credential checklists.
 
 ---
 
@@ -123,7 +123,7 @@
 - [ ] T063 [US2] Add CI job executing environment validation command for native and container profiles in `.github/workflows/tests.yml`
 - [ ] T064 [US2] Schedule weekly checksum monitor and validation command bundle in `bootstrap/app.php`
 
-**Checkpoint**: User Story 2 functional and testable independently.
+**Checkpoint**: User Story 2 functional—QA validates CI workflow updates, scheduled jobs, and checksum monitor outputs.
 
 ---
 
@@ -151,7 +151,7 @@
 - [ ] T075 [US3] Extend seeder with dependency metadata in `database/seeders/BasePlatformSeeder.php`
 - [ ] T076 [US3] Document support metric tracking plan in `docs/base-platform/support-metrics.md`
 
-**Checkpoint**: All user stories functional and independently testable.
+**Checkpoint**: All user stories functional—QA confirms dependency review automation, support metric tracking, and documentation outputs.
 
 ---
 
@@ -163,7 +163,7 @@
 - [ ] T078 Validate combined quickstart flow end-to-end per `docs/base-platform/quickstart.md`
 - [ ] T079 [P] Run parity audit report and archive results in `storage/app/base-platform/parity-report.log`
 - [ ] T080 [P] Review security posture and credential rotation notes in `docs/base-platform/security-review.md`
-- [ ] T081 Final verification: ensure policy acknowledgement headers, checksum monitor outputs, and profile validation reports are present across artifacts in `specs/001-base-platform/`
+- [ ] T081 Final verification: ensure policy acknowledgement headers, checksum monitor outputs, profile validation reports, and QA evidence are present across artifacts in `specs/001-base-platform/`
 
 ---
 

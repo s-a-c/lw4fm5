@@ -89,3 +89,30 @@ tests/
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
 | _None_ | — | — |
+
+## Automation Ownership & Responsibilities
+
+- **Artisan commands** (`RunPlatformBootstrap`, `RunParityCheck`, `ValidateEnvironmentProfiles`, `PolicyChecksumMonitor`, `DependencyReviewReport`) are owned by the Platform Engineering team; they maintain schedules, alerts, and post-launch refinements.
+- **Shell scripts** (`scripts/platform/*`, `scripts/profile/*`, `scripts/automation/*`) are owned by Platform Engineering for local tooling, with onboarding documentation in `docs/base-platform/` kept synchronized with command behavior.
+- **GitHub workflows** (tests, lint, browser, nightly heavy suites) are owned jointly by Platform Engineering and DevEx; DevEx monitors CI reliability, while Platform Engineering ensures workflow configuration remains aligned with spec requirements.
+- Ownership handoffs after launch must be recorded in the changelog and acknowledged during sprint retrospectives.
+
+## Operational Cadence & Monitoring
+
+| Automation | Cadence | Responsible Artifact |
+|------------|---------|-----------------------|
+| Policy checksum monitor | Nightly + pre-release | `.github/workflows/tests.yml`, `bootstrap/app.php` |
+| Environment profile validation | Weekly + pre-release | `.github/workflows/tests.yml`, `bootstrap/app.php` |
+| Mutation/browser heavy suites | Nightly + release gate | `.github/workflows/nightly-heavy.yml` |
+| Dependency review report | Monthly | `bootstrap/app.php`, `scripts/automation/dependency-review.sh` |
+
+All cadence adjustments must be reflected in `plan.md`, `tasks.md` checkpoints, and the quickstart QA section.
+
+## QA Gates & Handoffs
+
+- **Phase entry readiness**: Each phase in `tasks.md` includes a checkpoint ensuring documentation, scripts, and migrations are prepared before implementation begins.
+- **User story exit criteria**: Completion requires passing automated tests (unit/feature/architecture), generated documentation updates, and archived validation reports.
+- **QA tooling access**: Quickstart now documents commands (`platform:bootstrap`, `platform:validate-profiles`, `policy:checksum-monitor`) and expected logs so QA can execute or verify automation independently.
+- **Success criteria mapping**: SC-001–SC-005 map to bootstrap validation, CI performance metrics, dependency review outputs, checklist confirmations, and support-metric tracking, ensuring QA can attest to each outcome.
+
+Support-request reduction (SC-005) will be measured via tagged helpdesk tickets; the process for capturing and reporting this metric is documented in `docs/base-platform/support-metrics.md` and referenced in the quickstart QA workflow.
