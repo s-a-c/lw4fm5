@@ -30,6 +30,15 @@ final class CredentialPolicy extends Model
     protected $keyType = 'string';
 
     /**
+     * @param  \Illuminate\Database\Eloquent\Builder<self>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<self>
+     */
+    public function scopeForContext($query, string $context)
+    {
+        return $query->where('context', $context);
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array

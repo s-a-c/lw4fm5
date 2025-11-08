@@ -42,6 +42,17 @@ final class BasePlatformMetrics
         ]);
     }
 
+    /**
+     * @param  array<string, string>  $labels
+     */
+    public static function recordHealthCheck(string $check, bool $passed, array $labels = []): void
+    {
+        self::record('health_check', array_merge($labels, [
+            'check' => $check,
+            'status' => $passed ? 'pass' : 'fail',
+        ]));
+    }
+
     private static function formatMetric(string $metric): string
     {
         $prefix = Str::of((string) config('base-platform.observability.metrics_prefix'))

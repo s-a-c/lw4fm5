@@ -24,7 +24,6 @@ final class WorkflowSuite extends Model
         'triggers',
         'required_checks',
         'sla_minutes',
-        'notification_channel',
     ];
 
     protected $keyType = 'string';

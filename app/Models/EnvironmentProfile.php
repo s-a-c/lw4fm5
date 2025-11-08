@@ -39,6 +39,15 @@ final class EnvironmentProfile extends Model
     }
 
     /**
+     * @param  \Illuminate\Database\Eloquent\Builder<self>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<self>
+     */
+    public function scopeSupported($query)
+    {
+        return $query->where('status', 'supported');
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array

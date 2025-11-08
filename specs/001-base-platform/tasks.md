@@ -96,33 +96,33 @@
 
 ### 4.1. Tests for User Story 1 (MANDATORY) ⚠️
 
-- [ ] T020 [P] [US1] Add bootstrap workflow feature test in `tests/Feature/BasePlatform/BootstrapWorkflowTest.php`
-- [ ] T021 [P] [US1] Add parity check feature test in `tests/Feature/BasePlatform/ParityCheckTest.php`
-- [ ] T022 [P] [US1] Add metrics emission unit test in `tests/Unit/BasePlatform/BasePlatformMetricsTest.php`
-- [ ] T023 [P] [US1] Add bootstrap recovery unit test in `tests/Unit/BasePlatform/BootstrapRecoveryTest.php`
-- [ ] T024 [P] [US1] Add credential policy unit test in `tests/Unit/BasePlatform/CredentialPolicyTest.php`
-- [ ] T025 [P] [US1] Add native profile validation feature test in `tests/Feature/BasePlatform/BootstrapNativeProfileTest.php`
-- [ ] T026 [P] [US1] Add container profile validation feature test in `tests/Feature/BasePlatform/BootstrapContainerProfileTest.php`
+- [x] T020 [P] [US1] Add bootstrap workflow feature test in `tests/Feature/BasePlatform/BootstrapWorkflowTest.php`
+- [x] T021 [P] [US1] Add parity check feature test in `tests/Feature/BasePlatform/ParityCheckTest.php`
+- [x] T022 [P] [US1] Add metrics emission unit test in `tests/Unit/BasePlatform/BasePlatformMetricsTest.php`
+- [x] T023 [P] [US1] Add bootstrap recovery unit test in `tests/Unit/BasePlatform/BootstrapRecoveryTest.php`
+- [x] T024 [P] [US1] Add credential policy unit test in `tests/Unit/BasePlatform/CredentialPolicyTest.php`
+- [x] T025 [P] [US1] Add native profile validation feature test in `tests/Feature/BasePlatform/BootstrapNativeProfileTest.php`
+- [x] T026 [P] [US1] Add container profile validation feature test in `tests/Feature/BasePlatform/BootstrapContainerProfileTest.php`
 
-- [ ] T027 [P] [US1] Implement `platform:bootstrap` command in `app/Console/Commands/RunPlatformBootstrap.php`
-- [ ] T028 [P] [US1] Implement `platform:parity-check` command in `app/Console/Commands/RunParityCheck.php`
-- [ ] T029 [US1] Implement bootstrap orchestrator service in `app/Services/BasePlatform/BootstrapRunner.php`
-- [ ] T030 [P] [US1] Create native profile switch script in `scripts/profile/use-native.sh`
-- [ ] T031 [P] [US1] Create container profile switch script in `scripts/profile/use-container.sh`
-- [ ] T032 [P] [US1] Add bootstrap shell script wrapper in `scripts/platform/bootstrap.sh`
-- [ ] T033 [US1] Implement bootstrap recovery helper in `app/Services/BasePlatform/BootstrapRecovery.php`
-- [ ] T034 [US1] Enhance bootstrap shell script to detect missing secrets and emit actionable guidance
-- [ ] T035 [US1] Document bootstrap recovery playbook in `docs/base-platform/bootstrap-recovery.md`
-- [ ] T036 [US1] Document offline/proxy bootstrap guidance in `docs/base-platform/offline-proxy.md`
-- [ ] T037 [US1] Seed baseline configuration via `database/seeders/BasePlatformSeeder.php`
-- [ ] T038 [US1] Register bootstrap, parity, recovery, and validation commands/schedules in `bootstrap/app.php`
-- [ ] T039 [US1] Extend quickstart instructions in `docs/base-platform/quickstart.md`
-- [ ] T040 [US1] Wire bootstrap health checks into `app/Support/BasePlatformMetrics.php`
-- [ ] T041 [US1] Document credential rotation playbook in `docs/base-platform/credential-rotation.md`
-- [ ] T042 [US1] Document credential onboarding checklist in `docs/base-platform/credential-onboarding.md`
-- [ ] T043 [US1] Implement `platform:validate-profiles` command in `app/Console/Commands/ValidateEnvironmentProfiles.php`
-- [ ] T044 [US1] Schedule weekly environment validation command (`platform:validate-profiles --all`) in `bootstrap/app.php`
-- [ ] T045 [US1] Document environment validation workflow in `docs/base-platform/environment-validation.md`
+- [x] T027 [P] [US1] Implement `platform:bootstrap` command in `app/Console/Commands/RunPlatformBootstrap.php`
+- [x] T028 [P] [US1] Implement `platform:parity-check` command in `app/Console/Commands/RunParityCheck.php`
+- [x] T029 [US1] Implement bootstrap orchestrator service in `app/Services/BasePlatform/BootstrapRunner.php`
+- [x] T030 [P] [US1] Create native profile switch script in `scripts/profile/use-native.sh`
+- [x] T031 [P] [US1] Create container profile switch script in `scripts/profile/use-container.sh`
+- [x] T032 [P] [US1] Add bootstrap shell script wrapper in `scripts/platform/bootstrap.sh`
+- [x] T033 [US1] Implement bootstrap recovery helper in `app/Services/BasePlatform/BootstrapRecovery.php`
+- [x] T034 [US1] Enhance bootstrap shell script to detect missing secrets and emit actionable guidance
+- [x] T035 [US1] Document bootstrap recovery playbook in `docs/base-platform/bootstrap-recovery.md`
+- [x] T036 [US1] Document offline/proxy bootstrap guidance in `docs/base-platform/offline-proxy.md`
+- [x] T037 [US1] Seed baseline configuration via `database/seeders/BasePlatformSeeder.php`
+- [x] T038 [US1] Register bootstrap, parity, recovery, and validation commands/schedules in `bootstrap/app.php`
+- [x] T039 [US1] Extend quickstart instructions in `docs/base-platform/quickstart.md`
+- [x] T040 [US1] Wire bootstrap health checks into `app/Support/BasePlatformMetrics.php`
+- [x] T041 [US1] Document credential rotation playbook in `docs/base-platform/credential-rotation.md`
+- [x] T042 [US1] Document credential onboarding checklist in `docs/base-platform/credential-onboarding.md`
+- [x] T043 [US1] Implement `platform:validate-profiles` command in `app/Console/Commands/ValidateEnvironmentProfiles.php`
+- [x] T044 [US1] Schedule weekly environment validation command (`platform:validate-profiles --all`) in `bootstrap/app.php`
+- [x] T045 [US1] Document environment validation workflow in `docs/base-platform/environment-validation.md`
 
 **Checkpoint**: User Story 1 functional—QA archives native/container validation reports (`storage/app/base-platform/validation/`), recovery documentation, and credential checklists alongside the corresponding CI run URLs.
 
