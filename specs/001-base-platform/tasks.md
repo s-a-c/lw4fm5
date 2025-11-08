@@ -68,21 +68,21 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T005 Create base configuration stub in `config/base-platform.php` including toggles for nightly, weekly, monthly schedules
-- [ ] T006 [P] Add service provider shell in `app/Providers/BasePlatformServiceProvider.php`
-- [ ] T007 [P] Register provider within `bootstrap/providers.php`
-- [ ] T008 [P] Scaffold environment profile migration `database/migrations/2025_11_07_000000_create_environment_profiles_table.php`
-- [ ] T009 [P] Scaffold toolchain definitions migration `database/migrations/2025_11_07_000100_create_toolchain_definitions_table.php`
-- [ ] T010 [P] Scaffold credential policies migration `database/migrations/2025_11_07_000200_create_credential_policies_table.php`
-- [ ] T011 [P] Scaffold workflow suites migration `database/migrations/2025_11_07_000300_create_workflow_suites_table.php`
-- [ ] T012 [P] Scaffold parity results migration `database/migrations/2025_11_07_000400_create_parity_results_table.php`
-- [ ] T013 [P] Create environment profile model in `app/Models/EnvironmentProfile.php`
-- [ ] T014 [P] Create toolchain definition model in `app/Models/ToolchainDefinition.php`
-- [ ] T015 [P] Create credential policy model in `app/Models/CredentialPolicy.php`
-- [ ] T016 [P] Create workflow suite model in `app/Models/WorkflowSuite.php`
-- [ ] T017 [P] Create parity result model in `app/Models/ParityResult.php`
-- [ ] T018 Establish base metrics helper in `app/Support/BasePlatformMetrics.php`
-- [ ] T019 Document parity routines in `docs/base-platform/parity-overview.md`
+- [x] T005 Create base configuration stub in `config/base-platform.php` including toggles for nightly, weekly, monthly schedules
+- [x] T006 [P] Add service provider shell in `app/Providers/BasePlatformServiceProvider.php`
+- [x] T007 [P] Register provider within `bootstrap/providers.php`
+- [x] T008 [P] Scaffold environment profile migration `database/migrations/2025_11_07_000000_create_environment_profiles_table.php`
+- [x] T009 [P] Scaffold toolchain definitions migration `database/migrations/2025_11_07_000100_create_toolchain_definitions_table.php`
+- [x] T010 [P] Scaffold credential policies migration `database/migrations/2025_11_07_000200_create_credential_policies_table.php`
+- [x] T011 [P] Scaffold workflow suites migration `database/migrations/2025_11_07_000300_create_workflow_suites_table.php`
+- [x] T012 [P] Scaffold parity results migration `database/migrations/2025_11_07_000400_create_parity_results_table.php`
+- [x] T013 [P] Create environment profile model in `app/Models/EnvironmentProfile.php`
+- [x] T014 [P] Create toolchain definition model in `app/Models/ToolchainDefinition.php`
+- [x] T015 [P] Create credential policy model in `app/Models/CredentialPolicy.php`
+- [x] T016 [P] Create workflow suite model in `app/Models/WorkflowSuite.php`
+- [x] T017 [P] Create parity result model in `app/Models/ParityResult.php`
+- [x] T018 Establish base metrics helper in `app/Support/BasePlatformMetrics.php`
+- [x] T019 Document parity routines in `docs/base-platform/parity-overview.md`
 
 **Checkpoint**: Foundation ready—QA confirms setup docs, migrations, and tooling prerequisites are satisfied before user story work begins, including verifying `docs/base-platform/README.md`, `scripts/*/README.md`, and `docs/base-platform/toolchain-baseline.md` capture recorded runtime versions and prerequisite checklists.
 
@@ -147,13 +147,21 @@
 - [ ] T053 [US2] Add nightly heavy-suite workflow in `.github/workflows/nightly-heavy.yml`
 - [ ] T054 [US2] Update tiered workflow scripts in `composer.json`
 - [ ] T055 [US2] Remove npm fallbacks and enforce Bun in `package.json`
+- [ ] T055A [US2] Add workflow suite channel migration `database/migrations/2025_11_07_000500_create_workflow_suite_channels_table.php`
+- [ ] T055B [US2] Implement `WorkflowSuiteChannel` model in `app/Models/WorkflowSuiteChannel.php`
 - [ ] T056 [US2] Document CI policy and SLAs in `docs/base-platform/ci-policy.md`
+- [ ] T056A [US2] Update plan.md to reflect multi-channel workflow suite architecture and safeguards
 - [ ] T057 [US2] Persist workflow suite records via `database/seeders/BasePlatformSeeder.php`
+- [ ] T057A [US2] Seed workflow suite channel defaults in `database/seeders/BasePlatformSeeder.php`
 - [ ] T058 [US2] Schedule nightly heavy run in `bootstrap/app.php`
 - [ ] T059 [US2] Implement policy checksum monitor script in `scripts/automation/policy-checksum.sh`
 - [ ] T060 [US2] Implement `policy:checksum-monitor` command in `app/Console/Commands/PolicyChecksumMonitor.php`
+- [ ] T060A [US2] Implement workflow suite channel repository/service in `app/Services/BasePlatform/WorkflowSuiteChannelSync.php`
+- [ ] T060B [US2] Add architecture test ensuring multi-channel workflow suites in `tests/Architecture/WorkflowSuiteChannelsTest.php`
 - [ ] T061 [US2] Schedule checksum monitor (nightly + release hooks) in `bootstrap/app.php`
 - [ ] T062 [US2] Add CI step executing policy checksum monitor in `.github/workflows/tests.yml`
+- [ ] T062A [US2] Export workflow suite channels via config cache in `config/base-platform.php`
+- [ ] T062B [US2] Document multi-channel alert mapping in `docs/base-platform/ci-policy.md`
 - [ ] T063 [US2] Add CI job executing environment validation command for native and container profiles in `.github/workflows/tests.yml`
 - [ ] T064 [US2] Schedule weekly checksum monitor and validation command bundle in `bootstrap/app.php`
 
@@ -183,6 +191,7 @@
 - [ ] T073 [US3] Add GitHub issue template in `.github/ISSUE_TEMPLATE/dependency-review.md`
 - [ ] T074 [US3] Publish contribution guidelines in `docs/base-platform/contribution-guidelines.md`
 - [ ] T075 [US3] Extend seeder with dependency metadata in `database/seeders/BasePlatformSeeder.php`
+- [ ] T075A [US3] Implement monthly dependency review performance reporting command in `app/Console/Commands/DependencyReviewPerformanceReport.php`
 - [ ] T076 [US3] Document support metric tracking plan in `docs/base-platform/support-metrics.md`
 
 **Checkpoint**: All user stories functional—QA confirms dependency review automation, support metric tracking, and documentation outputs, storing the monthly dependency report sample and contribution checklist evidence.
@@ -194,8 +203,11 @@
 **Purpose**: Hardening, documentation, and validation tasks affecting multiple stories.
 
 - [ ] T077 [P] Refresh changelog with baseline entry in `docs/base-platform/CHANGELOG.md`
+- [ ] T077A [P] Capture bootstrap timing metrics and publish report in `storage/app/base-platform/bootstrap-timings.json`
 - [ ] T078 Validate combined quickstart flow end-to-end per `docs/base-platform/quickstart.md`
+- [ ] T078A Validate CI workflow duration P90 via GitHub API and document results in `docs/base-platform/ci-policy.md`
 - [ ] T079 [P] Run parity audit report and archive results in `storage/app/base-platform/parity-report.log`
+- [ ] T079A [P] Measure queue throughput baseline (`≥1k jobs/min`) and record evidence in `docs/base-platform/support-metrics.md`
 - [ ] T080 [P] Review security posture and credential rotation notes in `docs/base-platform/security-review.md`
 - [ ] T081 Final verification: ensure policy acknowledgement headers, checksum monitor outputs, profile validation reports, and QA evidence are present across artifacts in `specs/001-base-platform/`
 

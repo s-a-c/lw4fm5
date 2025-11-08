@@ -56,10 +56,9 @@ Technical leads want a governed process that documents which backend and fronten
 
 ### Edge Cases
 
-- What happens when developers operate offline or behind restrictive proxies that block private package repositories or artifact mirrors?
 - How does the platform respond when GitHub Actions lacks required secrets (registry credentials, browser automation tokens) or the selected JavaScript runtime is unavailable on the runner image, and how are recovery steps communicated to the engineer?
 - How is version drift handled when contributors use Windows or Linux environments that cannot rely on macOS-specific tooling currently assumed by local docs?
-- What guidance is provided when bootstrap runs offline or behind restrictive proxies so engineers can complete setup with mirrored registries or cached artifacts?
+- How do bootstrap, parity, and recovery workflows operate when developers run offline or behind restrictive proxies that block private package repositories or artifact mirrors, and what mirrored registry guidance must be provided?
 
 ## Requirements *(mandatory)*
 
@@ -87,6 +86,7 @@ Technical leads want a governed process that documents which backend and fronten
 - **Dependency Catalogue**: Living inventory of backend and frontend packages with ownership, classification, and lifecycle metadata.
 - **Automation Suite**: Collection of GitHub workflows, local scripts, and health checks that enforce baseline quality gates.
 - **Credential Policy**: Guidance for managing required secrets (private registries, automation tokens, database credentials) including rotation cadence and onboarding/offboarding steps.
+- **Workflow Suite Channel**: Mapping between workflow suites and the Slack, email, or webhook destinations that receive failure alerts.
 
 ### Assumptions
 
@@ -161,3 +161,5 @@ These cadences mirror the Operational Cadence table in `plan.md` and the schedul
 ### Session 2025-11-07
 - Q: How should registry and automation secrets (e.g., Flux credentials) be managed across local and CI workflows? → A: Use GitHub Actions secrets for CI plus encrypted local `.env` storage for the solo developer.
 - Q: When should mutation and browser suites run within the tiered workflow policy? → A: Execute nightly and require completion before tagged releases or hotfixes.
+### Session 2025-11-08
+- Q: How many notification destinations should each workflow suite support? → A: Store channels in a separate table so suites can own multiple notification targets.

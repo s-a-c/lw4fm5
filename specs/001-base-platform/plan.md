@@ -95,6 +95,7 @@ tests/
 - **Artisan commands** (`platform:bootstrap`, `platform:parity-check`, `platform:validate-profiles`, `policy:checksum-monitor`, `platform:dependency-review`) are owned by the Platform Engineering team; they maintain schedules, alerts, and post-launch refinements. Command classes live in `app/Console/Commands/` (for example `RunPlatformBootstrap`, `RunParityCheck`, `ValidateEnvironmentProfiles`, `PolicyChecksumMonitor`, `DependencyReviewReport`).
 - **Shell scripts** (`scripts/platform/*`, `scripts/profile/*`, `scripts/automation/*`) are owned by Platform Engineering for local tooling, with onboarding documentation in `docs/base-platform/` kept synchronized with command behavior.
 - **GitHub workflows** (tests, lint, browser, nightly heavy suites) are owned jointly by Platform Engineering and DevEx; DevEx monitors CI reliability, while Platform Engineering ensures workflow configuration remains aligned with spec requirements.
+- **Workflow suite channels** (`workflow_suite_channels` table and supporting models/services) are maintained by Platform Engineering to map each workflow suite to its Slack, email, or webhook destinations without duplicating suite metadata.
 - Ownership handoffs after launch must be recorded in the changelog and acknowledged during sprint retrospectives.
 
 ### Component Responsibility Alignment
@@ -109,6 +110,7 @@ tests/
 | Shell scripts (`scripts/profile/use-*.sh`) | `scripts/profile/` directory | Configure environment variables and `.env` files for native/container profiles | Phase 1 T002, Phase 3 T030–T031, `quickstart.md` §1 |
 | Shell script (`scripts/platform/bootstrap.sh`) | `scripts/platform/` directory | Developer-friendly wrapper around `platform:bootstrap`, handles secret prompts | Phase 3 T032–T034, `quickstart.md` §2 |
 | GitHub workflows (`tests.yml`, `lint.yml`, `browser-tests.yml`, `nightly-heavy.yml`) | `.github/workflows/` | Enforce Bun toolchain, schedule heavy suites, call checksum and validation commands | Phase 4 T046–T064, `Operational Cadence & Monitoring` |
+| Workflow suite channels | `app/Models/WorkflowSuiteChannel.php`, `app/Services/BasePlatform/WorkflowSuiteChannelSync.php` | Persist and synchronize multi-destination alert routing for each workflow suite | Phase 4 T055A–T057A, T060A–T062B, `data-model.md` §2.6 |
 
 ### Environment Validation Alignment
 

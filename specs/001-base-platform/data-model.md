@@ -2,13 +2,32 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 
 # Data Model: Base Platform Foundation
 
-## Overview
+<details>
+<summary>Expand for Table of Contents</summary>
+
+- [Data Model: Base Platform Foundation](#data-model-base-platform-foundation)
+  - [1. Overview](#1-overview)
+  - [2. Entities](#2-entities)
+    - [2.1. environment\_profiles](#21-environment_profiles)
+    - [2.2. toolchain\_definitions](#22-toolchain_definitions)
+    - [2.3. credential\_policies](#23-credential_policies)
+    - [2.4. workflow\_suites](#24-workflow_suites)
+    - [2.5. parity\_results](#25-parity_results)
+  - [3. Relationships \& Lifecycle](#3-relationships--lifecycle)
+  - [4. Validation Rules](#4-validation-rules)
+
+</details>
+
+---
+
+## 1. Overview
 
 Although the feature introduces primarily operational workflows, several configuration entities require structured storage (database tables, configuration files, or JSON metadata) to keep the baseline auditable, scriptable, and testable. Entities below can live in database tables, configuration JSON, or structured YAML/JSON stored in the repository and loaded via config caches.
 
-## Entities
+## 2. Entities
 
-### environment_profiles
+### 2.1. environment_profiles
+
 | Field | Type | Rules |
 |-------|------|-------|
 | id | uuid | Primary identifier |
@@ -19,7 +38,8 @@ Although the feature introduces primarily operational workflows, several configu
 | status | enum(`supported`,`deprecated`) | Only supported profiles exposed in docs |
 | created_at / updated_at | timestamps | Track lifecycle |
 
-### toolchain_definitions
+### 2.2. toolchain_definitions
+
 | Field | Type | Rules |
 |-------|------|-------|
 | id | uuid | Primary identifier |
@@ -30,7 +50,8 @@ Although the feature introduces primarily operational workflows, several configu
 | documentation_url | string nullable | Reference for contributors |
 | created_at / updated_at | timestamps | |
 
-### credential_policies
+### 2.3. credential_policies
+
 | Field | Type | Rules |
 |-------|------|-------|
 | id | uuid | Primary identifier |
@@ -41,7 +62,8 @@ Although the feature introduces primarily operational workflows, several configu
 | notes | text nullable | Future migration instructions |
 | created_at / updated_at | timestamps | |
 
-### workflow_suites
+### 2.4. workflow_suites
+
 | Field | Type | Rules |
 |-------|------|-------|
 | id | uuid | Primary identifier |
@@ -49,10 +71,10 @@ Although the feature introduces primarily operational workflows, several configu
 | triggers | jsonb | Lists push/nightly/release conditions |
 | required_checks | jsonb | Lists named jobs (lint, unit, type, mutation, browser) |
 | sla_minutes | integer | Target completion SLA (e.g., 25 for core) |
-| notification_channel | string | Slack/email hook for failures |
 | created_at / updated_at | timestamps | |
 
-### parity_results
+### 2.5. parity_results
+
 | Field | Type | Rules |
 |-------|------|-------|
 | id | uuid | Primary identifier |
@@ -62,15 +84,26 @@ Although the feature introduces primarily operational workflows, several configu
 | issues | jsonb | Detailed parity differences (versions, missing services) |
 | created_at | timestamp | Record insertion |
 
-## Relationships & Lifecycle
+### 2.6. workflow_suite_channels
+
+| Field | Type | Rules |
+|-------|------|-------|
+| id | uuid | Primary identifier |
+| workflow_suite_id | uuid FK → workflow_suites.id | Supports many channels per suite |
+| channel | string | Destination identifier (Slack webhook alias, email list, etc.) |
+| medium | enum(`slack`,`email`,`webhook`) | Delivery mechanism |
+| created_at / updated_at | timestamps | Track maintenance changes |
+
+## 3. Relationships & Lifecycle
 
 - `environment_profiles` 1→N `parity_results` to track parity drift over time.
 - `toolchain_definitions` link logically to `environment_profiles` (many-to-many) when validating runtime parity.
 - `workflow_suites` reference `toolchain_definitions` to ensure CI scripts use the correct versions.
 - `credential_policies` reference both CI pipelines and local docs; future multi-user support can add a join table mapping developers to access grants.
+- `workflow_suites` reference `workflow_suite_channels` (1→N) ensuring each suite can alert multiple destinations without duplicating suite metadata.
 - State transitions: profiles move from `supported` → `deprecated` when superseded; workflows update `sla_minutes` as optimization efforts land.
 
-## Validation Rules
+## 4. Validation Rules
 
 - Version fields must pass semantic version validation and align with lockfiles checked into the repo.
 - Parity results marked `fail` trigger incident response workflow and must include at least one issue entry.
