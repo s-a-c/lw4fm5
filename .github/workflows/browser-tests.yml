@@ -23,24 +23,17 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.4
+          php-version: 8.5
           tools: composer:v2
-          coverage: xdebug
+          coverage: none
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: Install Node Dependencies
-        run: npm ci
-
-      - name: Install Playwright Dependencies
-        run: npm install playwright@latest
+          bun-version: 1.1.17
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: bunx playwright install --with-deps
 
       - name: Add `laravel-labs/starter-kit-browser-tests` Repository
         run: |
@@ -49,10 +42,13 @@ jobs:
           composer require "laravel-labs/starter-kit-browser-tests:dev-main@dev" --dev --no-update
 
       - name: Add Flux Credentials Loaded From ENV
-        run: composer config http-basic.composer.fluxui.dev "${{ secrets.FLUX_PRO_USERNAME }}" "${{ secrets.FLUX_PRO_PASSWORD }}"
+        if: ${{ secrets.FLUXUI_PRO_USERNAME != '' && secrets.FLUXUI_PRO_KEY != '' }}
+        run: composer config http-basic.composer.fluxui.dev "${{ secrets.FLUXUI_PRO_USERNAME }}" "${{ secrets.FLUXUI_PRO_KEY }}"
 
       - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+        run: |
+          composer install --no-interaction --prefer-dist --optimize-autoloader
+          bun install --frozen-lockfile
 
       - name: Copy Environment File
         run: cp .env.example .env
@@ -62,13 +58,13 @@ jobs:
 
       - name: Setup Test Environment
         run: |
-           cp vendor/laravel-labs/starter-kit-browser-tests/phpunit.xml.dist .
-           rm phpunit.xml
-           rm -Rf tests/
-           cp -rf vendor/laravel-labs/starter-kit-browser-tests/tests/ tests/
+          cp vendor/laravel-labs/starter-kit-browser-tests/phpunit.xml.dist .
+          rm phpunit.xml
+          rm -Rf tests/
+          cp -rf vendor/laravel-labs/starter-kit-browser-tests/tests/ tests/
 
       - name: Build Assets
-        run: npm run build
+        run: bun run build
 
       - name: Tests
         run: php vendor/bin/pest

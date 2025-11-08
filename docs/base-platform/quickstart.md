@@ -36,7 +36,16 @@ php artisan platform:validate-profiles --all
 
 Validation runs weekly via scheduler and nightly in CI, but you can execute it locally after large changes. Results are stored in `storage/app/base-platform/validation/`.
 
-## 5. Recovery & Support
+## 5. CI Parity Checks
+
+```bash
+composer workflow:core
+php artisan policy:checksum-monitor --once
+```
+
+Validate that the same suite executed in CI passes locally before opening a pull request.
+
+## 6. Recovery & Support
 
 - Bootstrap failure? See [Bootstrap Recovery](./bootstrap-recovery.md)
 - Offline network? Follow [Offline & Proxy Guide](./offline-proxy.md)

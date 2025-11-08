@@ -111,6 +111,7 @@ tests/
 | Shell script (`scripts/platform/bootstrap.sh`) | `scripts/platform/` directory | Developer-friendly wrapper around `platform:bootstrap`, handles secret prompts | Phase 3 T032–T034, `quickstart.md` §2 |
 | GitHub workflows (`tests.yml`, `lint.yml`, `browser-tests.yml`, `nightly-heavy.yml`) | `.github/workflows/` | Enforce Bun toolchain, schedule heavy suites, call checksum and validation commands | Phase 4 T046–T064, `Operational Cadence & Monitoring` |
 | Workflow suite channels | `app/Models/WorkflowSuiteChannel.php`, `app/Services/BasePlatform/WorkflowSuiteChannelSync.php` | Persist and synchronize multi-destination alert routing for each workflow suite | Phase 4 T055A–T057A, T060A–T062B, `data-model.md` §2.6 |
+| Workflow tier policy helper | `app/Support/TieredWorkflowPolicy.php` | Provide tier metadata for CI workflows and SLA mapping | Phase 4 T048, `config/base-platform.php` |
 
 ### Environment Validation Alignment
 

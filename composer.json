@@ -149,6 +149,19 @@
       "pint --parallel",
       "bun run lint"
     ],
+    "workflow:core": [
+      "@test:lint",
+      "@test:unit",
+      "@test:types",
+      "@security:audit"
+    ],
+    "workflow:heavy": [
+      "@test:mutation",
+      "bunx playwright test"
+    ],
+    "workflow:policy": [
+      "php artisan policy:checksum-monitor"
+    ],
     "test:type-coverage": "pest --type-coverage --min=100",
     "test:lint": [
       "pint --parallel --test",

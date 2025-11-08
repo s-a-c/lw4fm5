@@ -11,6 +11,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 final class WorkflowSuite extends Model
 {
@@ -27,6 +28,14 @@ final class WorkflowSuite extends Model
     ];
 
     protected $keyType = 'string';
+
+    /**
+     * @return HasMany<WorkflowSuiteChannel>
+     */
+    public function channels(): HasMany
+    {
+        return $this->hasMany(WorkflowSuiteChannel::class);
+    }
 
     /**
      * @return array<string, string>

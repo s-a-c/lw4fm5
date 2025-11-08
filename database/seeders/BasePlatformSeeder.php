@@ -8,8 +8,10 @@ use App\Models\CredentialPolicy;
 use App\Models\EnvironmentProfile;
 use App\Models\ToolchainDefinition;
 use App\Models\WorkflowSuite;
+use App\Models\WorkflowSuiteChannel;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 
 final class BasePlatformSeeder extends Seeder
@@ -20,6 +22,7 @@ final class BasePlatformSeeder extends Seeder
         $this->seedToolchainDefinitions();
         $this->seedCredentialPolicies();
         $this->seedWorkflowSuites();
+        $this->seedWorkflowSuiteChannels();
     }
 
     private function seedEnvironmentProfiles(): void
@@ -145,6 +148,40 @@ final class BasePlatformSeeder extends Seeder
             uniqueBy: ['name'],
             update: ['triggers', 'required_checks', 'sla_minutes', 'updated_at']
         );
+    }
+
+    private function seedWorkflowSuiteChannels(): void
+    {
+        $desired = Config::get('base-platform.workflow_suite_channels', []);
+
+        $records = [];
+
+        foreach ($desired as $suiteName => $channels) {
+            $suite = WorkflowSuite::query()->where('name', $suiteName)->first();
+
+            if ($suite === null) {
+                continue;
+            }
+
+            foreach ($channels as $channel) {
+                $records[] = [
+                    'id' => (string) Str::uuid(),
+                    'workflow_suite_id' => $suite->id,
+                    'channel' => $channel['channel'],
+                    'medium' => $channel['medium'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+        }
+
+        if ($records !== []) {
+            WorkflowSuiteChannel::query()->upsert(
+                $records,
+                uniqueBy: ['workflow_suite_id', 'channel', 'medium'],
+                update: ['updated_at']
+            );
+        }
     }
 
     /**

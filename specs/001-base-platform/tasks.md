@@ -1,3 +1,5 @@
+Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
+
 # Tasks: Base Platform Foundation
 
 <details>
@@ -136,34 +138,34 @@
 
 ### 5.1. Tests for User Story 2 (MANDATORY) ⚠️
 
-- [ ] T046 [P] [US2] Add architecture test ensuring workflows use Bun in `tests/Architecture/GitHubWorkflowComplianceTest.php`
-- [ ] T047 [P] [US2] Add architecture test verifying nightly workflow presence in `tests/Architecture/NightlyWorkflowTest.php`
-- [ ] T048 [P] [US2] Add unit test confirming tiered policy metadata in `tests/Unit/BasePlatform/TieredWorkflowPolicyTest.php`
-- [ ] T049 [P] [US2] Add feature test for policy checksum monitor command in `tests/Feature/BasePlatform/PolicyChecksumMonitorTest.php`
+- [x] T046 [P] [US2] Add architecture test ensuring workflows use Bun in `tests/Architecture/GitHubWorkflowComplianceTest.php`
+- [x] T047 [P] [US2] Add architecture test verifying nightly workflow presence in `tests/Architecture/NightlyWorkflowTest.php`
+- [x] T048 [P] [US2] Add unit test confirming tiered policy metadata in `tests/Unit/BasePlatform/TieredWorkflowPolicyTest.php`
+- [x] T049 [P] [US2] Add feature test for policy checksum monitor command in `tests/Feature/BasePlatform/PolicyChecksumMonitorTest.php`
 
-- [ ] T050 [US2] Refactor CI workflow configuration in `.github/workflows/tests.yml` to run Bun-based `composer lint` + `composer test` and invoke `policy:checksum-monitor`
-- [ ] T051 [US2] Refactor lint workflow to Bun in `.github/workflows/lint.yml`
-- [ ] T052 [US2] Refactor browser workflow to Bun in `.github/workflows/browser-tests.yml`
-- [ ] T053 [US2] Add nightly heavy-suite workflow in `.github/workflows/nightly-heavy.yml`
-- [ ] T054 [US2] Update tiered workflow scripts in `composer.json`
-- [ ] T055 [US2] Remove npm fallbacks and enforce Bun in `package.json`
-- [ ] T055A [US2] Add workflow suite channel migration `database/migrations/2025_11_07_000500_create_workflow_suite_channels_table.php`
-- [ ] T055B [US2] Implement `WorkflowSuiteChannel` model in `app/Models/WorkflowSuiteChannel.php`
-- [ ] T056 [US2] Document CI policy and SLAs in `docs/base-platform/ci-policy.md`
-- [ ] T056A [US2] Update plan.md to reflect multi-channel workflow suite architecture and safeguards
-- [ ] T057 [US2] Persist workflow suite records via `database/seeders/BasePlatformSeeder.php`
-- [ ] T057A [US2] Seed workflow suite channel defaults in `database/seeders/BasePlatformSeeder.php`
-- [ ] T058 [US2] Schedule nightly heavy run in `bootstrap/app.php`
-- [ ] T059 [US2] Implement policy checksum monitor script in `scripts/automation/policy-checksum.sh`
-- [ ] T060 [US2] Implement `policy:checksum-monitor` command in `app/Console/Commands/PolicyChecksumMonitor.php`
-- [ ] T060A [US2] Implement workflow suite channel repository/service in `app/Services/BasePlatform/WorkflowSuiteChannelSync.php`
-- [ ] T060B [US2] Add architecture test ensuring multi-channel workflow suites in `tests/Architecture/WorkflowSuiteChannelsTest.php`
-- [ ] T061 [US2] Schedule checksum monitor (nightly + release hooks) in `bootstrap/app.php`
-- [ ] T062 [US2] Add CI step executing policy checksum monitor in `.github/workflows/tests.yml`
-- [ ] T062A [US2] Export workflow suite channels via config cache in `config/base-platform.php`
-- [ ] T062B [US2] Document multi-channel alert mapping in `docs/base-platform/ci-policy.md`
-- [ ] T063 [US2] Add CI job executing environment validation command for native and container profiles in `.github/workflows/tests.yml`
-- [ ] T064 [US2] Schedule weekly checksum monitor and validation command bundle in `bootstrap/app.php`
+- [x] T050 [US2] Refactor CI workflow configuration in `.github/workflows/tests.yml` to run Bun-based `composer lint` + `composer test` and invoke `policy:checksum-monitor`
+- [x] T051 [US2] Refactor lint workflow to Bun in `.github/workflows/lint.yml`
+- [x] T052 [US2] Refactor browser workflow to Bun in `.github/workflows/browser-tests.yml`
+- [x] T053 [US2] Add nightly heavy-suite workflow in `.github/workflows/nightly-heavy.yml`
+- [x] T054 [US2] Update tiered workflow scripts in `composer.json`
+- [x] T055 [US2] Remove npm fallbacks and enforce Bun in `package.json`
+- [x] T055A [US2] Add workflow suite channel migration `database/migrations/2025_11_07_000500_create_workflow_suite_channels_table.php`
+- [x] T055B [US2] Implement `WorkflowSuiteChannel` model in `app/Models/WorkflowSuiteChannel.php`
+- [x] T056 [US2] Document CI policy and SLAs in `docs/base-platform/ci-policy.md`
+- [x] T056A [US2] Update plan.md to reflect multi-channel workflow suite architecture and safeguards
+- [x] T057 [US2] Persist workflow suite records via `database/seeders/BasePlatformSeeder.php`
+- [x] T057A [US2] Seed workflow suite channel defaults in `database/seeders/BasePlatformSeeder.php`
+- [x] T058 [US2] Schedule nightly heavy run in `bootstrap/app.php`
+- [x] T059 [US2] Implement policy checksum monitor script in `scripts/automation/policy-checksum.sh`
+- [x] T060 [US2] Implement `policy:checksum-monitor` command in `app/Console/Commands/PolicyChecksumMonitor.php`
+- [x] T060A [US2] Implement workflow suite channel repository/service in `app/Services/BasePlatform/WorkflowSuiteChannelSync.php`
+- [x] T060B [US2] Add architecture test ensuring multi-channel workflow suites in `tests/Architecture/WorkflowSuiteChannelsTest.php`
+- [x] T061 [US2] Schedule checksum monitor (nightly + release hooks) in `bootstrap/app.php`
+- [x] T062 [US2] Add CI step executing policy checksum monitor in `.github/workflows/tests.yml`
+- [x] T062A [US2] Export workflow suite channels via config cache in `config/base-platform.php`
+- [x] T062B [US2] Document multi-channel alert mapping in `docs/base-platform/ci-policy.md`
+- [x] T063 [US2] Add CI job executing environment validation command for native and container profiles in `.github/workflows/tests.yml`
+- [x] T064 [US2] Schedule weekly checksum monitor and validation command bundle in `bootstrap/app.php`
 
 **Checkpoint**: User Story 2 functional—QA validates CI workflow updates, scheduled jobs, and checksum monitor outputs, attaching run logs that demonstrate nightly, weekly, and release-gate executions.
 

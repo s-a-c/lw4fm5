@@ -11,7 +11,7 @@ on:
       - main
 
 jobs:
-  ci:
+  core-quality:
     runs-on: ubuntu-latest
     environment: Testing
 
@@ -24,80 +24,66 @@ jobs:
         with:
           php-version: 8.5
           tools: composer:v2
-          coverage: xdebug
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "25"
+          coverage: none
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version: 1.1.17
 
-      - name: Install Node Dependencies
-        run: bun install
+      - name: Configure Composer Auth
+        if: ${{ secrets.FLUXUI_PRO_USERNAME != '' && secrets.FLUXUI_PRO_KEY != '' }}
+        run: composer config http-basic.composer.fluxui.dev "${{ secrets.FLUXUI_PRO_USERNAME }}" "${{ secrets.FLUXUI_PRO_KEY }}"
 
-      - name: Add Flux Credentials Loaded From ENV
+      - name: Install Composer Dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Install Bun Dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Prepare Environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Run Core Tier Workflow
+        run: composer workflow:core
+
+      - name: Run Policy Checksum Monitor
+        run: php artisan policy:checksum-monitor
+
+  environment-validation:
+    runs-on: ubuntu-latest
+    needs: core-quality
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.5
+          tools: composer:v2
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.1.17
+
+      - name: Configure Composer Auth
+        if: ${{ secrets.FLUXUI_PRO_USERNAME != '' && secrets.FLUXUI_PRO_KEY != '' }}
         run: composer config http-basic.composer.fluxui.dev "${{ secrets.FLUXUI_PRO_USERNAME }}" "${{ secrets.FLUXUI_PRO_KEY }}"
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Copy Environment File
-        run: cp .env.example .env
+      - name: Prepare Application
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan migrate --force
+          php artisan db:seed --class=BasePlatformSeeder
 
-      - name: Generate Application Key
-        run: php artisan key:generate
-
-      - name: Build Assets
-        run: bun run build
-
-      - name: Get Playwright version
-        id: playwright-version
-        run: echo "version=$(jq -r '.devDependencies["@playwright/test"] // .dependencies["@playwright/test"] // ""' package.json)" >> $GITHUB_OUTPUT
-
-      - name: Cache Playwright Browsers
-        uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}
-
-      - name: Install Playwright Browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: bunx playwright install --with-deps
-
-      - name: Install Playwright System Dependencies
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: bunx playwright install-deps
-
-      - name: Rector Cache
-        uses: actions/cache@v4
-        with:
-          path: /tmp/rector
-          key: ${{ runner.os }}-rector-${{ hashFiles('composer.lock') }}
-          restore-keys: ${{ runner.os }}-rector-
-      - run: mkdir -p /tmp/rector
-
-      - name: PHPStan Cache
-        uses: actions/cache@v4
-        with:
-          path: /tmp/phpstan
-          key: ${{ runner.os }}-phpstan-${{ hashFiles('composer.lock') }}
-          restore-keys: ${{ runner.os }}-phpstan-
-      - run: mkdir -p /tmp/phpstan
-
-      - name: Run Composer Test Suite (types, unit, lint, audit)
-        run: composer test
-
-      - name: Run Mutation Tests
-        run: composer test:mutation
-
-      - name: Store Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: browser-screenshots
-          path: |
-            tests/Browser/Screenshots
+      - name: Validate Environment Profiles
+        run: php artisan platform:validate-profiles --all
