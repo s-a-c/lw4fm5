@@ -31,6 +31,7 @@ The command performs:
 - Bootstrap recovery helper registration
 
 If Flux credentials are missing, the script exits with actionable guidance (also see `docs/base-platform/bootstrap-recovery.md` and `docs/base-platform/credential-onboarding.md`).
+Success criterion: total bootstrap time must stay within 45 minutes and conclude with a zero exit code plus the `Bootstrap complete` log entry captured in `storage/logs/bootstrap.log`.
 
 ## 3. Parity Smoke Test (Optional but Recommended)
 ```bash
@@ -43,6 +44,7 @@ To run the full environment validation that covers both profiles:
 php artisan platform:validate-profiles --all
 ```
 See `docs/base-platform/environment-validation.md` for interpreting results.
+Exit criteria: the command must return code `0` with each profile marked `pass`. Any `warning` or `fail` status blocks progression until recovery steps succeed.
 
 ## 4. Run Quality Gates
 ```bash
@@ -86,6 +88,7 @@ Verify:
 - Execute checksum monitor dry run: `php artisan policy:checksum-monitor --once`; store output together with validation reports.
 - Confirm nightly heavy-suite and validation jobs passed in GitHub Actions before release tagging.
 - Record support-ticket metrics before launch and weekly after launch following `docs/base-platform/support-metrics.md`.
+Bundle these artifacts (validation reports, checksum logs, Actions run URLs) under the sprint QA evidence folder referenced in `tasks.md` checkpoints.
 
 ## 9. CI Verification
 Push a branch; ensure GitHub workflows `lint`, `tests`, and `browser-tests` complete in <25 minutes. Heavy suites execute nightly—monitor Actions dashboard for results before tagging releases.

@@ -1,5 +1,36 @@
 # Tasks: Base Platform Foundation
 
+<details>
+<summary>Expand for Table of Contents</summary>
+
+- [Tasks: Base Platform Foundation](#tasks-base-platform-foundation)
+  - [1. Format: `[ID] [P?] [Story] Description`](#1-format-id-p-story-description)
+  - [2. Phase 1: Setup (Shared Infrastructure)](#2-phase-1-setup-shared-infrastructure)
+  - [3. Phase 2: Foundational (Blocking Prerequisites)](#3-phase-2-foundational-blocking-prerequisites)
+  - [4. Phase 3: User Story 1 - Engineer boots the baseline stack (Priority: P1) 🎯 MVP](#4-phase-3-user-story-1---engineer-boots-the-baseline-stack-priority-p1--mvp)
+    - [4.1. Tests for User Story 1 (MANDATORY) ⚠️](#41-tests-for-user-story-1-mandatory-️)
+  - [5. Phase 4: User Story 2 - CI guardians enforce consistency (Priority: P2)](#5-phase-4-user-story-2---ci-guardians-enforce-consistency-priority-p2)
+    - [5.1. Tests for User Story 2 (MANDATORY) ⚠️](#51-tests-for-user-story-2-mandatory-️)
+  - [6. Phase 5: User Story 3 - Dependency stewardship stays sane (Priority: P3)](#6-phase-5-user-story-3---dependency-stewardship-stays-sane-priority-p3)
+    - [6.1. Tests for User Story 3 (MANDATORY) ⚠️](#61-tests-for-user-story-3-mandatory-️)
+    - [6.2. Implementation for User Story 3](#62-implementation-for-user-story-3)
+  - [7. Phase 6: Polish \& Cross-Cutting Concerns](#7-phase-6-polish--cross-cutting-concerns)
+  - [8. Dependencies \& Execution Order](#8-dependencies--execution-order)
+    - [8.1. Phase Dependencies](#81-phase-dependencies)
+    - [8.2. User Story Dependencies](#82-user-story-dependencies)
+    - [8.3. Within Each User Story](#83-within-each-user-story)
+    - [8.4. Parallel Opportunities](#84-parallel-opportunities)
+  - [9. Parallel Example: User Story 1](#9-parallel-example-user-story-1)
+  - [10. Implementation Strategy](#10-implementation-strategy)
+    - [10.1. MVP First (User Story 1 Only)](#101-mvp-first-user-story-1-only)
+    - [10.2. Incremental Delivery](#102-incremental-delivery)
+    - [10.3. Parallel Team Strategy](#103-parallel-team-strategy)
+  - [11. Notes](#11-notes)
+
+</details>
+
+---
+
 **Input**: Design documents from `/specs/001-base-platform/`
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
@@ -7,30 +38,37 @@
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
-## Format: `[ID] [P?] [Story] Description`
+## 1. Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)
 - **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3)
 - Include exact file paths in descriptions
+- Command names listed below match `quickstart.md` instructions and `plan.md` responsibility tables to prevent tooling drift.
 
-## Phase 1: Setup (Shared Infrastructure)
+[P]: #
+[Story]: #
+[US1]: #
+[US2]: #
+[US3]: #
+
+## 2. Phase 1: Setup (Shared Infrastructure)
 
 **Purpose**: Prepare documentation scaffolding and profile directories required by all subsequent work.
 
-- [ ] T001 Create environment overview stub in `docs/base-platform/README.md`
-- [ ] T002 [P] Add profile switching directory with placeholder doc in `scripts/profile/README.md`
-- [ ] T003 [P] Add automation scripts directory note in `scripts/platform/README.md`
-- [ ] T004 Record baseline toolchain versions in `docs/base-platform/toolchain-baseline.md`
+- [x] T001 Create environment overview stub in `docs/base-platform/README.md`
+- [x] T002 [P] Add profile switching directory with placeholder doc in `scripts/profile/README.md` describing how `platform:bootstrap` consumes profile env files
+- [x] T003 [P] Add automation scripts directory note in `scripts/platform/README.md` outlining wrapper responsibilities for artisan commands
+- [x] T004 Record baseline toolchain versions in `docs/base-platform/toolchain-baseline.md`
 
 ---
 
-## Phase 2: Foundational (Blocking Prerequisites)
+## 3. Phase 2: Foundational (Blocking Prerequisites)
 
 **Purpose**: Core infrastructure that MUST be complete before ANY user story can be implemented.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T005 Create base configuration stub in `config/base-platform.php`
+- [ ] T005 Create base configuration stub in `config/base-platform.php` including toggles for nightly, weekly, monthly schedules
 - [ ] T006 [P] Add service provider shell in `app/Providers/BasePlatformServiceProvider.php`
 - [ ] T007 [P] Register provider within `bootstrap/providers.php`
 - [ ] T008 [P] Scaffold environment profile migration `database/migrations/2025_11_07_000000_create_environment_profiles_table.php`
@@ -46,17 +84,17 @@
 - [ ] T018 Establish base metrics helper in `app/Support/BasePlatformMetrics.php`
 - [ ] T019 Document parity routines in `docs/base-platform/parity-overview.md`
 
-**Checkpoint**: Foundation ready—QA confirms setup docs, migrations, and tooling prerequisites are satisfied before user story work begins.
+**Checkpoint**: Foundation ready—QA confirms setup docs, migrations, and tooling prerequisites are satisfied before user story work begins, including verifying `docs/base-platform/README.md`, `scripts/*/README.md`, and `docs/base-platform/toolchain-baseline.md` capture recorded runtime versions and prerequisite checklists.
 
 ---
 
-## Phase 3: User Story 1 - Engineer boots the baseline stack (Priority: P1) 🎯 MVP
+## 4. Phase 3: User Story 1 - Engineer boots the baseline stack (Priority: P1) 🎯 MVP
 
 **Goal**: Deliver an automated bootstrap workflow supporting both native and container profiles with smoke tests, recovery routines, and metrics.
 
 **Independent Test**: Run `php artisan platform:bootstrap --profile=native` (or `container`) on a clean machine; confirm bootstrap completes, parity check reports pass, recovery guidance surfaces for failures, and metrics/log entries are emitted.
 
-### Tests for User Story 1 (MANDATORY) ⚠️
+### 4.1. Tests for User Story 1 (MANDATORY) ⚠️
 
 - [ ] T020 [P] [US1] Add bootstrap workflow feature test in `tests/Feature/BasePlatform/BootstrapWorkflowTest.php`
 - [ ] T021 [P] [US1] Add parity check feature test in `tests/Feature/BasePlatform/ParityCheckTest.php`
@@ -66,10 +104,8 @@
 - [ ] T025 [P] [US1] Add native profile validation feature test in `tests/Feature/BasePlatform/BootstrapNativeProfileTest.php`
 - [ ] T026 [P] [US1] Add container profile validation feature test in `tests/Feature/BasePlatform/BootstrapContainerProfileTest.php`
 
-### Implementation for User Story 1
-
-- [ ] T027 [P] [US1] Implement bootstrap command in `app/Console/Commands/RunPlatformBootstrap.php`
-- [ ] T028 [P] [US1] Implement parity check command in `app/Console/Commands/RunParityCheck.php`
+- [ ] T027 [P] [US1] Implement `platform:bootstrap` command in `app/Console/Commands/RunPlatformBootstrap.php`
+- [ ] T028 [P] [US1] Implement `platform:parity-check` command in `app/Console/Commands/RunParityCheck.php`
 - [ ] T029 [US1] Implement bootstrap orchestrator service in `app/Services/BasePlatform/BootstrapRunner.php`
 - [ ] T030 [P] [US1] Create native profile switch script in `scripts/profile/use-native.sh`
 - [ ] T031 [P] [US1] Create container profile switch script in `scripts/profile/use-container.sh`
@@ -84,30 +120,28 @@
 - [ ] T040 [US1] Wire bootstrap health checks into `app/Support/BasePlatformMetrics.php`
 - [ ] T041 [US1] Document credential rotation playbook in `docs/base-platform/credential-rotation.md`
 - [ ] T042 [US1] Document credential onboarding checklist in `docs/base-platform/credential-onboarding.md`
-- [ ] T043 [US1] Implement environment validation command in `app/Console/Commands/ValidateEnvironmentProfiles.php`
-- [ ] T044 [US1] Schedule environment validation command weekly in `bootstrap/app.php`
+- [ ] T043 [US1] Implement `platform:validate-profiles` command in `app/Console/Commands/ValidateEnvironmentProfiles.php`
+- [ ] T044 [US1] Schedule weekly environment validation command (`platform:validate-profiles --all`) in `bootstrap/app.php`
 - [ ] T045 [US1] Document environment validation workflow in `docs/base-platform/environment-validation.md`
 
-**Checkpoint**: User Story 1 functional—QA archives native/container validation reports, recovery documentation, and credential checklists.
+**Checkpoint**: User Story 1 functional—QA archives native/container validation reports (`storage/app/base-platform/validation/`), recovery documentation, and credential checklists alongside the corresponding CI run URLs.
 
 ---
 
-## Phase 4: User Story 2 - CI guardians enforce consistency (Priority: P2)
+## 5. Phase 4: User Story 2 - CI guardians enforce consistency (Priority: P2)
 
 **Goal**: Align GitHub workflows with the standardized toolchain, tiered quality gates, nightly heavy-suite runs, and automated policy acknowledgement monitoring.
 
 **Independent Test**: Trigger CI workflows for a sample branch to confirm Bun-powered jobs complete within SLA, nightly heavy suite schedule enqueues mutation/browser suites, and policy checksum monitoring runs nightly and during release gating.
 
-### Tests for User Story 2 (MANDATORY) ⚠️
+### 5.1. Tests for User Story 2 (MANDATORY) ⚠️
 
 - [ ] T046 [P] [US2] Add architecture test ensuring workflows use Bun in `tests/Architecture/GitHubWorkflowComplianceTest.php`
 - [ ] T047 [P] [US2] Add architecture test verifying nightly workflow presence in `tests/Architecture/NightlyWorkflowTest.php`
 - [ ] T048 [P] [US2] Add unit test confirming tiered policy metadata in `tests/Unit/BasePlatform/TieredWorkflowPolicyTest.php`
 - [ ] T049 [P] [US2] Add feature test for policy checksum monitor command in `tests/Feature/BasePlatform/PolicyChecksumMonitorTest.php`
 
-### Implementation for User Story 2
-
-- [ ] T050 [US2] Refactor CI workflow configuration in `.github/workflows/tests.yml`
+- [ ] T050 [US2] Refactor CI workflow configuration in `.github/workflows/tests.yml` to run Bun-based `composer lint` + `composer test` and invoke `policy:checksum-monitor`
 - [ ] T051 [US2] Refactor lint workflow to Bun in `.github/workflows/lint.yml`
 - [ ] T052 [US2] Refactor browser workflow to Bun in `.github/workflows/browser-tests.yml`
 - [ ] T053 [US2] Add nightly heavy-suite workflow in `.github/workflows/nightly-heavy.yml`
@@ -117,33 +151,33 @@
 - [ ] T057 [US2] Persist workflow suite records via `database/seeders/BasePlatformSeeder.php`
 - [ ] T058 [US2] Schedule nightly heavy run in `bootstrap/app.php`
 - [ ] T059 [US2] Implement policy checksum monitor script in `scripts/automation/policy-checksum.sh`
-- [ ] T060 [US2] Implement policy checksum monitor command in `app/Console/Commands/PolicyChecksumMonitor.php`
+- [ ] T060 [US2] Implement `policy:checksum-monitor` command in `app/Console/Commands/PolicyChecksumMonitor.php`
 - [ ] T061 [US2] Schedule checksum monitor (nightly + release hooks) in `bootstrap/app.php`
 - [ ] T062 [US2] Add CI step executing policy checksum monitor in `.github/workflows/tests.yml`
 - [ ] T063 [US2] Add CI job executing environment validation command for native and container profiles in `.github/workflows/tests.yml`
 - [ ] T064 [US2] Schedule weekly checksum monitor and validation command bundle in `bootstrap/app.php`
 
-**Checkpoint**: User Story 2 functional—QA validates CI workflow updates, scheduled jobs, and checksum monitor outputs.
+**Checkpoint**: User Story 2 functional—QA validates CI workflow updates, scheduled jobs, and checksum monitor outputs, attaching run logs that demonstrate nightly, weekly, and release-gate executions.
 
 ---
 
-## Phase 5: User Story 3 - Dependency stewardship stays sane (Priority: P3)
+## 6. Phase 5: User Story 3 - Dependency stewardship stays sane (Priority: P3)
 
 **Goal**: Create a governed dependency catalogue, automated review workflow, contribution guidelines, and support-metric tracking plan.
 
 **Independent Test**: Execute dependency review command, confirm catalog output, tracking issue generation, and documentation updates for governance and metrics.
 
-### Tests for User Story 3 (MANDATORY) ⚠️
+### 6.1. Tests for User Story 3 (MANDATORY) ⚠️
 
 - [ ] T065 [P] [US3] Add unit test for dependency catalogue parser in `tests/Unit/BasePlatform/DependencyCatalogueTest.php`
 - [ ] T066 [P] [US3] Add feature test for dependency review command in `tests/Feature/BasePlatform/DependencyReviewCommandTest.php`
 - [ ] T067 [P] [US3] Add unit test for contribution guidelines checklist in `tests/Unit/BasePlatform/ContributionGuidelinesTest.php`
 
-### Implementation for User Story 3
+### 6.2. Implementation for User Story 3
 
 - [ ] T068 [US3] Create dependency catalogue data in `storage/app/base-platform/dependencies.json`
 - [ ] T069 [US3] Create dependency policy doc in `docs/base-platform/dependency-policy.md`
-- [ ] T070 [US3] Implement dependency review command in `app/Console/Commands/DependencyReviewReport.php`
+- [ ] T070 [US3] Implement `platform:dependency-review` command in `app/Console/Commands/DependencyReviewReport.php`
 - [ ] T071 [US3] Add monthly scheduler binding in `bootstrap/app.php`
 - [ ] T072 [US3] Add review automation script in `scripts/automation/dependency-review.sh`
 - [ ] T073 [US3] Add GitHub issue template in `.github/ISSUE_TEMPLATE/dependency-review.md`
@@ -151,11 +185,11 @@
 - [ ] T075 [US3] Extend seeder with dependency metadata in `database/seeders/BasePlatformSeeder.php`
 - [ ] T076 [US3] Document support metric tracking plan in `docs/base-platform/support-metrics.md`
 
-**Checkpoint**: All user stories functional—QA confirms dependency review automation, support metric tracking, and documentation outputs.
+**Checkpoint**: All user stories functional—QA confirms dependency review automation, support metric tracking, and documentation outputs, storing the monthly dependency report sample and contribution checklist evidence.
 
 ---
 
-## Phase 6: Polish & Cross-Cutting Concerns
+## 7. Phase 6: Polish & Cross-Cutting Concerns
 
 **Purpose**: Hardening, documentation, and validation tasks affecting multiple stories.
 
@@ -167,28 +201,28 @@
 
 ---
 
-## Dependencies & Execution Order
+## 8. Dependencies & Execution Order
 
-### Phase Dependencies
+### 8.1. Phase Dependencies
 
 - **Setup (Phase 1)**: No dependencies—start immediately.
 - **Foundational (Phase 2)**: Depends on Setup completion—BLOCKS all user stories.
 - **User Stories (Phase 3-5)**: All depend on Foundational completion. Implement in priority order (P1 → P2 → P3) or in parallel once foundation is ready.
 - **Polish (Phase 6)**: Depends on completion of intended user stories.
 
-### User Story Dependencies
+### 8.2. User Story Dependencies
 
 - **User Story 1 (P1)**: Can start after Phase 2; no dependency on other stories.
 - **User Story 2 (P2)**: Requires Phase 2 and US1 bootstrap infrastructure (metrics/recovery hooks).
 - **User Story 3 (P3)**: Requires Phase 2 and shared seeder/config updates from US1.
 
-### Within Each User Story
+### 8.3. Within Each User Story
 
 - Write and fail tests (tasks marked [P] in test sections) before implementation tasks.
 - Models/config/scripts → Services/commands → Documentation → Scheduling/metrics updates.
 - Use checkpoints to validate each story independently before moving on.
 
-### Parallel Opportunities
+### 8.4. Parallel Opportunities
 
 - Tasks flagged [P] in Phases 1-6 can run concurrently.
 - Once foundation complete, user stories can proceed in parallel if team capacity allows.
@@ -196,7 +230,7 @@
 
 ---
 
-## Parallel Example: User Story 1
+## 9. Parallel Example: User Story 1
 
 ```bash
 # Run tests in parallel (after scaffolding files):
@@ -216,23 +250,23 @@
 
 ---
 
-## Implementation Strategy
+## 10. Implementation Strategy
 
-### MVP First (User Story 1 Only)
+### 10.1. MVP First (User Story 1 Only)
 
 1. Complete Phase 1: Setup.
 2. Complete Phase 2: Foundational (BLOCKER).
 3. Execute Phase 3: User Story 1 end-to-end, including recovery/credential docs.
 4. STOP and validate bootstrap flow using checkpoints and quickstart.
 
-### Incremental Delivery
+### 10.2. Incremental Delivery
 
 1. Deliver User Story 1 (MVP) → share bootstrap capability.
 2. Deliver User Story 2 → CI standardization & policy monitoring.
 3. Deliver User Story 3 → dependency governance & support metrics.
 4. Finish with Phase 6 polish tasks.
 
-### Parallel Team Strategy
+### 10.3. Parallel Team Strategy
 
 - After Phase 2, assign US1/US2/US3 to different owners.
 - Coordinate on shared files (`bootstrap/app.php`, `database/seeders/BasePlatformSeeder.php`, docs).
@@ -240,10 +274,11 @@
 
 ---
 
-## Notes
+## 11. Notes
 
 - [P] tasks target different files to avoid merge conflicts.
 - Maintain TDD: ensure tests fail before implementation.
 - Keep documentation in sync with automation (CI, quickstart, recovery, policies).
 - Update seeder and schedules once per story to avoid conflicts.
 - Confirm constitution requirements (policy headers, TDD, observability) remain satisfied throughout delivery.
+- Archive QA evidence (validation reports, checksum logs, dependency review outputs) in the locations specified by quickstart checkpoints before marking tasks complete.

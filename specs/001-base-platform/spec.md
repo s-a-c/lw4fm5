@@ -98,6 +98,54 @@ Technical leads want a governed process that documents which backend and fronten
 - Current scope assumes a solo developer managing local credentials via encrypted `.env` files; future team expansion must revisit access provisioning and auditing needs.
 - Base Platform automation lives entirely within the Storefront service; it must not introduce cross-service integrations, and ongoing maintenance ownership resides with the Platform Engineering team.
 
+## Architecture Alignment
+
+### Service Boundaries
+
+- Base Platform automation operates exclusively inside the Storefront repository. No new cross-service APIs, database links, or workflow triggers are introduced. GitHub Actions jobs interact only with Storefront code and existing first-party services (PostgreSQL, Redis, Horizon).
+- Explicitly out of scope: communicating with payment, merchandising, or marketing services; publishing events to external queues; depending on other monorepos. Future integrations require a new specification.
+
+### Responsibility Matrix
+
+| Component | Primary Role | Owner | Related Artifacts |
+|-----------|--------------|-------|-------------------|
+| Laravel commands (`platform:bootstrap`, `platform:parity-check`, `platform:validate-profiles`, `policy:checksum-monitor`, `platform:dependency-review`) | Orchestrate domain logic, emit metrics/logs, and coordinate database state | Platform Engineering | `app/Console/Commands/*.php`, `app/Services/BasePlatform/*`, `app/Support/BasePlatformMetrics.php` |
+| Shell scripts (`scripts/platform/*.sh`, `scripts/profile/*.sh`, `scripts/automation/*.sh`) | Provide developer ergonomics and CI shell entrypoints; wrap artisan commands with environment setup | Platform Engineering | Script directories noted in `tasks.md` Phase 1 & 3 |
+| GitHub workflows (`tests.yml`, `lint.yml`, `browser-tests.yml`, `nightly-heavy.yml`) | Enforce parity between local and CI executions, schedule heavy suites, surface checksum drift | Platform Engineering (configuration) with DevEx (operations) | `.github/workflows/*.yml`, `plan.md` Operational Cadence table |
+
+### Environment Validation Coverage
+
+- Dual-profile validation is mandated by **FR-002**. Bootstrap flows, parity checks, and weekly validation schedules cover both native and container profiles. Failure criteria are documented in `tasks.md` (Phase 3, T020–T045) and surfaced to QA through `quickstart.md` §8.
+- Validation output destinations are fixed (`storage/app/base-platform/validation/` for reports, GitHub Actions artifacts for CI), ensuring results remain auditable.
+
+### Recovery & Fallback Coverage
+
+- Recovery flows cover bootstrap, parity, CI heavy suites, and profile validation. Documentation tasks (T034–T036, T045) guarantee actionable guidance for missing secrets, offline/proxy scenarios, and retry escalation paths.
+- Escalation timelines align with **FR-008**: retry once within 15 minutes, then escalate automatically to Platform Engineering through GitHub workflow notifications.
+
+### Observability Hooks
+
+- Each command and script emits structured logs and Prometheus metrics via `app/Support/BasePlatformMetrics.php`, covering bootstrap health, parity drift, checksum compliance, and dependency review status.
+- Smoke tests validate queues, schedulers, and asset builds immediately after bootstrap. Weekly validation jobs reuse the same metrics pipeline to keep observability consistent across automation entry points.
+
+### Scheduling Cadence Consistency
+
+- Nightly: heavy suite workflow (`nightly-heavy.yml`) and checksum monitor.
+- Weekly: environment validation command bundling both profiles.
+- Pre-release: checksum monitor plus environment validation and heavy suite confirmation before tagging.
+- Monthly: dependency review (`platform:dependency-review`) with automated issue creation.
+These cadences mirror the Operational Cadence table in `plan.md` and the scheduling tasks in `tasks.md` Phase 4–5.
+
+### Success Criteria Traceability
+
+| Success Criterion | Architectural Mechanism | Tasks |
+|-------------------|-------------------------|-------|
+| **SC-001** 45-minute bootstrap SLA | `platform:bootstrap`, profile switch scripts, smoke tests, recovery guides | Phase 3 T027–T045 |
+| **SC-002** CI <25 minutes, <5% flake | Bun-aligned workflows, tiered policy metadata, nightly heavy suites | Phase 4 T046–T064 |
+| **SC-003** Monthly dependency review | `platform:dependency-review`, catalog JSON, GitHub issue template | Phase 5 T065–T075 |
+| **SC-004** Quality gate adoption | Composer scripts, workflow suite records, quickstart QA checklist | Phases 3–4, 6 T078–T081 |
+| **SC-005** Support ticket reduction | Credential onboarding/rotation docs, recovery playbooks, QA workflow | Phase 3 docs T035–T045, Phase 6 T076 |
+
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes

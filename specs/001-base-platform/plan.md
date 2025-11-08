@@ -92,10 +92,55 @@ tests/
 
 ## Automation Ownership & Responsibilities
 
-- **Artisan commands** (`RunPlatformBootstrap`, `RunParityCheck`, `ValidateEnvironmentProfiles`, `PolicyChecksumMonitor`, `DependencyReviewReport`) are owned by the Platform Engineering team; they maintain schedules, alerts, and post-launch refinements.
+- **Artisan commands** (`platform:bootstrap`, `platform:parity-check`, `platform:validate-profiles`, `policy:checksum-monitor`, `platform:dependency-review`) are owned by the Platform Engineering team; they maintain schedules, alerts, and post-launch refinements. Command classes live in `app/Console/Commands/` (for example `RunPlatformBootstrap`, `RunParityCheck`, `ValidateEnvironmentProfiles`, `PolicyChecksumMonitor`, `DependencyReviewReport`).
 - **Shell scripts** (`scripts/platform/*`, `scripts/profile/*`, `scripts/automation/*`) are owned by Platform Engineering for local tooling, with onboarding documentation in `docs/base-platform/` kept synchronized with command behavior.
 - **GitHub workflows** (tests, lint, browser, nightly heavy suites) are owned jointly by Platform Engineering and DevEx; DevEx monitors CI reliability, while Platform Engineering ensures workflow configuration remains aligned with spec requirements.
 - Ownership handoffs after launch must be recorded in the changelog and acknowledged during sprint retrospectives.
+
+### Component Responsibility Alignment
+
+| Artifact Type | Runtime Entry Point | Responsibility | Primary References |
+|---------------|---------------------|----------------|--------------------|
+| Artisan command (`platform:bootstrap`) | `app/Console/Commands/RunPlatformBootstrap.php` | Execute bootstrap orchestration, dispatch smoke tests, emit metrics | Phase 3 T027, `quickstart.md` §2, `spec.md` Architecture Alignment |
+| Artisan command (`platform:parity-check`) | `app/Console/Commands/RunParityCheck.php` | Compare native/container parity, persist `parity_results` records, raise drift alerts | Phase 3 T028–T032, `data-model.md` §parity_results |
+| Artisan command (`platform:validate-profiles`) | `app/Console/Commands/ValidateEnvironmentProfiles.php` | Run weekly profile validations across both profiles, archive reports | Phase 3 T043–T045, `quickstart.md` §8 |
+| Artisan command (`policy:checksum-monitor`) | `app/Console/Commands/PolicyChecksumMonitor.php` | Verify policy acknowledgement headers and report drift | Phase 4 T049–T062, `Operational Cadence & Monitoring` |
+| Artisan command (`platform:dependency-review`) | `app/Console/Commands/DependencyReviewReport.php` | Produce monthly dependency catalog reports and open tracking issues | Phase 5 T065–T072 |
+| Shell scripts (`scripts/profile/use-*.sh`) | `scripts/profile/` directory | Configure environment variables and `.env` files for native/container profiles | Phase 1 T002, Phase 3 T030–T031, `quickstart.md` §1 |
+| Shell script (`scripts/platform/bootstrap.sh`) | `scripts/platform/` directory | Developer-friendly wrapper around `platform:bootstrap`, handles secret prompts | Phase 3 T032–T034, `quickstart.md` §2 |
+| GitHub workflows (`tests.yml`, `lint.yml`, `browser-tests.yml`, `nightly-heavy.yml`) | `.github/workflows/` | Enforce Bun toolchain, schedule heavy suites, call checksum and validation commands | Phase 4 T046–T064, `Operational Cadence & Monitoring` |
+
+### Environment Validation Alignment
+
+- **Source of Truth**: `environment_profiles` table (Phase 2 T008, Phase 3 T043) and corresponding documentation (`docs/base-platform/environment-validation.md`).
+- **Execution**: `platform:validate-profiles` runs weekly (scheduled via Phase 3 T044/T064) across both profiles and archives results in `storage/app/base-platform/validation/`.
+- **Failure Criteria**: Any parity drift, missing service, or unsupported runtime halts bootstrap workflows (`platform:bootstrap` exits non-zero) and raises a CI failure (`tests.yml` job).
+- **Surfacing**: Quickstart (§8) instructs QA to store reports, while GitHub Actions retention ensures CI visibility. Tasks checkpoints require QA confirmation before advancing phases.
+
+### Credential & Secret Management Alignment
+
+- **Storage Mechanisms**: GitHub Actions secrets for CI, encrypted `.env` for local (reinforced in `spec.md` FR-007, `quickstart.md` §6, Tasks Phase 3 T041–T042).
+- **Rotation & Onboarding**: Documented via `docs/base-platform/credential-rotation.md` and `docs/base-platform/credential-onboarding.md` with actionable steps tied to Phase 3 tasks and Phase 6 T080.
+- **Validation**: Phase 1 prerequisites include confirming GitHub secrets (`quickstart.md` §1), while bootstrap scripts (T034) fail gracefully when credentials are missing and direct contributors to the docs.
+
+### Recovery & Fallback Strategy
+
+- Bootstrap recovery helper (T033) and documentation (T035) define retry cadence, escalation owners, and log capture steps.
+- Offline/proxy fallback guidance (T036) instructs developers how to mirror registries; parity checks feed into the same guidance when drift stems from network restrictions.
+- CI heavy suite failures link to recovery scripts in `scripts/automation/` (T059–T072) and create actionable logs for QA to validate (Phase 4 checkpoint).
+
+### External Dependencies & Mitigations
+
+- **GitHub Actions**: Verified in Phase 1 prerequisites; mitigated via local `policy:checksum-monitor --once` command when CI unavailable.
+- **Bun & Playwright**: Version pinning recorded in `docs/base-platform/toolchain-baseline.md` (Phase 1 T004) and `composer.json`/`package.json` tasks (Phase 4 T054–T055).
+- **Docker Desktop / Herd**: Documented readiness checks appear in Quickstart §1; tasks require parity scripts to assert virtualization availability.
+- **Credential Providers (Flux)**: Recovery docs include fallback contact and verification steps, satisfying Assumptions mitigation requirements.
+
+### QA Deliverables & Evidence
+
+- Each phase checkpoint lists required artifacts: validation reports, checksum outputs, credential checklist confirmations, parity logs.
+- Quickstart §8–§9 defines where QA stores artifacts (`storage/app/base-platform/validation/`, GitHub Actions run attachments) and the cadence for reviewing nightly jobs prior to releases.
+- Phase 6 T081 explicitly confirms presence of policy headers, checksum outputs, profile validation reports, and QA evidence before sign-off.
 
 ## Operational Cadence & Monitoring
 
@@ -116,3 +161,11 @@ All cadence adjustments must be reflected in `plan.md`, `tasks.md` checkpoints, 
 - **Success criteria mapping**: SC-001–SC-005 map to bootstrap validation, CI performance metrics, dependency review outputs, checklist confirmations, and support-metric tracking, ensuring QA can attest to each outcome.
 
 Support-request reduction (SC-005) will be measured via tagged helpdesk tickets; the process for capturing and reporting this metric is documented in `docs/base-platform/support-metrics.md` and referenced in the quickstart QA workflow.
+
+### Phase Handoff Checkpoints
+
+1. **Setup → Foundational**: QA confirms prerequisite docs (`docs/base-platform/README.md`, `scripts/*/README.md`, `docs/base-platform/toolchain-baseline.md`) list runtime versions, secret checks, and parity prerequisites. Missing content blocks migration work.
+2. **Foundational → User Stories**: Database migrations, models, configuration stubs, and metrics helpers load without runtime errors; `BasePlatformServiceProvider` registration verified via `php artisan` bootstrap.
+3. **US1 → US2**: Commands `platform:bootstrap`, `platform:parity-check`, and `platform:validate-profiles` pass their new test suites, recovery/offline docs are published, and QA archives validation reports.
+4. **US2 → US3**: CI workflows demonstrate Bun parity, nightly heavy suites, and checksum monitor schedules; QA stores GitHub Actions evidence for nightly, weekly, and release-gate runs.
+5. **US3 → Polish**: Dependency catalogue JSON, policy docs, support metrics plan, and monthly report sample exist; QA validates `platform:dependency-review` output before final polish tasks begin.
