@@ -11,6 +11,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 ```
 
 Verify `.env` is symlinked to the chosen profile and `BASE_PLATFORM_PROFILE` is exported.
+> **Windows via WSL**: Launch these commands from the Ubuntu 24.04 WSL shell. Ensure Docker Desktop has WSL integration enabled so the container profile maps to the same environment used in CI.
 
 ## 2. Run Bootstrap
 

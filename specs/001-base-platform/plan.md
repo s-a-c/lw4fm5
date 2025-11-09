@@ -107,6 +107,7 @@ tests/
 | Artisan command (`platform:validate-profiles`) | `app/Console/Commands/ValidateEnvironmentProfiles.php` | Run weekly profile validations across both profiles, archive reports | Phase 3 T043–T045, `quickstart.md` §8 |
 | Artisan command (`policy:checksum-monitor`) | `app/Console/Commands/PolicyChecksumMonitor.php` | Verify policy acknowledgement headers and report drift | Phase 4 T049–T062, `Operational Cadence & Monitoring` |
 | Artisan command (`platform:dependency-review`) | `app/Console/Commands/DependencyReviewReport.php` | Produce monthly dependency catalog reports and open tracking issues | Phase 5 T065–T072 |
+| Artisan command (`platform:dependency-review-performance-report`) | `app/Console/Commands/DependencyReviewPerformanceReport.php` | Record monthly dependency review performance observations and publish outputs for QA evidence | Phase 5 T075A |
 | Shell scripts (`scripts/profile/use-*.sh`) | `scripts/profile/` directory | Configure environment variables and `.env` files for native/container profiles | Phase 1 T002, Phase 3 T030–T031, `quickstart.md` §1 |
 | Shell script (`scripts/platform/bootstrap.sh`) | `scripts/platform/` directory | Developer-friendly wrapper around `platform:bootstrap`, handles secret prompts | Phase 3 T032–T034, `quickstart.md` §2 |
 | GitHub workflows (`tests.yml`, `lint.yml`, `browser-tests.yml`, `nightly-heavy.yml`) | `.github/workflows/` | Enforce Bun toolchain, schedule heavy suites, call checksum and validation commands | Phase 4 T046–T064, `Operational Cadence & Monitoring` |
@@ -115,10 +116,10 @@ tests/
 
 ### Environment Validation Alignment
 
-- **Source of Truth**: `environment_profiles` table (Phase 2 T008, Phase 3 T043) and corresponding documentation (`docs/base-platform/environment-validation.md`).
-- **Execution**: `platform:validate-profiles` runs weekly (scheduled via Phase 3 T044/T064) across both profiles and archives results in `storage/app/base-platform/validation/`.
+- **Source of Truth**: `environment_profiles` table (Phase 2 T008, Phase 3 T043) and corresponding documentation (`docs/base-platform/environment-validation.md`, `docs/base-platform/environment-support-matrix.md`), including the WSL container profile.
+- **Execution**: `platform:validate-profiles` runs weekly (scheduled via Phase 3 T044/T064) across native (macOS/Linux) and container (Linux, macOS, Windows WSL) flows, archives results in `storage/app/base-platform/validation/`, and monthly stewardship tasks verify the environment support matrix while persisting parity logs in `storage/app/base-platform/environment-support.log`.
 - **Failure Criteria**: Any parity drift, missing service, or unsupported runtime halts bootstrap workflows (`platform:bootstrap` exits non-zero) and raises a CI failure (`tests.yml` job).
-- **Surfacing**: Quickstart (§8) instructs QA to store reports, while GitHub Actions retention ensures CI visibility. Tasks checkpoints require QA confirmation before advancing phases.
+- **Surfacing**: Quickstart (§8) instructs QA to store reports, the environment support matrix document is published in `docs/base-platform/environment-support-matrix.md`, validation artifacts live in `storage/app/base-platform/environment-support.log`, and GitHub Actions retention ensures CI visibility. Tasks checkpoints require QA confirmation before advancing phases.
 
 ### Credential & Secret Management Alignment
 
@@ -141,7 +142,7 @@ tests/
 
 ### QA Deliverables & Evidence
 
-- Each phase checkpoint lists required artifacts: validation reports, checksum outputs, credential checklist confirmations, parity logs.
+- Each phase checkpoint lists required artifacts: validation reports, checksum outputs, credential checklist confirmations, parity logs, monthly dependency performance outputs, and the published environment support matrix with its validation log.
 - Quickstart §8–§9 defines where QA stores artifacts (`storage/app/base-platform/validation/`, GitHub Actions run attachments) and the cadence for reviewing nightly jobs prior to releases.
 - Phase 6 T081 explicitly confirms presence of policy headers, checksum outputs, profile validation reports, and QA evidence before sign-off.
 
@@ -150,9 +151,9 @@ tests/
 | Automation | Cadence | Responsible Artifact |
 |------------|---------|-----------------------|
 | Policy checksum monitor | Nightly + pre-release | `.github/workflows/tests.yml`, `bootstrap/app.php` |
-| Environment profile validation | Weekly + pre-release | `.github/workflows/tests.yml`, `bootstrap/app.php` |
+| Environment profile validation | Weekly + pre-release | `.github/workflows/tests.yml`, `bootstrap/app.php`, `docs/base-platform/environment-support-matrix.md` (native + container + WSL) |
 | Mutation/browser heavy suites | Nightly + release gate | `.github/workflows/nightly-heavy.yml` |
-| Dependency review report | Monthly | `bootstrap/app.php`, `scripts/automation/dependency-review.sh` |
+| Dependency review report + performance log | Monthly | `bootstrap/app.php`, `scripts/automation/dependency-review.sh`, `app/Console/Commands/DependencyReviewPerformanceReport.php` |
 
 All cadence adjustments must be reflected in `plan.md`, `tasks.md` checkpoints, and the quickstart QA section.
 

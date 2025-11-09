@@ -57,7 +57,7 @@ Technical leads want a governed process that documents which backend and fronten
 ### Edge Cases
 
 - How does the platform respond when GitHub Actions lacks required secrets (registry credentials, browser automation tokens) or the selected JavaScript runtime is unavailable on the runner image, and how are recovery steps communicated to the engineer?
-- How is version drift handled when contributors use Windows or Linux environments that cannot rely on macOS-specific tooling currently assumed by local docs?
+- How is version drift handled when contributors use Windows (via WSL) or Linux environments that cannot rely on macOS-specific tooling currently assumed by local docs?
 - How do bootstrap, parity, and recovery workflows operate when developers run offline or behind restrictive proxies that block private package repositories or artifact mirrors, and what mirrored registry guidance must be provided?
 
 ## Requirements *(mandatory)*
@@ -65,14 +65,15 @@ Technical leads want a governed process that documents which backend and fronten
 ### Functional Requirements
 
 - **FR-001**: Deliver a single documented bootstrap workflow (scripted or make target) that configures the supported backend runtime, authenticates against private package feeds, applies schema migrations, starts queue workers, and builds frontend assets without manual file edits.
-- **FR-002**: Publish an environment support matrix (minimum macOS + Linux) covering prerequisites, supported runtime versions, and containerized versus host-managed alternatives with automated validation for each path (native and container) that fails the build if either flow breaks.
+- **FR-002**: Publish an environment support matrix (minimum macOS + Linux) in `docs/base-platform/environment-support-matrix.md` covering prerequisites, supported runtime versions, and containerized versus host-managed alternatives, with automated validation for each path (native and container) that fails the build if either flow breaks and archives results in `storage/app/base-platform/environment-support.log`.
 - **FR-003**: Establish a dependency catalogue that classifies backend and frontend packages into “core,” “optional,” and “experimental,” including owners, rationale, and deprecation policy.
 - **FR-004**: Standardize automation scripts so that setup, lint, quality, and test commands are idempotent, parallel-safe, and runnable both locally and in CI; deprecate redundant or failing scripts and document replacements.
 - **FR-005**: Align GitHub workflows (tests, lint, browser) to a shared toolchain configuration (matrix or reusable workflow) that reuses the same runtime definitions, unifies versioning, and caches dependencies consistently.
 - **FR-006**: Provide observability hooks (health checks, smoke tests) that confirm queues, schedulers, and asset builds are functioning post-bootstrap and surface actionable errors when they fail.
 - **FR-007**: Define credential management rules covering private package feeds, browser automation downloads, and environment secrets, including the agreed solo-developer baseline of GitHub Actions secrets for CI and encrypted local `.env` storage, published rotation playbooks, onboarding checklists, and fallback behaviour for future collaborators.
 - **FR-008**: Document and automate recovery procedures for failed automation (bootstrap, parity, CI heavy suites, asset builds) with time-boxed retries and escalation steps.
-- **FR-009**: Deliver a quarterly dependency review workflow that triggers automated reports (e.g., outdated package listings) and creates tasks for the platform backlog.
+- **FR-009**: Deliver a monthly dependency review workflow that triggers automated reports (e.g., outdated package listings), records performance observations, and creates tasks for the platform backlog.
+  - Performance reports must capture command runtime, success/failure state, counts of outdated packages by severity, and references to any follow-up tasks or issues opened from the run.
 - **FR-010**: Ensure policy acknowledgements remain current across all generated artifacts (specs, plans, automation outputs) with an automated checksum monitor that runs nightly and before tagged releases, alerting on drift.
 - **FR-011**: Define baseline data and configuration seeding required for downstream feature work, including synthetic accounts, queue configuration, and monitoring dashboards.
 - **FR-012**: Provide contribution guidelines that map feature work to baseline expectations (testing levels, scripts to run, required Git hooks) so new product teams can self-serve onboarding.
@@ -95,6 +96,7 @@ Technical leads want a governed process that documents which backend and fronten
 - Database, queue, and cache services will remain the standard Laravel stack (PostgreSQL, Redis) unless future specs dictate otherwise.
 - The designated JavaScript runtime is Bun and is expected to remain standard across local and CI environments; any future change must preserve the guarantees defined in this specification.
 - Containerized and native development paths must remain functionally equivalent, with automated parity checks ensuring neither path lags behind.
+- Windows developers are supported through a WSL-driven container profile that mirrors the Linux container flow; native Windows runtimes are out of scope.
 - Current scope assumes a solo developer managing local credentials via encrypted `.env` files; future team expansion must revisit access provisioning and auditing needs.
 - Base Platform automation lives entirely within the Storefront service; it must not introduce cross-service integrations, and ongoing maintenance ownership resides with the Platform Engineering team.
 
@@ -152,7 +154,7 @@ These cadences mirror the Operational Cadence table in `plan.md` and the schedul
 
 - **SC-001**: 100% of new engineers can execute the documented bootstrap within 45 minutes on supported OSs, achieving passing smoke tests on first attempt.
 - **SC-002**: GitHub workflows (lint + test + browser) complete within 25 minutes P90 and exhibit <5% flake rate across rolling seven-day windows.
-- **SC-003**: Dependency review pipeline produces a monthly report with zero missing owner assignments and no unreviewed critical security advisories older than seven days.
+- **SC-003**: Dependency review pipeline produces a monthly report with zero missing owner assignments, includes performance reporting outputs, and has no unreviewed critical security advisories older than seven days.
 - **SC-004**: At least 95% of merged pull requests reference baseline quality gates (lint, type checks, tests) in their checklists, indicating adoption of standardized scripts.
 - **SC-005**: Support requests related to local setup drop by 80% within two sprints after the baseline launch, measured via internal helpdesk tags.
 
@@ -163,3 +165,5 @@ These cadences mirror the Operational Cadence table in `plan.md` and the schedul
 - Q: When should mutation and browser suites run within the tiered workflow policy? → A: Execute nightly and require completion before tagged releases or hotfixes.
 ### Session 2025-11-08
 - Q: How many notification destinations should each workflow suite support? → A: Store channels in a separate table so suites can own multiple notification targets.
+- Q: What level of Windows support is required? → A: Support Windows via WSL container profile; native Windows runtimes are out of scope.
+- Q: What metrics must the dependency review performance report include? → A: Runtime, success state, outdated package counts by severity, and links to follow-up tasks/issues.

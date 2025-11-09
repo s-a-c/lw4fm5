@@ -1,6 +1,8 @@
+# Tasks: Base Platform Foundation
+
 Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
 
-# Tasks: Base Platform Foundation
+---
 
 <details>
 <summary>Expand for Table of Contents</summary>
@@ -185,6 +187,8 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 
 ### 6.2. Implementation for User Story 3
 
+- [ ] T067A [US3] Publish environment support matrix documentation in `docs/base-platform/environment-support-matrix.md`
+- [ ] T067B [US3] Persist environment support validation outputs in `storage/app/base-platform/environment-support.log`
 - [ ] T068 [US3] Create dependency catalogue data in `storage/app/base-platform/dependencies.json`
 - [ ] T069 [US3] Create dependency policy doc in `docs/base-platform/dependency-policy.md`
 - [ ] T070 [US3] Implement `platform:dependency-review` command in `app/Console/Commands/DependencyReviewReport.php`
@@ -193,7 +197,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 - [ ] T073 [US3] Add GitHub issue template in `.github/ISSUE_TEMPLATE/dependency-review.md`
 - [ ] T074 [US3] Publish contribution guidelines in `docs/base-platform/contribution-guidelines.md`
 - [ ] T075 [US3] Extend seeder with dependency metadata in `database/seeders/BasePlatformSeeder.php`
-- [ ] T075A [US3] Implement monthly dependency review performance reporting command in `app/Console/Commands/DependencyReviewPerformanceReport.php`
+- [ ] T075A [US3] Implement monthly dependency review performance reporting command in `app/Console/Commands/DependencyReviewPerformanceReport.php` and capture outputs for QA evidence
 - [ ] T076 [US3] Document support metric tracking plan in `docs/base-platform/support-metrics.md`
 
 **Checkpoint**: All user stories functional—QA confirms dependency review automation, support metric tracking, and documentation outputs, storing the monthly dependency report sample and contribution checklist evidence.
