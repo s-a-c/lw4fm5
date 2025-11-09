@@ -8,7 +8,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 
 ## Requirement Completeness
 
-- [x] CHK001 Are QA entry/exit criteria defined for each user story (bootstrap, CI alignment, dependency governance) so QA knows when work is test-ready? [Completeness, Spec §User Stories, Tasks §Checkpoints]
+- [ ] CHK001 Are QA entry/exit criteria defined for each user story (bootstrap, CI alignment, dependency governance) so QA knows when work is test-ready? [Completeness, Spec §User Stories, Tasks §Checkpoints]
 - [x] CHK002 Do requirements specify how QA accesses scripted tooling (commands, scripts, workflows) for validation runs? [Completeness, Spec §FR-001–FR-015, Plan §Summary]
 
 ## Requirement Clarity
@@ -19,7 +19,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 ## Requirement Consistency
 
 - [x] CHK005 Do QA responsibilities across documentation (quickstart, CI policy, recovery guides) present consistent guidance? [Consistency, Quickstart §2–7, Docs referenced in Tasks]
-- [x] CHK006 Are support-metric success criteria aligned with documentation on how QA captures and reports them? [Consistency, Spec §SC-005, Tasks §Phase 5]
+- [ ] CHK006 Are support-metric success criteria aligned with documentation on how QA captures and reports them? [Consistency, Spec §SC-005, Tasks §Phase 5]
 
 ## Acceptance Criteria Quality
 

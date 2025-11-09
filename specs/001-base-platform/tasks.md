@@ -196,8 +196,8 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 
 - [ ] T067A [US3] Publish environment support matrix documentation in `docs/base-platform/environment-support-matrix.md`
 - [ ] T067B [US3] Persist environment support validation outputs in `storage/app/base-platform/environment-support.log`
-- [ ] T068 [US3] Create dependency catalogue data in `storage/app/base-platform/dependencies.json`
-- [ ] T069 [US3] Create dependency policy doc in `docs/base-platform/dependency-policy.md`
+- [x] T068 [US3] Create dependency catalogue data in `storage/app/base-platform/dependencies.json`
+- [x] T069 [US3] Create dependency policy doc in `docs/base-platform/dependency-policy.md`
 - [ ] T070 [US3] Implement `platform:dependency-review` command in `app/Console/Commands/DependencyReviewReport.php`
 - [ ] T071 [US3] Add monthly scheduler binding in `bootstrap/app.php`
 - [ ] T072 [US3] Add review automation script in `scripts/automation/dependency-review.sh`

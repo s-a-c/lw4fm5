@@ -21,12 +21,17 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
   "owner": "Platform Engineering",
   "justification": "Framework baseline",
   "lastReviewedAt": "2025-10-31",
+  "reviewCadence": "monthly",
+  "riskLevel": "medium",
   "notes": "Pin to LTS release"
 }
 ```
 
-- Owners must update `lastReviewedAt` during each monthly review and document decisions in the monthly report.
-- Experimental dependencies require a linked ADR or spike reference in `notes`.
+- Required fields:
+  - `reviewCadence`: monthly | quarterly (default monthly for core/experimental)
+  - `riskLevel`: high | medium | low (used by performance report analytics)
+- Owners MUST update `lastReviewedAt`, `riskLevel`, and any mitigation notes during each monthly review and document decisions in the monthly report.
+- Experimental dependencies require a linked ADR or spike reference in `notes` plus an explicit re-evaluation date.
 
 ## Classification Rules
 
@@ -35,6 +40,16 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 | Core | Required for baseline automation or runtime | Removal requires approval from Platform Engineering + DevEx, documented in catalogue and changelog |
 | Optional | Enhances workflows but not mandatory for bootstrap or CI | May be toggled off; list fallback instructions in catalogue notes |
 | Experimental | Under evaluation; not required for baseline success criteria | Must include exit criteria and review date; automation warns when review date passes |
+
+### Severity Thresholds
+
+- Outdated packages are grouped by severity using `composer audit`:
+  - **Critical/High:** MUST be remediated or mitigated within the same monthly cycle.
+  - **Medium:** Create a follow-up task with due date ≤30 days.
+  - **Low:** Track in catalogue notes; escalate if still present after 90 days.
+- A monthly review fails if:
+  - Any core dependency has a Critical or High advisory outstanding.
+  - Any experimental dependency misses its review window (past `lastReviewedAt` + cadence).
 
 ## Monthly Review Workflow
 
@@ -76,6 +91,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 - Monthly reports: `storage/app/base-platform/dependency-reports/YYYY-MM.json`
 - Performance logs: `storage/app/base-platform/dependency-performance.log`
 - Catalogue snapshots: Git-committed `dependencies.json`
+- Severity/dashboard exports: `storage/app/base-platform/dependency-reports/YYYY-MM-severity.csv`
 - Phase Checkpoint: Aligns with Tasks T070–T075A in Phase 5. Confirm this policy doc and evidence artifacts exist before marking the Phase 5 checkpoint complete.
 - Tracking ticket template: `.github/ISSUE_TEMPLATE/dependency-review.md`
 
