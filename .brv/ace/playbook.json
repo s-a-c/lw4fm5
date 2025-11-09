@@ -1,0 +1,21 @@
+{
+  "bullets": {
+    "project-00001": {
+      "id": "project-00001",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-09T21:17:36.052Z"
+      },
+      "section": "Architecture"
+    }
+  },
+  "nextId": 2,
+  "sections": {
+    "Architecture": [
+      "project-00001"
+    ]
+  }
+}
