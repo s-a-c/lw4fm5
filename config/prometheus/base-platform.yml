@@ -1,0 +1,39 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+scrape_configs:
+  - job_name: base-platform-bootstrap
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - localhost:9600
+        labels:
+          component: bootstrap
+          environment: local
+
+  - job_name: base-platform-parity
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - localhost:9601
+        labels:
+          component: parity-check
+          environment: local
+
+  - job_name: base-platform-validation
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - localhost:9602
+        labels:
+          component: profile-validation
+          environment: local
+
+rule_files: []
