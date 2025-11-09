@@ -216,15 +216,16 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 
 **Purpose**: Hardening, documentation, and validation tasks affecting multiple stories.
 
-- [ ] T077 [P] Refresh changelog with baseline entry in `docs/base-platform/CHANGELOG.md`
-- [ ] T077A [P] Capture bootstrap timing metrics and publish report in `storage/app/base-platform/bootstrap-timings.json`
-- [ ] T078 Validate combined quickstart flow end-to-end per `docs/base-platform/quickstart.md`
-- [ ] T078A Validate CI workflow duration P90 via GitHub API and document results in `docs/base-platform/ci-policy.md`
-- [ ] T079 [P] Run parity audit report and archive results in `storage/app/base-platform/parity-report.log`
-- [ ] T079A [P] Measure queue throughput baseline (`≥1k jobs/min`) and record evidence in `docs/base-platform/support-metrics.md`
-- [ ] T080 [P] Review security posture and credential rotation notes in `docs/base-platform/security-review.md`
-- [ ] T081 Final verification: ensure policy acknowledgement headers, checksum monitor outputs, profile validation reports, and QA evidence are present across artifacts in `specs/001-base-platform/`
-- [ ] T081A Final documentation checklist pass confirming all items are marked complete
+- [x] T077 [P] Refresh changelog with baseline entry in `docs/base-platform/CHANGELOG.md`
+- [x] T077A [P] Capture bootstrap timing metrics and publish report in `storage/app/base-platform/bootstrap-timings.json`
+- [x] T078 Validate combined quickstart flow end-to-end per `docs/base-platform/quickstart.md`
+- [x] T078A Validate CI workflow duration P90 via GitHub API and document results in `docs/base-platform/ci-policy.md`
+- [x] T079 [P] Run parity audit report and archive results in `storage/app/base-platform/parity-report.log`
+- [x] T079A [P] Measure queue throughput baseline (`≥1k jobs/min`) and record evidence in `docs/base-platform/support-metrics.md`
+- [x] T080 [P] Review security posture and credential rotation notes in `docs/base-platform/security-review.md`
+- [x] T081 Final verification: ensure policy acknowledgement headers, checksum monitor outputs, profile validation reports, and QA evidence are present across artifacts in `specs/001-base-platform/`
+- [x] T081A Final documentation checklist pass confirming all items are marked complete
+- [x] T081B Implement quality-gate adoption tracking (PR checklist + weekly reporting) captured in `docs/base-platform/quickstart.md`, `docs/base-platform/support-metrics.md`, and `storage/app/base-platform/quality-gates/`
 
 ---
 

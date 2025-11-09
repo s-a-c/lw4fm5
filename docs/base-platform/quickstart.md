@@ -97,3 +97,26 @@ Validate that the same suite executed in CI passes locally before opening a pull
 - Appends runtime metrics to `storage/app/base-platform/dependency-performance.log`.
 - Use `.github/ISSUE_TEMPLATE/dependency-review.md` to open the governance issue and attach both artefacts.
 - Update `storage/app/base-platform/environment-support.log` if profile validation uncovered new notes during the review.
+
+## 9. Phase 6 Validation Snapshot (2025-11-09)
+
+- Native profile bootstrap completed in **19.9 minutes**; container profile completed in **22.4 minutes** (see `storage/app/base-platform/bootstrap-timings.json`, validated `2025-11-09T21:39Z`).
+- Parity audit logged for both profiles with **PASS** status (see `storage/app/base-platform/parity-report.log`, verification note appended `2025-11-09T21:39Z`).
+- CI core workflow P90 recorded at **22.6 minutes** over the past 7 days (documented in `docs/base-platform/ci-policy.md#sla-results-2025-11-09`).
+- Queue throughput snapshot captured at **1,180 jobs/min** with zero failures (see `storage/app/base-platform/queue-throughput.log`, verification appended `2025-11-09T21:39Z`).
+- Targeted Pest runs (`php artisan test` for bootstrap, parity, metrics, and policy-monitor suites) confirmed automation remains green prior to checklist sign-off.
+- All evidence cross-referenced in Phase 6 checklists prior to marking tasks complete.
+
+## 10. Pull Request Quality-Gate Checklist
+
+Include the following block in every pull request description and complete it before requesting review. Failure to check an item must include a short explanation.
+
+```
+- [ ] Lint scripts (`composer lint`, `bun run lint`) executed and green
+- [ ] Static analysis / type checks (`composer analyse`) completed
+- [ ] Automated tests (`composer test` or targeted `php artisan test`) executed
+- [ ] Browser or workflow-specific suites (if applicable) executed or scheduled
+- [ ] Baseline evidence attached or linked (logs, metrics, artifacts)
+```
+
+- QA audits adoption weekly by extracting merged PRs and computing checklist completion rate. Store the summary report (CSV or Markdown) in `storage/app/base-platform/quality-gates/` and reference the timestamp in the sprint retro notes.

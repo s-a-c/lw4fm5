@@ -101,3 +101,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 - [x] CHK243 Is the process for handling composer/bun script failures during CI clearly documented without contradictory steps? [Ambiguity/Conflict, Spec §FR-008, CI Policy]
 - [x] CHK244 Are packages marked experimental in `dependencies.json` clearly labeled as such in documentation to avoid confusion? [Ambiguity, Spec §FR-003, Dependency Policy]
 - [x] CHK245 Are instructions for reinstalling or removing packages consistent across docs (no conflicting `composer remove` vs manual edits guidance)? [Conflict, Spec §FR-004, Documentation cross-check]
+
+## Phase 6 Sign-off (2025-11-09)
+
+- Tooling prerequisites, quickstart commands, and CI/Bun alignment verified during final polish; no drift detected in documentation or evidence logs.

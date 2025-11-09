@@ -18,6 +18,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 | Queue throughput | ≥ 1k jobs/min (Plan requirement) | Horizon metrics or log exports | Monthly | `storage/app/base-platform/queue-throughput.log` |
 | Dependency review runtime | Runtime + status + severity counts (FR-009) | `php artisan platform:dependency-review`, `php artisan platform:dependency-review-performance-report` | Monthly | `storage/app/base-platform/dependency-performance.log` |
 | Environment parity validation | Profiles remain supported (FR-002) | `php artisan platform:validate-profiles --all` | Weekly + monthly | `storage/app/base-platform/environment-support.log` |
+| Quality gate adoption | ≥ 95% of merged PRs complete checklist (SC-004) | PR checklist audit + weekly QA report | Weekly | `storage/app/base-platform/quality-gates/` |
 
 ## Collection Process
 
@@ -49,6 +50,10 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
    - Run `php artisan platform:validate-profiles --all` for native and container profiles.
    - Append validation outcomes to `storage/app/base-platform/environment-support.log` (include timestamps, profile, and result).
    - Cross-link updates to `docs/base-platform/environment-support-matrix.md`.
+7. **Quality Gate Adoption**
+   - Apply the pull request checklist documented in `docs/base-platform/quickstart.md`.
+   - Weekly, export merged PRs, calculate checklist completion, and store a summary report in `storage/app/base-platform/quality-gates/<yyyy-mm-dd>-adoption.md`.
+   - Record adoption trends in sprint retrospective notes and flag drops below the 95% target to Platform Engineering.
 
 ## Evidence & Reporting
 
@@ -82,3 +87,10 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 - Plan §QA Deliverables & Evidence
 - Tasks Phase 6 (T077A, T078A, T079A, T080, T081)
 - CI Policy (`docs/base-platform/ci-policy.md`)
+
+## Phase 6 Verification (2025-11-09)
+
+- Confirmed bootstrap timing evidence updated with validation timestamp (`storage/app/base-platform/bootstrap-timings.json`).
+- Confirmed queue throughput snapshot remains ≥1k jobs/min (log appended `2025-11-09T21:39Z`).
+- Documented CI P90 outcome in `docs/base-platform/ci-policy.md#sla-results-2025-11-09`.
+- Added quality gate adoption metric, PR checklist reference, and weekly reporting workflow (`storage/app/base-platform/quality-gates/`).

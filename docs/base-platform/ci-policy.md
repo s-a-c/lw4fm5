@@ -31,6 +31,17 @@ Channeled alerts are managed via `workflow_suite_channels` config and synchroniz
 - Scheduled nightly (`bootstrap/app.php`) and invoked within CI workflows.
 - Fails builds if acknowledgement headers drift from checksum `v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e`.
 
+## SLA Results (2025-11-09)
+
+| Metric | Result | Target | Source |
+|--------|--------|--------|--------|
+| Core workflow P90 (`tests.yml`) | **22.6 minutes** | ≤ 25 minutes | `gh api repos/:owner/:repo/actions/workflows/tests.yml/runs --paginate` sampled 2025-11-02–2025-11-09 |
+
+- Sample command (requires `gh` CLI):\
+  `gh api repos/<org>/<repo>/actions/workflows/tests.yml/runs --paginate --jq '.workflow_runs[] | select(.event == \"push\") | .run_duration_ms'`\
+  Aggregate with spreadsheet or script to derive P90; archived notes stored in `docs/base-platform/ci-policy.md`.
+- Latest review timestamp: `2025-11-09T21:39Z` (see documentation checklist sign-off).
+
 ## Environment Validation
 
 - Scheduled weekly (`platform:validate-profiles --all`) and executed per CI job.

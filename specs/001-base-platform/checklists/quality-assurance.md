@@ -46,3 +46,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 ## Ambiguities & Conflicts
 
 - [x] CHK014 Are there any conflicting instructions between spec, plan, and tasks about QA’s role in running automated suites versus observing CI outputs? [Ambiguity, Spec §FR-015, Plan §Constraints, Tasks §Phase 4]
+
+## Phase 6 Sign-off (2025-11-09)
+
+- QA evidence reviewed: targeted Pest runs (`bootstrap`, `parity`, `metrics`) completed 2025-11-09T21:39Z; CI SLA summary and queue throughput snapshot archived for release review; quality gate adoption report stored under `storage/app/base-platform/quality-gates/2025-11-09-adoption.md`.

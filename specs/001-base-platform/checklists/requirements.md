@@ -32,3 +32,7 @@
 ## Notes
 
 - Items marked incomplete require spec updates before `/speckit.clarify` or `/speckit.plan`
+
+## Phase 6 Sign-off (2025-11-09)
+
+- Spec references cross-checked against updated Phase 6 evidence (quickstart snapshot, CI SLA, security review) with no gaps identified.
