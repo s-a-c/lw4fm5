@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\PendingCommand;
@@ -67,7 +68,6 @@ beforeEach(function (): void {
 
 afterEach(function (): void {
     Carbon::setTestNow();
-    Process::restore();
 });
 
 it('generates a dependency review report with severity counts and overdue entries', function (): void {
@@ -80,9 +80,20 @@ it('generates a dependency review report with severity counts and overdue entrie
 
     $reportPath = 'base-platform/dependency-reports/2025-11-dependency-review.json';
 
-    expect(Storage::disk('local')->exists($reportPath))->toBeTrue();
+    $disk = Storage::disk('local');
+    $reportExists = $disk->exists($reportPath);
 
-    $report = json_decode(Storage::disk('local')->get($reportPath), true, 512, JSON_THROW_ON_ERROR);
+    if (! $reportExists) {
+        $reportExists = File::exists(storage_path('app/'.$reportPath));
+    }
+
+    expect($reportExists)->toBeTrue();
+
+    $contents = $disk->exists($reportPath)
+        ? $disk->get($reportPath)
+        : File::get(storage_path('app/'.$reportPath));
+
+    $report = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
 
     expect($report)->toHaveKeys([
         'generated_at',

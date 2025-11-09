@@ -28,7 +28,7 @@ Complete this list before requesting review. Copy/paste into your PR description
 - Store dependency review artifacts under `storage/app/base-platform/dependency-reports/`.
 - Append runtime/performance entries to `storage/app/base-platform/dependency-performance.log`.
 - Record environment validation parity in `storage/app/base-platform/environment-support.log`.
-- Update support ticket metrics per [Support Metrics & Evidence Plan](./support-metrics.md) and link notable deltas.
+- Update support ticket metrics per [Support Metrics & Evidence Plan](./support-metrics.md) (path: `docs/base-platform/support-metrics.md`) and link notable deltas.
 - Reference the monthly tracking issue generated from `.github/ISSUE_TEMPLATE/dependency-review.md`.
 
 ## Monthly Dependency Stewardship

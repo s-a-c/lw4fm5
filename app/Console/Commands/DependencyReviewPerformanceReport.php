@@ -6,9 +6,9 @@ namespace App\Console\Commands;
 
 use App\Support\BasePlatformMetrics;
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use JsonException;
 use RuntimeException;
 
@@ -26,15 +26,9 @@ final class DependencyReviewPerformanceReport extends Command
 
     private const PERFORMANCE_LOG = 'base-platform/dependency-performance.log';
 
-    public function __construct(
-        private readonly FilesystemManager $filesystems,
-    ) {
-        parent::__construct();
-    }
-
     public function handle(): int
     {
-        $disk = $this->filesystems->disk('local');
+        $disk = Storage::disk('local');
         $reportPath = $this->option('report');
 
         if (! is_string($reportPath) || $reportPath === '') {
@@ -101,7 +95,7 @@ final class DependencyReviewPerformanceReport extends Command
 
     private function resolveLatestReport(): string
     {
-        $disk = $this->filesystems->disk('local');
+        $disk = Storage::disk('local');
 
         $files = collect($disk->files(self::REPORT_DIRECTORY))
             ->filter(fn (string $path) => Str::endsWith($path, '.json'))
