@@ -16,6 +16,8 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 | Support ticket reduction | ≥ 80% drop two sprints post-launch (SC-005) | Helpdesk system (tag: `baseline-support`) | Sprint review | `storage/app/base-platform/support-metrics.log` |
 | CI P90 duration | ≤ 25 minutes (SC-002) | GitHub Actions API (`tests.yml`) | Weekly | `docs/base-platform/ci-policy.md` (results section) |
 | Queue throughput | ≥ 1k jobs/min (Plan requirement) | Horizon metrics or log exports | Monthly | `storage/app/base-platform/queue-throughput.log` |
+| Dependency review runtime | Runtime + status + severity counts (FR-009) | `php artisan platform:dependency-review`, `php artisan platform:dependency-review-performance-report` | Monthly | `storage/app/base-platform/dependency-performance.log` |
+| Environment parity validation | Profiles remain supported (FR-002) | `php artisan platform:validate-profiles --all` | Weekly + monthly | `storage/app/base-platform/environment-support.log` |
 
 ## Collection Process
 
@@ -37,6 +39,17 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
    - Capture Horizon or queue metrics snapshot monthly; store raw numbers in `queue-throughput.log`.
    - Note test scenario (load test or production observation) and any scaling adjustments.
 
+5. **Dependency Review Runtime**
+   - Execute `./scripts/automation/dependency-review.sh` (or run the commands individually) during the monthly governance window.
+   - Confirm `storage/app/base-platform/dependency-reports/<yyyy-mm>-dependency-review.json` exists and reflects the latest catalogue.
+   - Append the runtime summary to `storage/app/base-platform/dependency-performance.log`.
+   - Create or update the governance issue using `.github/ISSUE_TEMPLATE/dependency-review.md`, including remediation tasks.
+
+6. **Environment Support Validation**
+   - Run `php artisan platform:validate-profiles --all` for native and container profiles.
+   - Append validation outcomes to `storage/app/base-platform/environment-support.log` (include timestamps, profile, and result).
+   - Cross-link updates to `docs/base-platform/environment-support-matrix.md`.
+
 ## Evidence & Reporting
 
 - Monthly governance ticket attaches:
@@ -44,14 +57,18 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
   - CI P90 summary
   - Queue throughput log excerpt
   - Support ticket delta table
+  - Dependency review report (`storage/app/base-platform/dependency-reports/<yyyy-mm>-dependency-review.json`)
+  - Dependency performance log entry (`storage/app/base-platform/dependency-performance.log`)
+  - Environment support validation excerpt (`storage/app/base-platform/environment-support.log`)
 - QA reviewers verify presence of artifacts during Phase 6 checkpoints (Tasks T078A, T079A, T081).
 - Retain at least three months of historical data for trend analysis.
 
 ## Roles & Responsibilities
 
-- **Platform Engineering**: Collects bootstrap timings, queue throughput, and maintains `support-metrics.log`.
+- **Platform Engineering**: Collects bootstrap timings, queue throughput, dependency governance evidence, and maintains `support-metrics.log`.
 - **DevEx**: Monitors CI duration metrics and raises remediation tasks when SLA breached.
 - **Support Team Liaison**: Ensures helpdesk tags applied and exports data each sprint.
+- **Governance Lead**: Owns monthly dependency review artefacts and ensures remediation follow-up is tracked.
 
 ## Escalation
 

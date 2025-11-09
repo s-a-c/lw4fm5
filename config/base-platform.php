@@ -70,6 +70,16 @@ return [
                 'medium' => 'email',
             ],
         ],
+        'dependency-governance' => [
+            [
+                'channel' => 'slack::#dependency-governance',
+                'medium' => 'slack',
+            ],
+            [
+                'channel' => 'email::platform-governance@example.com',
+                'medium' => 'email',
+            ],
+        ],
     ],
 
     'policy' => [

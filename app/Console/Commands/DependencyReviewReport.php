@@ -1,0 +1,173 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Console\Commands;
+
+use App\Services\BasePlatform\DependencyCatalogue;
+use App\Support\BasePlatformMetrics;
+use Illuminate\Console\Command;
+use Illuminate\Filesystem\FilesystemManager;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Process;
+
+/**
+ * Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
+ */
+final class DependencyReviewReport extends Command
+{
+    protected $signature = 'platform:dependency-review
+        {--output= : Relative storage path for the generated report}
+        {--issue-template=.github/ISSUE_TEMPLATE/dependency-review.md : GitHub issue template used by automation}';
+
+    protected $description = 'Generate the monthly dependency review report and emit governance metrics.';
+
+    private const DEFAULT_REPORT_DIRECTORY = 'base-platform/dependency-reports';
+
+    private const COMPOSER_AUDIT_COMMAND = 'composer audit --format=json';
+
+    public function __construct(
+        private readonly FilesystemManager $filesystems,
+    ) {
+        parent::__construct();
+    }
+
+    public function handle(): int
+    {
+        $startedAt = microtime(true);
+        $now = Carbon::now();
+
+        $disk = $this->filesystems->disk('local');
+        $catalogue = new DependencyCatalogue($disk);
+        $dependencies = $catalogue->entries();
+        $overdue = $catalogue->overdue($now);
+
+        $severityCounts = [
+            'critical' => 0,
+            'high' => 0,
+            'medium' => 0,
+            'low' => 0,
+        ];
+
+        $auditStatus = 'pass';
+        $auditError = null;
+
+        $result = Process::run(self::COMPOSER_AUDIT_COMMAND);
+
+        if (! $result->successful()) {
+            $auditStatus = 'fail';
+            $auditError = trim($result->errorOutput()) !== '' ? trim($result->errorOutput()) : $result->output();
+        } else {
+            $decoded = json_decode($result->output(), true);
+
+            if (! is_array($decoded)) {
+                $auditStatus = 'fail';
+                $auditError = 'Composer audit returned malformed JSON output.';
+            } else {
+                $severityCounts = $this->tallySeverities(Arr::get($decoded, 'advisories', []));
+
+                if ($severityCounts['critical'] > 0 || $severityCounts['high'] > 0) {
+                    $auditStatus = 'fail';
+                } elseif ($severityCounts['medium'] > 0 || $overdue->isNotEmpty()) {
+                    $auditStatus = 'warn';
+                }
+            }
+        }
+
+        $reportPath = $this->determineOutputPath($now);
+
+        $disk->makeDirectory(self::DEFAULT_REPORT_DIRECTORY);
+
+        $report = [
+            'generated_at' => $now->toIso8601String(),
+            'status' => $auditStatus,
+            'runtime_seconds' => round(microtime(true) - $startedAt, 3),
+            'severity_counts' => $severityCounts,
+            'overdue_reviews' => $overdue->map->toArray()->values()->all(),
+            'dependencies' => $dependencies->map->toArray()->values()->all(),
+            'issue_template' => $this->option('issue-template'),
+            'composer_command' => self::COMPOSER_AUDIT_COMMAND,
+            'error' => $auditError,
+        ];
+
+        $disk->put(
+            $reportPath,
+            json_encode($report, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR)
+        );
+
+        $this->components->info(sprintf(
+            'Dependency review report generated: storage/app/%s',
+            $reportPath
+        ));
+
+        if ($overdue->isNotEmpty()) {
+            $this->components->warn(sprintf(
+                'Overdue dependencies detected: %s',
+                $overdue->map(fn ($entry) => $entry->name)->implode(', ')
+            ));
+        }
+
+        if ($auditError !== null) {
+            $this->components->error($auditError);
+        }
+
+        BasePlatformMetrics::record('dependency_review_status', [
+            'status' => $auditStatus,
+            'overdue_count' => $overdue->count(),
+            'critical' => $severityCounts['critical'],
+            'high' => $severityCounts['high'],
+            'medium' => $severityCounts['medium'],
+            'low' => $severityCounts['low'],
+        ]);
+
+        BasePlatformMetrics::record('dependency_review_runtime_seconds', [
+            'status' => $auditStatus,
+        ], $report['runtime_seconds']);
+
+        return $auditStatus === 'fail' ? self::FAILURE : self::SUCCESS;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $advisories
+     * @return array<string, int>
+     */
+    private function tallySeverities(array $advisories): array
+    {
+        $counts = [
+            'critical' => 0,
+            'high' => 0,
+            'medium' => 0,
+            'low' => 0,
+        ];
+
+        Collection::make($advisories)
+            ->each(function (array $advisory) use (&$counts): void {
+                $severity = strtolower((string) ($advisory['severity'] ?? 'low'));
+
+                if (! array_key_exists($severity, $counts)) {
+                    $severity = 'low';
+                }
+
+                $counts[$severity]++;
+            });
+
+        return $counts;
+    }
+
+    private function determineOutputPath(Carbon $now): string
+    {
+        $option = $this->option('output');
+
+        if (is_string($option) && $option !== '') {
+            return ltrim($option, '/');
+        }
+
+        return sprintf(
+            '%s/%s-dependency-review.json',
+            self::DEFAULT_REPORT_DIRECTORY,
+            $now->format('Y-m')
+        );
+    }
+}

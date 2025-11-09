@@ -51,6 +51,12 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
   - Any core dependency has a Critical or High advisory outstanding.
   - Any experimental dependency misses its review window (past `lastReviewedAt` + cadence).
 
+### Optional & Experimental Handling
+
+- **Optional packages**: Document fallback or disable steps in the catalogue `notes` field (for example, how to disable browser plugins or Horizon dashboards) and confirm CI scripts succeed with the package toggled off.
+- **Experimental packages**: Require an explicit ADR/spike reference plus re-evaluation date. During each monthly review decide whether to promote to core, keep experimental, or remove entirely. Update `dependencies.json`, `docs/base-platform/contribution-guidelines.md`, and the governance issue accordingly.
+- When enabling a new optional/experimental package, record post-install commands (e.g., `composer install`, `bunx playwright install`, `php artisan vendor:publish`) in the dependency review issue and link to quickstart updates if it becomes core.
+
 ## Monthly Review Workflow
 
 1. Execute `php artisan platform:dependency-review` (or CI equivalent) to generate the monthly report.

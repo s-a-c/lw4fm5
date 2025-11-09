@@ -86,3 +86,14 @@ Validate that the same suite executed in CI passes locally before opening a pull
   3. Update lockfiles (`composer.lock`, `bun.lock`) and follow the [Lockfile Maintenance](./dependency-policy.md#lockfile-maintenance) checklist.
   4. Run targeted tests (`composer workflow:core`, `composer workflow:heavy` if required).
 - **CI cache rehydration:** Nightly workflows call `bunx playwright install --with-deps` and `composer install` with cache keys. If cache misses increase, re-run `composer install` / `bun install` locally and commit the updated lockfiles.
+
+## 8. Monthly Dependency Stewardship
+
+```bash
+./scripts/automation/dependency-review.sh
+```
+
+- Generates `storage/app/base-platform/dependency-reports/<yyyy-mm>-dependency-review.json`.
+- Appends runtime metrics to `storage/app/base-platform/dependency-performance.log`.
+- Use `.github/ISSUE_TEMPLATE/dependency-review.md` to open the governance issue and attach both artefacts.
+- Update `storage/app/base-platform/environment-support.log` if profile validation uncovered new notes during the review.

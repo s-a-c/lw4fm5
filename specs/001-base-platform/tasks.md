@@ -188,25 +188,25 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 
 ### 6.1. Tests for User Story 3 (MANDATORY) ⚠️
 
-- [ ] T065 [P] [US3] Add unit test for dependency catalogue parser in `tests/Unit/BasePlatform/DependencyCatalogueTest.php`
-- [ ] T066 [P] [US3] Add feature test for dependency review command in `tests/Feature/BasePlatform/DependencyReviewCommandTest.php`
-- [ ] T067 [P] [US3] Add unit test for contribution guidelines checklist in `tests/Unit/BasePlatform/ContributionGuidelinesTest.php`
+- [x] T065 [P] [US3] Add unit test for dependency catalogue parser in `tests/Unit/BasePlatform/DependencyCatalogueTest.php`
+- [x] T066 [P] [US3] Add feature test for dependency review command in `tests/Feature/BasePlatform/DependencyReviewCommandTest.php`
+- [x] T067 [P] [US3] Add unit test for contribution guidelines checklist in `tests/Unit/BasePlatform/ContributionGuidelinesTest.php`
 
 ### 6.2. Implementation for User Story 3
 
-- [ ] T067A [US3] Publish environment support matrix documentation in `docs/base-platform/environment-support-matrix.md`
-- [ ] T067B [US3] Persist environment support validation outputs in `storage/app/base-platform/environment-support.log`
+- [x] T067A [US3] Publish environment support matrix documentation in `docs/base-platform/environment-support-matrix.md`
+- [x] T067B [US3] Persist environment support validation outputs in `storage/app/base-platform/environment-support.log`
 - [x] T068 [US3] Create dependency catalogue data in `storage/app/base-platform/dependencies.json`
 - [x] T069 [US3] Create dependency policy doc in `docs/base-platform/dependency-policy.md`
-- [ ] T070 [US3] Implement `platform:dependency-review` command in `app/Console/Commands/DependencyReviewReport.php`
-- [ ] T071 [US3] Add monthly scheduler binding in `bootstrap/app.php`
-- [ ] T072 [US3] Add review automation script in `scripts/automation/dependency-review.sh`
-- [ ] T073 [US3] Add GitHub issue template in `.github/ISSUE_TEMPLATE/dependency-review.md`
-- [ ] T074 [US3] Publish contribution guidelines in `docs/base-platform/contribution-guidelines.md`
-- [ ] T075 [US3] Extend seeder with dependency metadata in `database/seeders/BasePlatformSeeder.php`
-- [ ] T075A [US3] Implement monthly dependency review performance reporting command in `app/Console/Commands/DependencyReviewPerformanceReport.php` and capture outputs for QA evidence
-- [ ] T076 [US3] Document support metric tracking plan in `docs/base-platform/support-metrics.md`
-- [ ] T076A Update documentation checklist confirming User Story 3 documentation coverage
+- [x] T070 [US3] Implement `platform:dependency-review` command in `app/Console/Commands/DependencyReviewReport.php`
+- [x] T071 [US3] Add monthly scheduler binding in `bootstrap/app.php`
+- [x] T072 [US3] Add review automation script in `scripts/automation/dependency-review.sh`
+- [x] T073 [US3] Add GitHub issue template in `.github/ISSUE_TEMPLATE/dependency-review.md`
+- [x] T074 [US3] Publish contribution guidelines in `docs/base-platform/contribution-guidelines.md`
+- [x] T075 [US3] Extend seeder with dependency metadata in `database/seeders/BasePlatformSeeder.php`
+- [x] T075A [US3] Implement monthly dependency review performance reporting command in `app/Console/Commands/DependencyReviewPerformanceReport.php` and capture outputs for QA evidence
+- [x] T076 [US3] Document support metric tracking plan in `docs/base-platform/support-metrics.md`
+- [x] T076A Update documentation checklist confirming User Story 3 documentation coverage
 
 **Checkpoint**: All user stories functional—QA confirms dependency review automation, support metric tracking, and documentation outputs, storing the monthly dependency report sample and contribution checklist evidence.
 

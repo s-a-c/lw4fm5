@@ -34,7 +34,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 - [x] CHK201 Are installation instructions documented for every composer repository requiring authentication (`composer.json` repositories section)? [Completeness, Spec §FR-007, Quickstart/Docs]
 - [x] CHK202 Do docs list all mandatory composer packages (runtime + dev) with justification or references to where their configuration lives? [Completeness, Spec §FR-003/FR-004]
 - [x] CHK203 Are Bun/Node prerequisites (Node/Bun versions, package manager commands) documented for each dependency in `package.json`? [Completeness, Spec §FR-014, Quickstart]
-- [ ] CHK204 Is there guidance for installing optional/experimental packages and the conditions under which they should be enabled/disabled? [Completeness, Spec §FR-003, Dependency Policy]
+- [x] CHK204 Is there guidance for installing optional/experimental packages and the conditions under which they should be enabled/disabled? [Completeness, Spec §FR-003, Dependency Policy]
 - [x] CHK205 Are post-install steps (migrations, asset builds, provider registration) tied to specific packages documented in setup guides or scripts? [Completeness, Spec §FR-001/FR-004]
 
 ## 2. Requirement Clarity
@@ -50,14 +50,14 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 - [x] CHK211 Do runtime versionRequirements in docs match composer constraints (`php ^8.5`, package versions) and Bun engine requirements? [Consistency, Spec §FR-014, Toolchain Baseline]
 - [x] CHK212 Are script names and usage consistent between documentation, `composer.json` scripts, and `package.json` scripts? [Consistency, Spec §FR-004, Plan §Automation]
 - [x] CHK213 Do quickstart, recovery, and CI policy docs refer to the same commands for lint/test/build workflows without conflicting instructions? [Consistency, Spec §FR-005/FR-015]
-- [ ] CHK214 Are package classification labels (core/optional/experimental) consistent between dependency policy and catalogue JSON? [Consistency, Spec §FR-003, Dependency Policy]
+- [x] CHK214 Are package classification labels (core/optional/experimental) consistent between dependency policy and catalogue JSON? [Consistency, Spec §FR-003, Dependency Policy]
 - [x] CHK215 Do Windows WSL instructions align with the same package versions and commands as native Linux/macOS docs? [Consistency, Spec Assumptions, Quickstart, Environment Matrix]
 
 ## 4. Acceptance Criteria Quality
 
 - [x] CHK216 Are success criteria for package installation (e.g., `composer install` exits 0, `bun run build` produces assets) defined with observable checks? [Acceptance Criteria, Spec §FR-001/FR-004]
 - [x] CHK217 Do docs specify evidence locations (logs, artifacts) that QA must review to confirm package installation succeeded? [Acceptance Criteria, Plan §QA Deliverables]
-- [ ] CHK218 Is there a measurable acceptance criterion for dependency review tasks (counts, report artifacts) in docs? [Acceptance Criteria, Spec §FR-009, Dependency Policy]
+- [x] CHK218 Is there a measurable acceptance criterion for dependency review tasks (counts, report artifacts) in docs? [Acceptance Criteria, Spec §FR-009, Dependency Policy]
 - [x] CHK219 Are rollback/cleanup steps documented when a package upgrade fails tests? [Acceptance Criteria, Spec §Edge Cases, Recovery Docs]
 - [x] CHK220 Do configuration docs describe how to verify CI pipelines are using the declared package versions (P90, flake rate metrics)? [Acceptance Criteria, Spec §SC-002, CI Policy]
 
@@ -67,7 +67,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 - [x] CHK222 Do docs cover containerized setups (Sail with Podman preferred, Docker fallback) as well as native Herd/Bun installations for package commands? [Coverage, Spec §FR-013, Quickstart]
 - [x] CHK223 Are recovery instructions provided for composer or Bun install failures (network, mirrors, credential) per edge cases? [Coverage, Spec Edge Cases, Recovery docs]
 - [x] CHK224 Are continuous integration scenarios documented (cache warm-up, re-install on CI runners, Playwright browser install)? [Coverage, Spec §FR-005/FR-015, CI Policy]
-- [ ] CHK225 Do docs describe how to handle experimental packages during the dependency review cadence (promote/demote workflow)? [Coverage, Spec §FR-003, Dependency Policy]
+- [x] CHK225 Do docs describe how to handle experimental packages during the dependency review cadence (promote/demote workflow)? [Coverage, Spec §FR-003, Dependency Policy]
 - [x] CHK225A Are Prometheus scrape configs and Grafana dashboards included with documented installation steps for local observability? [Coverage, Spec §FR-006, Observability doc, config/prometheus/base-platform.yml]
 
 ## 6. Edge Case Coverage
@@ -76,15 +76,15 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 - [x] CHK227 Are remediation steps documented when package scripts fail due to missing system dependencies (e.g., Playwright browsers, Tailwind oxide binaries)? [Edge Case, Spec §FR-006/FR-014]
 - [x] CHK228 Do docs address conflicts between Bun and Node version managers or global installations? [Edge Case, Spec Assumptions, Toolchain Baseline]
 - [x] CHK229 Are procedures described for rebuilding vendor caches when corrupted (composer cache clear, Bun cache)? [Edge Case, Spec §FR-008, Recovery docs]
-- [ ] CHK230 Do requirements cover handling security advisories for packages (e.g., composer audit output)? [Edge Case, Spec §FR-009, Support Metrics/Dependency Policy]
+- [x] CHK230 Do requirements cover handling security advisories for packages (e.g., composer audit output)? [Edge Case, Spec §FR-009, Support Metrics/Dependency Policy]
 
 ## 7. Non-Functional Requirements
 
 - [x] CHK231 Are performance considerations for package scripts documented (e.g., `workflow:core` target P90, caching strategies)? [Non-Functional, Spec §SC-002, CI Policy]
 - [x] CHK232 Do docs state observability hooks related to package operations (logs, metrics, health checks)? [Non-Functional, Spec §FR-006, Plan §Observability]
 - [x] CHK233 Are security requirements (credential storage, token rotation) for private packages captured? [Non-Functional, Spec §FR-007, Credential docs]
-- [ ] CHK234 Is the dependency audit process (composer audit, security advisories) documented with thresholds or required actions? [Non-Functional, Spec §FR-009, Dependency Policy]
-- [ ] CHK235 Are upgrade frequency and maintenance windows for critical packages documented (e.g., monthly review cadence)? [Non-Functional, Spec §FR-009, Plan §Operational Cadence]
+- [x] CHK234 Is the dependency audit process (composer audit, security advisories) documented with thresholds or required actions? [Non-Functional, Spec §FR-009, Dependency Policy]
+- [x] CHK235 Are upgrade frequency and maintenance windows for critical packages documented (e.g., monthly review cadence)? [Non-Functional, Spec §FR-009, Plan §Operational Cadence]
 
 ## 8. Dependencies & Assumptions
 

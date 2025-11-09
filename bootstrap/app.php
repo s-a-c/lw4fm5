@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+if (($_ENV['APP_ENV'] ?? null) === 'local') {
+    error_reporting(error_reporting() & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+}
+
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -40,6 +44,16 @@ return Application::configure(basePath: dirname(__DIR__))
             Artisan::call('policy:checksum-monitor');
             Artisan::call('platform:validate-profiles --all');
         })->weeklyOn(5, '04:00')->description('Weekly checksum and validation bundle');
+
+        $schedule->command('platform:dependency-review')
+            ->monthlyOn(1, '05:00')
+            ->when(fn (): bool => (bool) config('base-platform.schedules.monthly', true))
+            ->description('Monthly dependency review governance report');
+
+        $schedule->command('platform:dependency-review-performance-report')
+            ->monthlyOn(1, '05:30')
+            ->when(fn (): bool => (bool) config('base-platform.schedules.monthly', true))
+            ->description('Monthly dependency review performance summary');
     })
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware

@@ -10,6 +10,6 @@ Artisan::command('inspire', function () {
 
 Schedule::command('sanctum:prune-expired --hours=24')->daily();
 
-$schedule->command('model:prune', [
+Schedule::command('model:prune', [
     '--model' => [\Spatie\DeletedModels\Models\DeletedModel::class],
 ])->daily();

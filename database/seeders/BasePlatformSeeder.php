@@ -141,6 +141,13 @@ final class BasePlatformSeeder extends Seeder
                 'required_checks' => ['mutation', 'browser'],
                 'sla_minutes' => 120,
             ],
+            [
+                'id' => (string) Str::uuid(),
+                'name' => 'dependency-governance',
+                'triggers' => ['monthly'],
+                'required_checks' => ['dependency-review', 'dependency-review-performance'],
+                'sla_minutes' => 30,
+            ],
         ];
 
         WorkflowSuite::query()->upsert(
