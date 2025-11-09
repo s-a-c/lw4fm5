@@ -1,6 +1,6 @@
-Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
-
 # Implementation Process Requirements Checklist: Base Platform Foundation
+
+Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
 
 **Purpose**: Validate implementation-process requirements for completeness, clarity, and alignment before execution
 **Created**: 2025-11-07
@@ -40,7 +40,8 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 
 ## Dependencies & Assumptions
 
-- [x] CHK012 Are assumptions about tool availability (GitHub Actions secrets, Bun, Docker) validated through initial setup tasks? [Dependencies, Spec §Assumptions, Quickstart §Prerequisites]
+- [x] CHK012 Are assumptions about tool availability (GitHub Actions secrets, Bun, Podman/Docker) validated through initial setup tasks? [Dependencies, Spec §Assumptions, Quickstart §Prerequisites]
+- [x] CHK013 Do tasks T040A–T040C ensure Prometheus scrape configs, Grafana dashboards, and observability documentation ship with the environment setup? [Completeness, Spec §FR-006, Plan §Component Responsibility Alignment]
 
 ## Ambiguities & Conflicts
 

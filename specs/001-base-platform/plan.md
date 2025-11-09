@@ -113,6 +113,7 @@ tests/
 | GitHub workflows (`tests.yml`, `lint.yml`, `browser-tests.yml`, `nightly-heavy.yml`) | `.github/workflows/` | Enforce Bun toolchain, schedule heavy suites, call checksum and validation commands | Phase 4 T046–T064, `Operational Cadence & Monitoring` |
 | Workflow suite channels | `app/Models/WorkflowSuiteChannel.php`, `app/Services/BasePlatform/WorkflowSuiteChannelSync.php` | Persist and synchronize multi-destination alert routing for each workflow suite | Phase 4 T055A–T057A, T060A–T062B, `data-model.md` §2.6 |
 | Workflow tier policy helper | `app/Support/TieredWorkflowPolicy.php` | Provide tier metadata for CI workflows and SLA mapping | Phase 4 T048, `config/base-platform.php` |
+| Observability assets (Prometheus + Grafana) | `config/prometheus/base-platform.yml`, `docs/base-platform/observability/grafana/` | Provide default scrape targets and dashboards for SLAs, parity drift, and CI health | Phase 3 T018, T040, T040A–T040C, `docs/base-platform/observability.md` |
 
 ### Environment Validation Alignment
 
@@ -137,12 +138,14 @@ tests/
 
 - **GitHub Actions**: Verified in Phase 1 prerequisites; mitigated via local `policy:checksum-monitor --once` command when CI unavailable.
 - **Bun & Playwright**: Version pinning recorded in `docs/base-platform/toolchain-baseline.md` (Phase 1 T004) and `composer.json`/`package.json` tasks (Phase 4 T054–T055).
-- **Docker Desktop / Herd**: Documented readiness checks appear in Quickstart §1; tasks require parity scripts to assert virtualization availability.
+- **Container Runtime (Podman preferred)**: Quickstart §1 documents Podman Desktop/`podman machine` setup for container parity, with Docker as a fallback only when Podman is unsupported; tasks enforce runtime validation before advancing phases.
+- **Observability Stack (Prometheus + Grafana)**: Prometheus scrapes metrics emitted by bootstrap, parity, and validation commands; Grafana dashboards visualize SLAs (SC-001–SC-005). Installation instructions live in `docs/base-platform/quickstart.md` §0, `docs/base-platform/observability.md`, and `toolchain-baseline.md`; tasks T018, T040, T040A–T040C, T077A ensure exporters, scrape configs, and dashboards remain in sync.
 - **Credential Providers (Flux)**: Recovery docs include fallback contact and verification steps, satisfying Assumptions mitigation requirements.
 
 ### QA Deliverables & Evidence
 
 - Each phase checkpoint lists required artifacts: validation reports, checksum outputs, credential checklist confirmations, parity logs, monthly dependency performance outputs, and the published environment support matrix with its validation log.
+- Observability outputs (Prometheus `base-platform.yml`, exporter endpoints, Grafana dashboards) are versioned in-repo and must be validated during Phase 3 checkpoints so QA can confirm SLAs directly from Grafana.
 - Quickstart §8–§9 defines where QA stores artifacts (`storage/app/base-platform/validation/`, GitHub Actions run attachments) and the cadence for reviewing nightly jobs prior to releases.
 - Phase 6 T081 explicitly confirms presence of policy headers, checksum outputs, profile validation reports, and QA evidence before sign-off.
 

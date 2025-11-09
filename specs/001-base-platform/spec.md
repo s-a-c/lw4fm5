@@ -69,7 +69,7 @@ Technical leads want a governed process that documents which backend and fronten
 - **FR-003**: Establish a dependency catalogue that classifies backend and frontend packages into “core,” “optional,” and “experimental,” including owners, rationale, and deprecation policy.
 - **FR-004**: Standardize automation scripts so that setup, lint, quality, and test commands are idempotent, parallel-safe, and runnable both locally and in CI; deprecate redundant or failing scripts and document replacements.
 - **FR-005**: Align GitHub workflows (tests, lint, browser) to a shared toolchain configuration (matrix or reusable workflow) that reuses the same runtime definitions, unifies versioning, and caches dependencies consistently.
-- **FR-006**: Provide observability hooks (health checks, smoke tests) that confirm queues, schedulers, and asset builds are functioning post-bootstrap and surface actionable errors when they fail.
+- **FR-006**: Provide observability hooks (health checks, smoke tests, Prometheus scrapes) that confirm queues, schedulers, and asset builds are functioning post-bootstrap and surface actionable errors when they fail, exposing baseline metrics for Grafana dashboards. Ship a default Prometheus scrape configuration (`config/prometheus/base-platform.yml`), baseline exporters, and developer-facing setup guidance (`docs/base-platform/observability.md`) with Grafana dashboards. [\[3\]](#references)[\[4\]](#references)
 - **FR-007**: Define credential management rules covering private package feeds, browser automation downloads, and environment secrets, including the agreed solo-developer baseline of GitHub Actions secrets for CI and encrypted local `.env` storage, published rotation playbooks, onboarding checklists, and fallback behaviour for future collaborators.
 - **FR-008**: Document and automate recovery procedures for failed automation (bootstrap, parity, CI heavy suites, asset builds) with time-boxed retries and escalation steps.
 - **FR-009**: Deliver a monthly dependency review workflow that triggers automated reports (e.g., outdated package listings), records performance observations, and creates tasks for the platform backlog.
@@ -95,7 +95,8 @@ Technical leads want a governed process that documents which backend and fronten
 - Feature teams depend on GitHub Actions; no alternative CI service is planned in the immediate roadmap.
 - Database, queue, and cache services will remain the standard Laravel stack (PostgreSQL, Redis) unless future specs dictate otherwise.
 - The designated JavaScript runtime is Bun and is expected to remain standard across local and CI environments; any future change must preserve the guarantees defined in this specification.
-- Containerized and native development paths must remain functionally equivalent, with automated parity checks ensuring neither path lags behind.
+- Containerized and native development paths must remain functionally equivalent, with automated parity checks ensuring neither path lags behind. Podman (v5.7.0 or newer) is the preferred container runtime; Docker-compatible tooling may be used only when Podman is unavailable. [\[1\]](#references)[\[2\]](#references)
+- Baseline observability relies on Prometheus for metrics ingestion and Grafana dashboards for visualization; configuration templates, scrape targets, and dashboards are delivered with the environment so setup is part of the baseline experience. Any alternative tools must preserve equivalent scrape targets, retention policies, and alert coverage. [\[3\]](#references)[\[4\]](#references)
 - Windows developers are supported through a WSL-driven container profile that mirrors the Linux container flow; native Windows runtimes are out of scope.
 - Current scope assumes a solo developer managing local credentials via encrypted `.env` files; future team expansion must revisit access provisioning and auditing needs.
 - Base Platform automation lives entirely within the Storefront service; it must not introduce cross-service integrations, and ongoing maintenance ownership resides with the Platform Engineering team.
@@ -157,6 +158,13 @@ These cadences mirror the Operational Cadence table in `plan.md` and the schedul
 - **SC-003**: Dependency review pipeline produces a monthly report with zero missing owner assignments, includes performance reporting outputs, and has no unreviewed critical security advisories older than seven days.
 - **SC-004**: At least 95% of merged pull requests reference baseline quality gates (lint, type checks, tests) in their checklists, indicating adoption of standardized scripts.
 - **SC-005**: Support requests related to local setup drop by 80% within two sprints after the baseline launch, measured via internal helpdesk tags.
+
+## References
+
+1. PostgreSQL Global Development Group. “PostgreSQL 18 Released!” (2025). [https://www.postgresql.org/about/news/postgresql-18-released-3142/](https://www.postgresql.org/about/news/postgresql-18-released-3142/)
+2. Containers Organization. “Podman v5.7.0 Release Notes.” (2025). [https://github.com/containers/podman/releases](https://github.com/containers/podman/releases)
+3. Prometheus Authors. “Prometheus – Open source metrics and monitoring.” (2025). [https://prometheus.io/](https://prometheus.io/)
+4. Grafana Labs. “Get started with Grafana OSS.” (2025). [https://grafana.com/get/#:~:text=Cloud-,OSS,-Grafana](https://grafana.com/get/#:~:text=Cloud-,OSS,-Grafana)
 
 ## Clarifications
 

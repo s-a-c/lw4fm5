@@ -1,6 +1,6 @@
-Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
-
 # Bootstrap Recovery Playbook
+
+Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
 
 ## Purpose
 
@@ -29,3 +29,4 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 
 - **Primary:** Platform Engineering Slack `#platform-support`
 - **Secondary:** Create incident ticket, attach log snippets from `storage/logs/bootstrap.log`, tag `platform-engineering`
+- Phase Checkpoint: Required for Phase 3 completion—ensure this playbook is current and linked in checkpoints before advancing to Phase 4 or later phases.

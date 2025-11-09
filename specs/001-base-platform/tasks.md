@@ -63,6 +63,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 - [x] T002 [P] Add profile switching directory with placeholder doc in `scripts/profile/README.md` describing how `platform:bootstrap` consumes profile env files
 - [x] T003 [P] Add automation scripts directory note in `scripts/platform/README.md` outlining wrapper responsibilities for artisan commands
 - [x] T004 Record baseline toolchain versions in `docs/base-platform/toolchain-baseline.md`
+- [ ] T004A Update documentation checklist (`specs/001-base-platform/checklists/documentation.md`) to reflect Phase 1 artifacts
 
 ---
 
@@ -87,6 +88,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 - [x] T017 [P] Create parity result model in `app/Models/ParityResult.php`
 - [x] T018 Establish base metrics helper in `app/Support/BasePlatformMetrics.php`
 - [x] T019 Document parity routines in `docs/base-platform/parity-overview.md`
+- [ ] T019A Update documentation checklist to capture foundational documentation deliverables
 
 **Checkpoint**: Foundation ready—QA confirms setup docs, migrations, and tooling prerequisites are satisfied before user story work begins, including verifying `docs/base-platform/README.md`, `scripts/*/README.md`, and `docs/base-platform/toolchain-baseline.md` capture recorded runtime versions and prerequisite checklists.
 
@@ -122,11 +124,15 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 - [x] T038 [US1] Register bootstrap, parity, recovery, and validation commands/schedules in `bootstrap/app.php`
 - [x] T039 [US1] Extend quickstart instructions in `docs/base-platform/quickstart.md`
 - [x] T040 [US1] Wire bootstrap health checks into `app/Support/BasePlatformMetrics.php`
+- [ ] T040A [US1] Publish Prometheus scrape configuration template in `config/prometheus/base-platform.yml` covering bootstrap, parity, and validation metrics
+- [ ] T040B [US1] Add Grafana dashboard templates under `docs/base-platform/observability/grafana/` visualizing bootstrap SLA, parity drift, and CI health KPIs
+- [ ] T040C [US1] Document observability setup workflow in `docs/base-platform/observability.md`, including Prometheus + Grafana install, Herd integration, and validation steps
 - [x] T041 [US1] Document credential rotation playbook in `docs/base-platform/credential-rotation.md`
 - [x] T042 [US1] Document credential onboarding checklist in `docs/base-platform/credential-onboarding.md`
 - [x] T043 [US1] Implement `platform:validate-profiles` command in `app/Console/Commands/ValidateEnvironmentProfiles.php`
 - [x] T044 [US1] Schedule weekly environment validation command (`platform:validate-profiles --all`) in `bootstrap/app.php`
 - [x] T045 [US1] Document environment validation workflow in `docs/base-platform/environment-validation.md`
+- [ ] T045A Update documentation checklist confirming User Story 1 documentation coverage
 
 **Checkpoint**: User Story 1 functional—QA archives native/container validation reports (`storage/app/base-platform/validation/`), recovery documentation, and credential checklists alongside the corresponding CI run URLs.
 
@@ -168,6 +174,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 - [x] T062B [US2] Document multi-channel alert mapping in `docs/base-platform/ci-policy.md`
 - [x] T063 [US2] Add CI job executing environment validation command for native and container profiles in `.github/workflows/tests.yml`
 - [x] T064 [US2] Schedule weekly checksum monitor and validation command bundle in `bootstrap/app.php`
+- [ ] T064A Update documentation checklist confirming User Story 2 documentation coverage
 
 **Checkpoint**: User Story 2 functional—QA validates CI workflow updates, scheduled jobs, and checksum monitor outputs, attaching run logs that demonstrate nightly, weekly, and release-gate executions.
 
@@ -199,6 +206,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 - [ ] T075 [US3] Extend seeder with dependency metadata in `database/seeders/BasePlatformSeeder.php`
 - [ ] T075A [US3] Implement monthly dependency review performance reporting command in `app/Console/Commands/DependencyReviewPerformanceReport.php` and capture outputs for QA evidence
 - [ ] T076 [US3] Document support metric tracking plan in `docs/base-platform/support-metrics.md`
+- [ ] T076A Update documentation checklist confirming User Story 3 documentation coverage
 
 **Checkpoint**: All user stories functional—QA confirms dependency review automation, support metric tracking, and documentation outputs, storing the monthly dependency report sample and contribution checklist evidence.
 
@@ -216,6 +224,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 - [ ] T079A [P] Measure queue throughput baseline (`≥1k jobs/min`) and record evidence in `docs/base-platform/support-metrics.md`
 - [ ] T080 [P] Review security posture and credential rotation notes in `docs/base-platform/security-review.md`
 - [ ] T081 Final verification: ensure policy acknowledgement headers, checksum monitor outputs, profile validation reports, and QA evidence are present across artifacts in `specs/001-base-platform/`
+- [ ] T081A Final documentation checklist pass confirming all items are marked complete
 
 ---
 

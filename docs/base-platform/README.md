@@ -1,6 +1,6 @@
-Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
-
 # Base Platform Environment Overview
+
+Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
 
 ## Purpose
 
@@ -12,7 +12,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 
 | Area | Native Profile | Container Profile | Notes |
 |------|----------------|-------------------|-------|
-| Runtime | PHP 8.5 via Herd | PHP 8.5 via Docker image | Both require Bun ≥1.1 |
+| Runtime | PHP 8.5 via Herd | PHP 8.5 via Podman/Docker image | Both require Bun ≥1.1 (Podman v5.7.0+ preferred) |
 | Bootstrap | `composer setup -- --profile=native` | `composer setup -- --profile=container` | Wraps `platform:bootstrap` command |
 | Parity Validation | `php artisan platform:validate-profiles --profile=native` | `php artisan platform:validate-profiles --profile=container` | Weekly schedule handles `--all` |
 | Secrets | Encrypted `.env.native` | Encrypted `.env.container` | Rotation documented in credential guides |
@@ -20,6 +20,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 ## Required Artifacts
 
 - `docs/base-platform/toolchain-baseline.md` records version pins used by automation
+- `docs/base-platform/observability.md` documents Prometheus scrape targets and Grafana dashboards required for local monitoring
 - `scripts/profile/` contains profile switch helpers invoked by bootstrap tooling
 - `scripts/platform/` includes shell wrappers for console commands
 - `storage/app/base-platform/validation/` archives validation outputs for QA

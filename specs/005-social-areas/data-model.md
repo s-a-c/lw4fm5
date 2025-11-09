@@ -1,6 +1,6 @@
-Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
-
 # Data Model: Social Areas Provisioning Phase 1
+
+Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
 
 ## Overview
 
@@ -12,6 +12,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 ## Entities
 
 ### areas (seeded reference)
+
 | Column | Type | Rules |
 | --- | --- | --- |
 | id | bigint (PK) | Auto-increment seed data (1=lobby, 2=greenroom, 3=residence) |
@@ -23,6 +24,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 **Notes**: No CRUD in Phase 1; used for joins and audit attribution.
 
 ### rooms
+
 | Column | Type | Rules |
 | --- | --- | --- |
 | id | uuid (PK) | `Str::uuid()` |
@@ -36,6 +38,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 **Relationships**: `rooms` belongsTo `users` (resident); hasMany `room_permissions`; soft delete not enabled (audit retains access via logs).
 
 ### room_permissions
+
 | Column | Type | Rules |
 | --- | --- | --- |
 | id | uuid (PK) | |
@@ -49,6 +52,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 **Purpose**: Captures parlour sharing overrides. Sanctuary and den never expose rows.
 
 ### invitations
+
 | Column | Type | Rules |
 | --- | --- | --- |
 | id | uuid (PK) | `Str::uuid()` |
@@ -66,6 +70,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 **Indexes**: `idx_invitations_host_state` (`host_id`, `state`), `idx_invitations_expires_at` for expiry sweeps.
 
 ### access_logs
+
 | Column | Type | Rules |
 | --- | --- | --- |
 | id | uuid (PK) | |
@@ -84,6 +89,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 **Retention**: Nightly job deletes rows older than 90 days (per clarification).
 
 ### lobby_invitation_requests
+
 | Column | Type | Rules |
 | --- | --- | --- |
 | id | uuid (PK) | |
@@ -96,6 +102,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 **Usage**: Stores public lobby requests to be triaged by residents; once approved, transforms into `invitations`.
 
 ## Relationships Diagram (textual)
+
 - `User` 1↔N `Room`
 - `Room` 1↔N `RoomPermission`
 - `User (resident)` 1↔N `Invitation`
@@ -104,16 +111,19 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 - `LobbyInvitationRequest` 1→1 `Invitation` when converted
 
 ## State Machines
+
 - **Invitation**: `pending` → `approved` (host action) → `expired` (scheduler) or `revoked` (host/admin). `approved` may transition to `revoked` for manual cancellation. State changes emit domain events for notifications and logging.
 - **Room Share Mode**: `resident_only` ↔ `resident_and_guests` (subject to room type constraints).
 
 ## Validation Rules
+
 - Emails validated via RFC, normalized lower-case.
 - `share_mode` changes limited to parlour type.
 - Guests cannot be granted sanctuary/den access; enforced in policies and data layer.
 - Invitation tokens hashed using Laravel `Hash::make` to prevent plain-text leakage.
 
 ## Migration Ordering
+
 1. Create `areas` seed (if not present) and `rooms` table.
 2. Create `room_permissions` table.
 3. Create `invitations` table with indices.

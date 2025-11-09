@@ -1,6 +1,6 @@
-Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
-
 # Data Model: Base Platform Foundation
+
+Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
 
 <details>
 <summary>Expand for Table of Contents</summary>
@@ -13,6 +13,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
     - [2.3. credential\_policies](#23-credential_policies)
     - [2.4. workflow\_suites](#24-workflow_suites)
     - [2.5. parity\_results](#25-parity_results)
+    - [2.6. workflow\_suite\_channels](#26-workflow_suite_channels)
   - [3. Relationships \& Lifecycle](#3-relationships--lifecycle)
   - [4. Validation Rules](#4-validation-rules)
 
