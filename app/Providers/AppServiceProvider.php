@@ -88,20 +88,20 @@ class AppServiceProvider extends ServiceProvider
         if (! $this->app->isLocal()) {
             Password::defaults(function () {
                 return Password::min(12)
-                               ->letters()
-                               ->numbers()
-                               ->symbols()
-                               ->mixedCase()
-                               ->uncompromised();
+                        ->letters()
+                        ->numbers()
+                        ->symbols()
+                        ->mixedCase()
+                        ->uncompromised();
             });
         }
         else {
             Password::defaults(function () {
                 return Password::min(8)
-                               ->letters()
-                               ->numbers()
-                               ->symbols()
-                               ->mixedCase();
+                        ->letters()
+                        ->numbers()
+                        ->symbols()
+                        ->mixedCase();
             });
         }
 
@@ -131,7 +131,7 @@ class AppServiceProvider extends ServiceProvider
 
         Vite::useBuildDirectory('build')
             ->withEntryPoints([
-                                  'resources/js/app.js',
-                              ]);
+                'resources/js/app.js',
+            ]);
     }
 }

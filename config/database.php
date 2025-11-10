@@ -1,6 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\Str;
+
+$mysqlSslAttribute = class_exists(PDO\MYSQL::class)
+    ? PDO\MYSQL::ATTR_SSL_CA
+    : (defined('PDO::MYSQL_ATTR_SSL_CA') ? PDO::MYSQL_ATTR_SSL_CA : null);
 
 return [
 
@@ -58,9 +64,9 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                \Pdo\Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'options' => extension_loaded('pdo_mysql') ? array_filter(
+                $mysqlSslAttribute !== null ? [$mysqlSslAttribute => env('MYSQL_ATTR_SSL_CA')] : []
+            ) : [],
         ],
 
         'mariadb' => [
@@ -78,9 +84,9 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                \Pdo\Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'options' => extension_loaded('pdo_mysql') ? array_filter(
+                $mysqlSslAttribute !== null ? [$mysqlSslAttribute => env('MYSQL_ATTR_SSL_CA')] : []
+            ) : [],
         ],
 
         'pgsql' => [

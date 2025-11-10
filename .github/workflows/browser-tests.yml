@@ -12,6 +12,9 @@ on:
       - develop
       - main
 
+permissions:
+  contents: read
+
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -23,36 +26,34 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.4
+          php-version: 8.5
           tools: composer:v2
-          coverage: xdebug
+          coverage: none
 
-      - name: Setup Node
-        uses: actions/setup-node@v6
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: '22'
-          cache: 'npm'
+          bun-version: 1.1.17
 
-      - name: Install Node Dependencies
-        run: npm ci
+      - name: Configure Composer Auth
+        env:
+          FLUXUI_PRO_USERNAME: ${{ secrets.FLUXUI_PRO_USERNAME }}
+          FLUXUI_PRO_KEY: ${{ secrets.FLUXUI_PRO_KEY }}
+        run: |
+          if [[ -z "$FLUXUI_PRO_USERNAME" || -z "$FLUXUI_PRO_KEY" ]]; then
+            echo "::error::Missing FLUXUI_PRO_USERNAME and FLUXUI_PRO_KEY secrets required for composer.fluxui.dev"
+            exit 1
+          fi
 
-      - name: Install Playwright Dependencies
-        run: npm install playwright@latest
+          composer config http-basic.composer.fluxui.dev "$FLUXUI_PRO_USERNAME" "$FLUXUI_PRO_KEY"
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-
-      - name: Add `laravel-labs/starter-kit-browser-tests` Repository
-        run: |
-          composer config repositories.browser-tests '{"type": "vcs", "url": "https://github.com/laravel-labs/starter-kit-browser-tests"}' --file composer.json
-          composer remove "phpunit/phpunit" --dev --no-update
-          composer require "laravel-labs/starter-kit-browser-tests:dev-main@dev" --dev --no-update
-
-      - name: Add Flux Credentials Loaded From ENV
-        run: composer config http-basic.composer.fluxui.dev "${{ secrets.FLUX_PRO_USERNAME }}" "${{ secrets.FLUX_PRO_PASSWORD }}"
+        run: bunx playwright install --with-deps
 
       - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+        run: |
+          composer install --no-interaction --prefer-dist --optimize-autoloader
+          bun install --frozen-lockfile
 
       - name: Copy Environment File
         run: cp .env.example .env
@@ -62,13 +63,13 @@ jobs:
 
       - name: Setup Test Environment
         run: |
-           cp vendor/laravel-labs/starter-kit-browser-tests/phpunit.xml.dist .
-           rm phpunit.xml
-           rm -Rf tests/
-           cp -rf vendor/laravel-labs/starter-kit-browser-tests/tests/ tests/
+          cp vendor/laravel-labs/starter-kit-browser-tests/phpunit.xml.dist .
+          rm phpunit.xml
+          rm -Rf tests/
+          cp -rf vendor/laravel-labs/starter-kit-browser-tests/tests/ tests/
 
       - name: Build Assets
-        run: npm run build
+        run: bun run build
 
       - name: Tests
         run: php vendor/bin/pest

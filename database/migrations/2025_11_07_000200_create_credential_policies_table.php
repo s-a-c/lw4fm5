@@ -1,0 +1,32 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
+ */
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('credential_policies', function (Blueprint $table): void {
+            $table->uuid('id')->primary();
+            $table->enum('context', ['ci', 'local']);
+            $table->enum('storage_mechanism', ['github_actions_secret', 'encrypted_env_file']);
+            $table->unsignedInteger('rotation_interval_days');
+            $table->string('owner');
+            $table->text('notes')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('credential_policies');
+    }
+};

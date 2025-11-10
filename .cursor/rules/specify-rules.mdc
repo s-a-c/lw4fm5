@@ -1,0 +1,32 @@
+# lw4fm5 Development Guidelines
+
+Auto-generated from all feature plans. Last updated: 2025-11-07
+
+## Active Technologies
+- PHP 8.4.12 (strict types) with Bun 1.1+ for JavaScript tooling + Laravel 12, Sanctum, Horizon, Pest 4, Laravel Pint, Rector, Bun toolchain, Playwright, Prometheus/OpenTelemetry exporters (001-base-platform)
+- PostgreSQL (primary application data), Redis (queues/cache) (001-base-platform)
+
+- PHP 8.4.12 with strict types + Laravel 12, Sanctum, Fortify, Laravel Mail queue, Pest 4 (001-social-areas)
+
+## Project Structure
+
+```text
+src/
+tests/
+```
+
+## Commands
+
+# Add commands for PHP 8.4.12 with strict types
+
+## Code Style
+
+PHP 8.4.12 with strict types: Follow standard conventions
+
+## Recent Changes
+- 001-base-platform: Added PHP 8.4.12 (strict types) with Bun 1.1+ for JavaScript tooling + Laravel 12, Sanctum, Horizon, Pest 4, Laravel Pint, Rector, Bun toolchain, Playwright, Prometheus/OpenTelemetry exporters
+
+- 001-social-areas: Added PHP 8.4.12 with strict types + Laravel 12, Sanctum, Fortify, Laravel Mail queue, Pest 4
+
+<!-- MANUAL ADDITIONS START -->
+<!-- MANUAL ADDITIONS END -->

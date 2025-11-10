@@ -11,8 +11,8 @@
     "build": "vite build",
     "dev": "vite",
     "preview": "vite preview",
-    "lint": "prettier --write resources/",
-    "test:lint": "prettier --check resources/",
+    "lint": "bunx prettier --write resources/",
+    "test:lint": "bunx prettier --check resources/",
     "playwright:install": "bunx playwright install --with-deps",
     "test:browser": "bunx playwright test"
   },
@@ -23,7 +23,7 @@
     "bun-git-hooks": "^0.3.1",
     "bun-plugin-tailwind": "^0.1.2",
     "prettier-plugin-packagejson": "^2.5.19",
-    "rolldown-vite": "^7.2.1"
+    "rolldown-vite": "^7.2.2"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.17",
@@ -37,8 +37,8 @@
     "prettier-plugin-tailwindcss": "^0.7.1",
     "pusher-js": "^8.4.0",
     "tailwindcss": "^4.1.17",
-    "vite": "^7.2.1",
-    "vitest": "^4.0.7"
+    "vite": "^7.2.2",
+    "vitest": "^4.0.8"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "4.53.1",

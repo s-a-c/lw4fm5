@@ -1,0 +1,118 @@
+openapi: 3.1.0
+info:
+  title: Base Platform Automation API
+  version: 0.1.0
+  description: |
+    Internal automation endpoints that orchestrate bootstrap checks, parity validation,
+    and workflow scheduling for the Base Platform Foundation feature.
+servers:
+  - url: https://internal.lw4fm5.local/api/v1
+paths:
+  /platform/bootstrap/run:
+    post:
+      summary: Execute the documented bootstrap workflow end-to-end.
+      description: |
+        Triggers the automated bootstrap script for the requested environment profile,
+        installing dependencies, running migrations, seeding baseline data, and executing
+        smoke checks (queues, schedulers, asset builds).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - environment_profile
+              properties:
+                environment_profile:
+                  type: string
+                  enum: [container, native]
+                  description: Target environment profile to bootstrap.
+                force_clean:
+                  type: boolean
+                  default: false
+                  description: When true, removes existing caches/artifacts before running.
+      responses:
+        '202':
+          description: Bootstrap workflow accepted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  run_id:
+                    type: string
+                  eta_minutes:
+                    type: integer
+                  notes:
+                    type: string
+        '409':
+          description: Bootstrap already running for the requested profile.
+  /platform/parity-checks/trigger:
+    post:
+      summary: Trigger parity validation between containerized and native profiles.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                run_id:
+                  type: string
+                  description: Optional bootstrap run ID to attach parity results to.
+      responses:
+        '202':
+          description: Parity check enqueued.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  parity_run_id:
+                    type: string
+                  estimated_completion_minutes:
+                    type: integer
+  /platform/workflows/schedule-heavy-suite:
+    post:
+      summary: Schedule nightly heavy-suite execution or on-demand release gate.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - trigger
+              properties:
+                trigger:
+                  type: string
+                  enum: [nightly, release]
+                release_tag:
+                  type: string
+                  description: Required when trigger is `release` to identify the target build.
+      responses:
+        '200':
+          description: Schedule acknowledged.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  schedule_id:
+                    type: string
+                  next_run:
+                    type: string
+                    format: date-time
+                  required_checks:
+                    type: array
+                    items:
+                      type: string
+components:
+  securitySchemes:
+    sanctumToken:
+      type: http
+      scheme: bearer
+      bearerFormat: Sanctum
+security:
+  - sanctumToken: []

@@ -1,0 +1,318 @@
+# Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
+openapi: 3.1.0
+info:
+  title: Social Areas API
+  version: 1.0.0
+  summary: Endpoints for lobby access, resident rooms, invitations, and access logging in Phase 1.
+servers:
+  - url: https://{tenant}.example.com/api/v1
+    variables:
+      tenant:
+        default: app
+paths:
+  /invitations:
+    post:
+      summary: Create a resident invitation for a guest.
+      operationId: createInvitation
+      security:
+        - sanctum: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInvitationRequest'
+      responses:
+        '201':
+          description: Invitation created and email queued.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationResource'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /invitations/{invitation}/approve:
+    post:
+      summary: Approve a pending invitation and notify the guest.
+      operationId: approveInvitation
+      security:
+        - sanctum: []
+      parameters:
+        - $ref: '#/components/parameters/InvitationId'
+      responses:
+        '200':
+          description: Invitation approved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationResource'
+        '409':
+          description: Invitation already approved, expired, or revoked.
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /invitations/{invitation}/revoke:
+    post:
+      summary: Revoke an invitation (approved or pending).
+      operationId: revokeInvitation
+      security:
+        - sanctum: []
+      parameters:
+        - $ref: '#/components/parameters/InvitationId'
+      responses:
+        '200':
+          description: Invitation revoked.
+        '409':
+          description: Invitation already revoked or expired.
+  /greenroom/entries:
+    post:
+      summary: Request guest entry into the greenroom.
+      operationId: requestGreenroomEntry
+      security:
+        - sanctum: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GreenroomEntryRequest'
+      responses:
+        '200':
+          description: Entry allowed and logged.
+        '202':
+          description: Entry pending host approval.
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /rooms:
+    get:
+      summary: Retrieve resident room configuration.
+      operationId: listRooms
+      security:
+        - sanctum: []
+      responses:
+        '200':
+          description: Rooms returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RoomResource'
+  /rooms/{room}:
+    put:
+      summary: Update parlour sharing settings.
+      operationId: updateRoom
+      security:
+        - sanctum: []
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRoomRequest'
+      responses:
+        '200':
+          description: Room updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomResource'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /lobby/content:
+    get:
+      summary: Fetch public lobby announcements.
+      operationId: getLobbyContent
+      responses:
+        '200':
+          description: Content payload.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LobbyAnnouncement'
+  /lobby/invitation-request:
+    post:
+      summary: Submit a lobby invitation request.
+      operationId: submitLobbyRequest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LobbyRequest'
+      responses:
+        '201':
+          description: Request recorded.
+        '429':
+          description: Rate limit reached.
+
+components:
+  securitySchemes:
+    sanctum:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    InvitationId:
+      name: invitation
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    RoomId:
+      name: room
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    ValidationError:
+      description: Validation failure.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationError'
+    Forbidden:
+      description: Access denied with contextual messaging.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    CreateInvitationRequest:
+      type: object
+      required: [guest_email, message]
+      properties:
+        guest_email:
+          type: string
+          format: email
+        message:
+          type: string
+          maxLength: 500
+        room_preferences:
+          type: array
+          items:
+            type: string
+            enum: [parlour]
+    InvitationResource:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        host_id:
+          type: integer
+        guest_email:
+          type: string
+          format: email
+        state:
+          type: string
+          enum: [pending, approved, expired, revoked]
+        expires_at:
+          type: string
+          format: date-time
+        approved_at:
+          type: string
+          format: date-time
+          nullable: true
+    GreenroomEntryRequest:
+      type: object
+      required: [invitation_token]
+      properties:
+        invitation_token:
+          type: string
+          minLength: 32
+        correlation_id:
+          type: string
+          format: uuid
+    RoomResource:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [sanctuary, parlour, den]
+        share_mode:
+          type: string
+          enum: [resident_only, resident_and_guests]
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoomPermission'
+    RoomPermission:
+      type: object
+      properties:
+        subject_type:
+          type: string
+          enum: [guest, resident]
+        subject_id:
+          type: integer
+          nullable: true
+        guest_email:
+          type: string
+          format: email
+          nullable: true
+    UpdateRoomRequest:
+      type: object
+      required: [share_mode, permissions]
+      properties:
+        share_mode:
+          type: string
+          enum: [resident_only, resident_and_guests]
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoomPermission'
+    LobbyAnnouncement:
+      type: object
+      properties:
+        id:
+          type: string
+        headline:
+          type: string
+        body:
+          type: string
+        published_at:
+          type: string
+          format: date-time
+    LobbyRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+        message:
+          type: string
+          maxLength: 500
+    ValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          type: string

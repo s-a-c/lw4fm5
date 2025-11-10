@@ -1,0 +1,47 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Contracts\BasePlatform\EnvironmentProfileValidatorContract;
+use App\Models\EnvironmentProfile;
+use App\Services\BasePlatform\ProfileValidationResult;
+use Illuminate\Support\Str;
+
+use function Pest\Laravel\artisan;
+use function Pest\Laravel\mock;
+
+it('validates only the native profile when requested', function (): void {
+    EnvironmentProfile::query()->create([
+        'id' => (string) Str::uuid(),
+        'name' => 'native',
+        'runtime_versions' => ['php' => '8.5', 'bun' => '1.1'],
+        'prerequisites' => ['herd' => true],
+        'smoke_check_script' => 'tests/smoke/native.sh',
+        'status' => 'supported',
+    ]);
+
+    EnvironmentProfile::query()->create([
+        'id' => (string) Str::uuid(),
+        'name' => 'container',
+        'runtime_versions' => ['php' => '8.5', 'bun' => '1.1'],
+        'prerequisites' => ['docker' => true],
+        'smoke_check_script' => 'tests/smoke/container.sh',
+        'status' => 'supported',
+    ]);
+
+    mock(EnvironmentProfileValidatorContract::class)
+        ->shouldReceive('validate')
+        ->once()
+        ->with(['native'])
+        ->andReturn([
+            new ProfileValidationResult(
+                profile: 'native',
+                status: ProfileValidationResult::STATUS_PASS,
+                issues: []
+            ),
+        ]);
+
+    artisan('platform:validate-profiles', ['--profile' => 'native'])
+        ->expectsOutputToContain('Validation complete for native')
+        ->assertExitCode(0);
+});
