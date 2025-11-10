@@ -7,7 +7,8 @@ namespace App\Models;
 /**
  * Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
  */
-
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -39,10 +40,11 @@ final class EnvironmentProfile extends Model
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder<self>  $query
-     * @return \Illuminate\Database\Eloquent\Builder<self>
+     * @param  Builder<self>  $query
+     * @return Builder<self>
      */
-    public function scopeSupported($query)
+    #[Scope]
+    protected function supported($query)
     {
         return $query->where('status', 'supported');
     }

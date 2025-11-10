@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
+use Spatie\DeletedModels\Models\DeletedModel;
 
-Artisan::command('inspire', function () {
+Artisan::command('inspire', function (): void {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
 Schedule::command('sanctum:prune-expired --hours=24')->daily();
 
 Schedule::command('model:prune', [
-    '--model' => [\Spatie\DeletedModels\Models\DeletedModel::class],
+    '--model' => [DeletedModel::class],
 ])->daily();

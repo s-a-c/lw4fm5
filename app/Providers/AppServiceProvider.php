@@ -15,14 +15,14 @@ use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
-class AppServiceProvider extends ServiceProvider
+final class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
      */
     public function register(): void
     {
-        FilamentView::registerRenderHook('panels::body.end', fn(): string => Blade::render("@vite('resources/js/app.js')"));
+        FilamentView::registerRenderHook('panels::body.end', fn (): string => Blade::render("@vite('resources/js/app.js')"));
     }
 
     /**
@@ -40,8 +40,6 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Configure the application's carbon.
-     *
-     * @return void
      */
     private function configureCarbon(): void
     {
@@ -51,24 +49,20 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Configure the application's commands.
-     *
-     * @return void
      */
     private function configureCommands(): void
     {
 
         DB::prohibitDestructiveCommands(
             $this->app->isProduction()
-            && !$this->app->runningInConsole()
-            && !$this->app->runningUnitTests()
-            && !$this->app->isDownForMaintenance(),
+            && ! $this->app->runningInConsole()
+            && ! $this->app->runningUnitTests()
+            && ! $this->app->isDownForMaintenance(),
         );
     }
 
     /**
      * Configure the application's models.
-     *
-     * @return void
      */
     private function configureModels(): void
     {
@@ -79,30 +73,23 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Configure the application's password rules.
-     *
-     * @return void
      */
-    private function configurePasswordRules() : void
+    private function configurePasswordRules(): void
     {
 
         if (! $this->app->isLocal()) {
-            Password::defaults(function () {
-                return Password::min(12)
-                        ->letters()
-                        ->numbers()
-                        ->symbols()
-                        ->mixedCase()
-                        ->uncompromised();
-            });
-        }
-        else {
-            Password::defaults(function () {
-                return Password::min(8)
-                        ->letters()
-                        ->numbers()
-                        ->symbols()
-                        ->mixedCase();
-            });
+            Password::defaults(fn () => Password::min(12)
+                ->letters()
+                ->numbers()
+                ->symbols()
+                ->mixedCase()
+                ->uncompromised());
+        } else {
+            Password::defaults(fn () => Password::min(8)
+                ->letters()
+                ->numbers()
+                ->symbols()
+                ->mixedCase());
         }
 
         // config(['auth.password_timeout' => 60])
@@ -110,8 +97,6 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Configure the application's url.
-     *
-     * @return void
      */
     private function configureUrl(): void
     {
@@ -123,8 +108,6 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Configure the application's vite.
-     *
-     * @return void
      */
     private function configureVite(): void
     {

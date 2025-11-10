@@ -3,16 +3,17 @@
 declare(strict_types=1);
 
 use App\Services\BasePlatform\DependencyCatalogue;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
 
 beforeEach(function (): void {
     Storage::fake('local');
-    Carbon::setTestNow('2025-11-09 12:00:00');
+    Date::setTestNow('2025-11-09 12:00:00');
 });
 
 afterEach(function (): void {
-    Carbon::setTestNow();
+    Date::setTestNow();
 });
 
 it('parses the dependency catalogue and flags overdue reviews', function (): void {
@@ -72,5 +73,5 @@ it('rejects catalogue entries with unsupported metadata', function (): void {
 
     $catalogue = new DependencyCatalogue(Storage::disk('local'));
 
-    expect(fn () => $catalogue->entries())->toThrow(InvalidArgumentException::class);
+    expect(fn (): Collection => $catalogue->entries())->toThrow(InvalidArgumentException::class);
 });

@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-if (($_ENV['APP_ENV'] ?? null) === 'local') {
+use Illuminate\Support\Env;
+
+if ((Env::get('APP_ENV')) === 'local') {
     error_reporting(error_reporting() & ~E_DEPRECATED & ~E_USER_DEPRECATED);
 }
 

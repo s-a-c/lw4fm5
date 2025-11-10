@@ -6,6 +6,7 @@ namespace App\Services\BasePlatform;
 
 use App\Contracts\BasePlatform\EnvironmentProfileValidatorContract;
 use App\Models\EnvironmentProfile;
+use Illuminate\Support\Collection;
 
 final class EnvironmentProfileValidator implements EnvironmentProfileValidatorContract
 {
@@ -17,18 +18,16 @@ final class EnvironmentProfileValidator implements EnvironmentProfileValidatorCo
     {
         $targets = $this->resolveProfiles($profiles);
 
-        return $targets->map(static function (EnvironmentProfile $profile): ProfileValidationResult {
-            return new ProfileValidationResult(
-                profile: $profile->name,
-                status: ProfileValidationResult::STATUS_PASS,
-                issues: [],
-            );
-        })->all();
+        return $targets->map(static fn (EnvironmentProfile $profile): ProfileValidationResult => new ProfileValidationResult(
+            profile: $profile->name,
+            status: ProfileValidationResult::STATUS_PASS,
+            issues: [],
+        ))->all();
     }
 
     /**
      * @param  array<int, string>  $profiles
-     * @return \Illuminate\Support\Collection<int, EnvironmentProfile>
+     * @return Collection<int, EnvironmentProfile>
      */
     private function resolveProfiles(array $profiles)
     {

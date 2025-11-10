@@ -7,35 +7,35 @@ namespace App\Services\BasePlatform;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use InvalidArgumentException;
 use RuntimeException;
 
 /**
  * Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
  */
-final class DependencyCatalogue
+final readonly class DependencyCatalogue
 {
-    private const CATALOGUE_PATH = 'base-platform/dependencies.json';
+    private const string CATALOGUE_PATH = 'base-platform/dependencies.json';
 
     /**
      * @var list<string>
      */
-    private const VALID_CLASSIFICATIONS = ['core', 'optional', 'experimental'];
+    private const array VALID_CLASSIFICATIONS = ['core', 'optional', 'experimental'];
 
     /**
      * @var list<string>
      */
-    private const VALID_REVIEW_CADENCES = ['monthly', 'quarterly'];
+    private const array VALID_REVIEW_CADENCES = ['monthly', 'quarterly'];
 
     /**
      * @var list<string>
      */
-    private const VALID_RISK_LEVELS = ['high', 'medium', 'low'];
+    private const array VALID_RISK_LEVELS = ['high', 'medium', 'low'];
 
     public function __construct(
-        private readonly Filesystem $filesystem,
-    ) {
-    }
+        private Filesystem $filesystem,
+    ) {}
 
     /**
      * @return Collection<int, DependencyRecord>
@@ -47,14 +47,12 @@ final class DependencyCatalogue
         }
 
         $raw = json_decode(
-            json: $this->filesystem->get(self::CATALOGUE_PATH),
+            json: (string) $this->filesystem->get(self::CATALOGUE_PATH),
             associative: true,
             flags: JSON_THROW_ON_ERROR
         );
 
-        if (! is_array($raw)) {
-            throw new InvalidArgumentException('Dependency catalogue must decode to an array');
-        }
+        throw_unless(is_array($raw), InvalidArgumentException::class, 'Dependency catalogue must decode to an array');
 
         return collect($raw)->map(function (array $entry): DependencyRecord {
             $this->assertValidEntry($entry);
@@ -65,7 +63,7 @@ final class DependencyCatalogue
                 classification: (string) $entry['classification'],
                 owner: (string) $entry['owner'],
                 justification: (string) $entry['justification'],
-                lastReviewedAt: Carbon::parse($entry['lastReviewedAt'])->startOfDay(),
+                lastReviewedAt: Date::parse($entry['lastReviewedAt'])->startOfDay(),
                 reviewCadence: (string) $entry['reviewCadence'],
                 riskLevel: (string) $entry['riskLevel'],
                 notes: (string) $entry['notes'],
@@ -78,7 +76,7 @@ final class DependencyCatalogue
      */
     public function overdue(?Carbon $reference = null): Collection
     {
-        $reference ??= Carbon::now();
+        $reference ??= Date::now();
 
         return $this->entries()->filter(fn (DependencyRecord $record): bool => $record->isOverdue($reference));
     }
@@ -155,8 +153,7 @@ final readonly class DependencyRecord
         public string $reviewCadence,
         public string $riskLevel,
         public string $notes,
-    ) {
-    }
+    ) {}
 
     public function reviewDeadline(): Carbon
     {

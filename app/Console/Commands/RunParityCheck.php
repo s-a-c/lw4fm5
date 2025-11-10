@@ -36,7 +36,7 @@ final class RunParityCheck extends Command
 
         $reports = $this->checker->run($profiles);
 
-        ParityReport::persistMany($reports)->each(function ($result): void {
+        ParityReport::persistMany($reports)->each(function (ParityResult $result): void {
             $message = $this->renderStatusMessage($result);
 
             match ($result->status) {

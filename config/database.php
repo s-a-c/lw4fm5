@@ -3,10 +3,11 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Str;
+use PDO\MYSQL;
 
-$mysqlSslAttribute = class_exists(PDO\MYSQL::class)
-    ? PDO\MYSQL::ATTR_SSL_CA
-    : (defined('PDO::MYSQL_ATTR_SSL_CA') ? PDO::MYSQL_ATTR_SSL_CA : null);
+$mysqlSslAttribute = class_exists(MYSQL::class)
+    ? MYSQL::ATTR_SSL_CA
+    : (defined('PDO::MYSQL_ATTR_SSL_CA') ? MYSQL::ATTR_SSL_CA : null);
 
 return [
 

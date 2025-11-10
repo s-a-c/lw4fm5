@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace App\Services\BasePlatform;
 
-final class ProfileValidationResult
+final readonly class ProfileValidationResult
 {
-    public const STATUS_PASS = 'pass';
+    public const string STATUS_PASS = 'pass';
 
-    public const STATUS_WARNING = 'warning';
+    public const string STATUS_WARNING = 'warning';
 
-    public const STATUS_FAIL = 'fail';
+    public const string STATUS_FAIL = 'fail';
 
     /**
      * @param  list<string>  $issues
      */
     public function __construct(
-        public readonly string $profile,
-        public readonly string $status,
-        public readonly array $issues = [],
+        public string $profile,
+        public string $status,
+        public array $issues = [],
     ) {}
 
     public function isPass(): bool

@@ -6,6 +6,7 @@ namespace App\Services\BasePlatform;
 
 use App\Contracts\BasePlatform\ParityCheckerContract;
 use App\Models\EnvironmentProfile;
+use Illuminate\Support\Collection;
 
 final class ParityChecker implements ParityCheckerContract
 {
@@ -17,18 +18,16 @@ final class ParityChecker implements ParityCheckerContract
     {
         $targets = $this->resolveProfiles($profiles);
 
-        return $targets->map(static function (EnvironmentProfile $profile): ParityReport {
-            return new ParityReport(
-                profile: $profile->name,
-                status: ParityReport::STATUS_PASS,
-                issues: [],
-            );
-        })->all();
+        return $targets->map(static fn (EnvironmentProfile $profile): ParityReport => new ParityReport(
+            profile: $profile->name,
+            status: ParityReport::STATUS_PASS,
+            issues: [],
+        ))->all();
     }
 
     /**
      * @param  array<int, string>  $profiles
-     * @return \Illuminate\Support\Collection<int, EnvironmentProfile>
+     * @return Collection<int, EnvironmentProfile>
      */
     private function resolveProfiles(array $profiles)
     {

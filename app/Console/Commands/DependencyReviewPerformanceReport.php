@@ -6,9 +6,9 @@ namespace App\Console\Commands;
 
 use App\Support\BasePlatformMetrics;
 use Illuminate\Console\Command;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use JsonException;
 use RuntimeException;
 
@@ -17,14 +17,14 @@ use RuntimeException;
  */
 final class DependencyReviewPerformanceReport extends Command
 {
+    private const string REPORT_DIRECTORY = 'base-platform/dependency-reports';
+
+    private const string PERFORMANCE_LOG = 'base-platform/dependency-performance.log';
+
     protected $signature = 'platform:dependency-review-performance-report
         {--report= : Relative storage path to a dependency review report}';
 
     protected $description = 'Summarise dependency review runtime metrics and append evidence logs for QA.';
-
-    private const REPORT_DIRECTORY = 'base-platform/dependency-reports';
-
-    private const PERFORMANCE_LOG = 'base-platform/dependency-performance.log';
 
     public function handle(): int
     {
@@ -49,7 +49,7 @@ final class DependencyReviewPerformanceReport extends Command
 
         try {
             $report = json_decode(
-                json: $disk->get($reportPath),
+                json: (string) $disk->get($reportPath),
                 associative: true,
                 flags: JSON_THROW_ON_ERROR
             );
@@ -66,7 +66,7 @@ final class DependencyReviewPerformanceReport extends Command
         }
 
         $entry = [
-            'recorded_at' => Carbon::now()->toIso8601String(),
+            'recorded_at' => Date::now()->toIso8601String(),
             'report_path' => $reportPath,
             'status' => $report['status'] ?? 'unknown',
             'runtime_seconds' => $report['runtime_seconds'] ?? null,
@@ -102,9 +102,7 @@ final class DependencyReviewPerformanceReport extends Command
             ->sortDesc()
             ->values();
 
-        if ($files->isEmpty()) {
-            throw new RuntimeException('No dependency review reports are present in storage.');
-        }
+        throw_if($files->isEmpty(), RuntimeException::class, 'No dependency review reports are present in storage.');
 
         return $files->first();
     }

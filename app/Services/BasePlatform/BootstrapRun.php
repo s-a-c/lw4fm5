@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace App\Services\BasePlatform;
 
-final class BootstrapRun
+final readonly class BootstrapRun
 {
-    public const STATUS_SUCCESS = 'success';
+    public const string STATUS_SUCCESS = 'success';
 
-    public const STATUS_WARNING = 'warning';
+    public const string STATUS_WARNING = 'warning';
 
-    public const STATUS_FAILED = 'failed';
+    public const string STATUS_FAILED = 'failed';
 
     /**
      * @param  array<string, mixed>  $notes
      */
     public function __construct(
-        public readonly string $profile,
-        public readonly string $status,
-        public readonly float $durationMinutes,
-        public readonly array $notes = [],
+        public string $profile,
+        public string $status,
+        public float $durationMinutes,
+        public array $notes = [],
     ) {}
 
     public function isSuccessful(): bool

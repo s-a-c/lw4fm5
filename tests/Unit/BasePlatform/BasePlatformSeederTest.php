@@ -19,10 +19,7 @@ it('appends timestamp keys without dropping existing attributes', function (): v
     ];
 
     /** @var list<array<string, mixed>> $result */
-    $result = (function (array $payload): array {
-        /** @var BasePlatformSeeder $this */
-        return $this->appendTimestamps($payload);
-    })->call($seeder, $records);
+    $result = ($this->appendTimestamps(...))->call($seeder, $records);
 
     expect($result)->toHaveCount(1);
 

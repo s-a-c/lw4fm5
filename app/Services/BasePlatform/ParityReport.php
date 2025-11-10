@@ -8,21 +8,21 @@ use App\Models\EnvironmentProfile;
 use App\Models\ParityResult;
 use Illuminate\Support\Collection;
 
-final class ParityReport
+final readonly class ParityReport
 {
-    public const STATUS_PASS = 'pass';
+    public const string STATUS_PASS = 'pass';
 
-    public const STATUS_WARNING = 'warning';
+    public const string STATUS_WARNING = 'warning';
 
-    public const STATUS_FAIL = 'fail';
+    public const string STATUS_FAIL = 'fail';
 
     /**
      * @param  list<string>  $issues
      */
     public function __construct(
-        public readonly string $profile,
-        public readonly string $status,
-        public readonly array $issues = [],
+        public string $profile,
+        public string $status,
+        public array $issues = [],
     ) {}
 
     /**

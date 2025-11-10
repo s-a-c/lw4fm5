@@ -18,7 +18,7 @@ final class BasePlatformMetrics
     {
         $payload = [
             'metric' => self::formatMetric($metric),
-            'labels' => Arr::map($labels, static fn ($label) => (string) $label),
+            'labels' => Arr::map($labels, static fn ($label): string => (string) $label),
             'value' => $value,
             'timestamp' => now()->toIso8601String(),
         ];

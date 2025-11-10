@@ -10,6 +10,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
@@ -19,20 +20,20 @@ use Illuminate\Support\Facades\Storage;
  */
 final class DependencyReviewReport extends Command
 {
+    private const string DEFAULT_REPORT_DIRECTORY = 'base-platform/dependency-reports';
+
+    private const string COMPOSER_AUDIT_COMMAND = 'composer audit --format=json';
+
     protected $signature = 'platform:dependency-review
         {--output= : Relative storage path for the generated report}
         {--issue-template=.github/ISSUE_TEMPLATE/dependency-review.md : GitHub issue template used by automation}';
 
     protected $description = 'Generate the monthly dependency review report and emit governance metrics.';
 
-    private const DEFAULT_REPORT_DIRECTORY = 'base-platform/dependency-reports';
-
-    private const COMPOSER_AUDIT_COMMAND = 'composer audit --format=json';
-
     public function handle(): int
     {
         $startedAt = microtime(true);
-        $now = Carbon::now();
+        $now = Date::now();
 
         $disk = Storage::disk('local');
         $catalogue = new DependencyCatalogue($disk);
@@ -53,7 +54,7 @@ final class DependencyReviewReport extends Command
 
         if (! $result->successful()) {
             $auditStatus = 'fail';
-            $auditError = trim($result->errorOutput()) !== '' ? trim($result->errorOutput()) : $result->output();
+            $auditError = mb_trim($result->errorOutput()) !== '' ? mb_trim($result->errorOutput()) : $result->output();
         } else {
             $decoded = json_decode($result->output(), true);
 
@@ -109,7 +110,7 @@ final class DependencyReviewReport extends Command
         if ($overdue->isNotEmpty()) {
             $this->components->warn(sprintf(
                 'Overdue dependencies detected: %s',
-                $overdue->map(fn ($entry) => $entry->name)->implode(', ')
+                $overdue->map(fn ($entry): string => $entry->name)->implode(', ')
             ));
         }
 
@@ -148,7 +149,7 @@ final class DependencyReviewReport extends Command
 
         Collection::make($advisories)
             ->each(function (array $advisory) use (&$counts): void {
-                $severity = strtolower((string) ($advisory['severity'] ?? 'low'));
+                $severity = mb_strtolower((string) ($advisory['severity'] ?? 'low'));
 
                 if (! array_key_exists($severity, $counts)) {
                     $severity = 'low';
@@ -165,7 +166,7 @@ final class DependencyReviewReport extends Command
         $option = $this->option('output');
 
         if (is_string($option) && $option !== '') {
-            return ltrim($option, '/');
+            return mb_ltrim($option, '/');
         }
 
         return sprintf(

@@ -9,14 +9,14 @@ namespace App\Services\BasePlatform;
  *
  * @param  array<int, string>  $nextSteps
  */
-final class BootstrapRecoveryGuidance
+final readonly class BootstrapRecoveryGuidance
 {
     /**
      * @param  array<int, string>  $nextSteps
      */
     public function __construct(
-        public readonly string $title,
-        public readonly string $documentation,
-        public readonly array $nextSteps,
+        public string $title,
+        public string $documentation,
+        public array $nextSteps,
     ) {}
 }

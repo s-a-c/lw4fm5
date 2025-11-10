@@ -10,19 +10,17 @@ use Illuminate\Process\Result;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Process;
 
-final class BootstrapRunner implements BootstrapRunnerContract
+final readonly class BootstrapRunner implements BootstrapRunnerContract
 {
     public function __construct(
-        private readonly BootstrapRecovery $recovery,
+        private BootstrapRecovery $recovery,
     ) {}
 
     public function run(string $profile, bool $forceClean): BootstrapRun
     {
         $supported = Config::get('base-platform.profiles.supported', []);
 
-        if (! in_array($profile, $supported, true)) {
-            throw new UnsupportedProfileException($profile);
-        }
+        throw_unless(in_array($profile, $supported, true), UnsupportedProfileException::class, $profile);
 
         $startedAt = microtime(true);
 

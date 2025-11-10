@@ -9,3 +9,6 @@ coverage/
 .idea/
 .vscode/
 tmp/
+
+resources/views/components/input-otp.blade.php
+resources/views/livewire/settings/two-factor.blade.php

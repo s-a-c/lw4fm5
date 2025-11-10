@@ -199,11 +199,9 @@ final class BasePlatformSeeder extends Seeder
     {
         $now = now();
 
-        return array_map(static function (array $attributes) use ($now): array {
-            return Arr::only($attributes + [
-                'created_at' => $now,
-                'updated_at' => $now,
-            ], array_merge(array_keys($attributes), ['created_at', 'updated_at']));
-        }, $records);
+        return array_map(static fn (array $attributes): array => Arr::only($attributes + [
+            'created_at' => $now,
+            'updated_at' => $now,
+        ], array_merge(array_keys($attributes), ['created_at', 'updated_at'])), $records);
     }
 }

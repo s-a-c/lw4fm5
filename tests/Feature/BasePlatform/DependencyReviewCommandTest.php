@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
@@ -13,7 +13,7 @@ use function Pest\Laravel\artisan;
 
 beforeEach(function (): void {
     Storage::fake('local');
-    Carbon::setTestNow('2025-11-09 09:30:00');
+    Date::setTestNow('2025-11-09 09:30:00');
 
     Storage::disk('local')->put('base-platform/dependencies.json', json_encode([
         [
@@ -67,7 +67,7 @@ beforeEach(function (): void {
 });
 
 afterEach(function (): void {
-    Carbon::setTestNow();
+    Date::setTestNow();
 });
 
 it('generates a dependency review report with severity counts and overdue entries', function (): void {
@@ -93,7 +93,7 @@ it('generates a dependency review report with severity counts and overdue entrie
         ? $disk->get($reportPath)
         : File::get(storage_path('app/'.$reportPath));
 
-    $report = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+    $report = json_decode((string) $contents, true, 512, JSON_THROW_ON_ERROR);
 
     expect($report)->toHaveKeys([
         'generated_at',
