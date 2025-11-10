@@ -12,6 +12,9 @@ on:
       - develop
       - main
 
+permissions:
+  contents: read
+
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -40,10 +43,6 @@ jobs:
           composer config repositories.browser-tests '{"type": "vcs", "url": "https://github.com/laravel-labs/starter-kit-browser-tests"}' --file composer.json
           composer remove "phpunit/phpunit" --dev --no-update
           composer require "laravel-labs/starter-kit-browser-tests:dev-main@dev" --dev --no-update
-
-      - name: Add Flux Credentials Loaded From ENV
-        if: ${{ secrets.FLUXUI_PRO_USERNAME != '' && secrets.FLUXUI_PRO_KEY != '' }}
-        run: composer config http-basic.composer.fluxui.dev "${{ secrets.FLUXUI_PRO_USERNAME }}" "${{ secrets.FLUXUI_PRO_KEY }}"
 
       - name: Install Dependencies
         run: |

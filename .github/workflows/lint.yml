@@ -11,7 +11,7 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   quality:
@@ -30,10 +30,6 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.1.17
-
-      - name: Configure Composer Auth
-        if: ${{ secrets.FLUXUI_PRO_USERNAME != '' && secrets.FLUXUI_PRO_KEY != '' }}
-        run: composer config http-basic.composer.fluxui.dev "${{ secrets.FLUXUI_PRO_USERNAME }}" "${{ secrets.FLUXUI_PRO_KEY }}"
 
       - name: Install Dependencies
         run: |

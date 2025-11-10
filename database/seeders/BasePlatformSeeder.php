@@ -203,7 +203,7 @@ final class BasePlatformSeeder extends Seeder
             return Arr::only($attributes + [
                 'created_at' => $now,
                 'updated_at' => $now,
-            ], array_keys($attributes) + ['created_at', 'updated_at']);
+            ], array_merge(array_keys($attributes), ['created_at', 'updated_at']));
         }, $records);
     }
 }
