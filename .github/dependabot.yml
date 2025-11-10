@@ -11,7 +11,7 @@ updates:
       - dependency-type: "all"
     open-pull-requests-limit: 10
 
-  - package-ecosystem: "npm"
+  - package-ecosystem: "bun"
     directory: "/"
     schedule:
       interval: "weekly"
