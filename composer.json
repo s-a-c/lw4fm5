@@ -6,6 +6,10 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "repositories": {
+        "laravel-labs-starter-kit-browser-tests": {
+            "type": "vcs",
+            "url": "https://github.com/laravel-labs/starter-kit-browser-tests"
+        },
         "flux-pro": {
             "type": "composer",
             "url": "https://composer.fluxui.dev"
@@ -59,6 +63,7 @@
         "fakerphp/faker": "^1.24",
         "jasonmccreary/laravel-test-assertions": "^2.8",
         "larastan/larastan": "^3.8",
+        "laravel-labs/starter-kit-browser-tests": "dev-main",
         "laravel-shift/blueprint": "^2.12",
         "laravel/boost": "^1.6",
         "laravel/pail": "^1.2",

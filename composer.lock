@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ac2b2e13c8154dab4d6369fe3a25a2df",
+    "content-hash": "66c9dd94358e6909247425f061ed325b",
     "packages": [
         {
             "name": "ably/ably-php",
@@ -17636,6 +17636,150 @@
             "time": "2025-10-27T23:09:14+00:00"
         },
         {
+            "name": "laravel-labs/starter-kit-browser-tests",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel-labs/starter-kit-browser-tests.git",
+                "reference": "2f099fc1ff60eeec3fa4f37ea78552d869985157"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel-labs/starter-kit-browser-tests/zipball/2f099fc1ff60eeec3fa4f37ea78552d869985157",
+                "reference": "2f099fc1ff60eeec3fa4f37ea78552d869985157",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "^12.27",
+                "pestphp/pest": "^4.0",
+                "pestphp/pest-plugin-browser": "^4.0",
+                "pestphp/pest-plugin-laravel": "^4.0",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^10.6",
+                "orchestra/testbench-core": "^10.6.4"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "post-autoload-dump": [
+                    "@prepare"
+                ],
+                "clear": [
+                    "@livewire:uninstall",
+                    "@react:uninstall",
+                    "@vue:uninstall"
+                ],
+                "prepare": [
+                    "@php vendor/bin/testbench package:discover --ansi"
+                ],
+                "livewire:install": [
+                    "@composer require --dev \"laravel/livewire-starter-kit:dev-main\""
+                ],
+                "livewire:uninstall": [
+                    "@composer remove --dev \"laravel/livewire-starter-kit\""
+                ],
+                "livewire:build": [
+                    "@react:uninstall",
+                    "@vue:uninstall",
+                    "@livewire:install",
+                    "cd \"./vendor/laravel/livewire-starter-kit\" && composer remove --dev \"laravel/sail\" --no-update",
+                    "cd \"./vendor/laravel/livewire-starter-kit\" && composer install",
+                    "cd \"./vendor/laravel/livewire-starter-kit\" && composer run post-root-package-install",
+                    "cd \"./vendor/laravel/livewire-starter-kit\" && composer run post-create-project-cmd",
+                    "cd \"./vendor/laravel/livewire-starter-kit\" && npm ci",
+                    "cd \"./vendor/laravel/livewire-starter-kit\" && npm run build",
+                    "cd \"./vendor/laravel/livewire-starter-kit\" && php artisan optimize:clear"
+                ],
+                "livewire:test": [
+                    "APP_BASE_PATH=./vendor/laravel/livewire-starter-kit php vendor/bin/pest --parallel"
+                ],
+                "livewire:ci": [
+                    "@livewire:build",
+                    "@livewire:test",
+                    "@livewire:uninstall"
+                ],
+                "livewire:serve": [
+                    "cd \"./vendor/laravel/livewire-starter-kit\" && php artisan serve"
+                ],
+                "react:install": [
+                    "@composer require --dev \"laravel/react-starter-kit:dev-main\""
+                ],
+                "react:uninstall": [
+                    "@composer remove --dev \"laravel/react-starter-kit\""
+                ],
+                "react:build": [
+                    "@livewire:uninstall",
+                    "@vue:uninstall",
+                    "@react:install",
+                    "cd \"./vendor/laravel/react-starter-kit\" && composer remove --dev \"laravel/sail\" --no-update",
+                    "cd \"./vendor/laravel/react-starter-kit\" && composer install",
+                    "cd \"./vendor/laravel/react-starter-kit\" && composer run post-root-package-install",
+                    "cd \"./vendor/laravel/react-starter-kit\" && composer run post-create-project-cmd",
+                    "cd \"./vendor/laravel/react-starter-kit\" && npm ci",
+                    "cd \"./vendor/laravel/react-starter-kit\" && npm run build",
+                    "cd \"./vendor/laravel/react-starter-kit\" && php artisan optimize:clear"
+                ],
+                "react:test": [
+                    "APP_BASE_PATH=./vendor/laravel/react-starter-kit php vendor/bin/pest --parallel"
+                ],
+                "react:ci": [
+                    "@react:build",
+                    "@react:test",
+                    "@react:uninstall"
+                ],
+                "react:serve": [
+                    "cd \"./vendor/laravel/react-starter-kit\" && php artisan serve"
+                ],
+                "vue:install": [
+                    "@composer require --dev \"laravel/vue-starter-kit:dev-main\""
+                ],
+                "vue:uninstall": [
+                    "@composer remove --dev \"laravel/vue-starter-kit\""
+                ],
+                "vue:build": [
+                    "@livewire:uninstall",
+                    "@react:uninstall",
+                    "@vue:install",
+                    "cd \"./vendor/laravel/vue-starter-kit\" && composer remove --dev \"laravel/sail\" --no-update",
+                    "cd \"./vendor/laravel/vue-starter-kit\" && composer install",
+                    "cd \"./vendor/laravel/vue-starter-kit\" && composer run post-root-package-install",
+                    "cd \"./vendor/laravel/vue-starter-kit\" && composer run post-create-project-cmd",
+                    "cd \"./vendor/laravel/vue-starter-kit\" && npm ci",
+                    "cd \"./vendor/laravel/vue-starter-kit\" && npm run build",
+                    "cd \"./vendor/laravel/vue-starter-kit\" && php artisan optimize:clear"
+                ],
+                "vue:test": [
+                    "APP_BASE_PATH=./vendor/laravel/vue-starter-kit php vendor/bin/pest --parallel"
+                ],
+                "vue:ci": [
+                    "@vue:build",
+                    "@vue:test",
+                    "@vue:uninstall"
+                ],
+                "vue:serve": [
+                    "cd \"./vendor/laravel/vue-starter-kit\" && php artisan serve"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Browser Tests for Laravel Starter Kit",
+            "keywords": [
+                "dev"
+            ],
+            "support": {
+                "source": "https://github.com/laravel-labs/starter-kit-browser-tests/tree/main"
+            },
+            "time": "2025-10-20T14:18:52+00:00"
+        },
+        {
             "name": "laravel-shift/blueprint",
             "version": "v2.12.0",
             "source": {
@@ -24233,6 +24377,7 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "filament/filament": 20,
+        "laravel-labs/starter-kit-browser-tests": 20,
         "laravel/folio": 20,
         "livewire/volt": 20,
         "roave/security-advisories": 20
