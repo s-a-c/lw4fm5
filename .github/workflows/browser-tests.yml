@@ -50,12 +50,6 @@ jobs:
       - name: Install Playwright Browsers
         run: bunx playwright install --with-deps
 
-      - name: Add `laravel-labs/starter-kit-browser-tests` Repository
-        run: |
-          composer config repositories.browser-tests '{"type": "vcs", "url": "https://github.com/laravel-labs/starter-kit-browser-tests"}' --file composer.json
-          composer remove "phpunit/phpunit" --dev --no-update
-          composer require "laravel-labs/starter-kit-browser-tests:dev-main@dev" --dev --no-update
-
       - name: Install Dependencies
         run: |
           composer install --no-interaction --prefer-dist --optimize-autoloader
