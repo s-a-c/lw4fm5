@@ -18,12 +18,12 @@
   },
   "dependencies": {
     "ably": "^2.14.0",
-    "autoprefixer": "^10.4.21",
+    "autoprefixer": "^10.4.22",
     "axios": "^1.13.2",
     "bun-git-hooks": "^0.3.1",
     "bun-plugin-tailwind": "^0.1.2",
     "prettier-plugin-packagejson": "^2.5.19",
-    "rolldown-vite": "^7.2.2"
+    "rolldown-vite": "^7.2.5"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.17",
