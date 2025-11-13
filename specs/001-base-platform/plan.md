@@ -25,7 +25,7 @@ Establish a reliable engineering baseline by delivering dual-path local setup (c
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- ✅ Policy acknowledgement header present on all deliverables (`Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e`)
+- ✅ Policy acknowledgement header present on all deliverables (`Compliant with [.ai/AI-GUIDELINES.md](../../.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e`)
 - ✅ Test plan approved before implementation, failing tests written (Red) before code (Green), refactor with tests green
 - ✅ Solution respects service boundaries (Storefront only) and avoids cross-database access
 - ✅ Security baselines enforced (credential policy: GitHub Actions secrets + encrypted local `.env`, Sanctum tokens, form request validation, rate limiting for future APIs)

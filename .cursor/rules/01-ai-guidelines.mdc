@@ -18,7 +18,7 @@ This project follows comprehensive guidelines defined in:
 All AI-authored artifacts (files, commit messages, documentation, etc.) MUST include an acknowledgment header:
 
 ```markdown
-Compliant with [AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v<checksum>
+Compliant with [AI-GUIDELINES.md](../../.ai/AI-GUIDELINES.md) v<checksum>
 ```
 
 The checksum MUST match the current composite checksum at the time of authoring (computed by `./.ai/scripts/policy-check.php`).
@@ -29,7 +29,7 @@ When performing sensitive actions (security-affecting changes, code execution, e
 
 **Example Format**:
 
-- `rule [AI-GUIDELINES/PHP-Laravel/040-security-standards.md#L41](.ai/AI-GUIDELINES/PHP-Laravel/040-security-standards.md#L41)`
+- `rule [AI-GUIDELINES/PHP-Laravel/040-security-standards.md#L41](../../.ai/AI-GUIDELINES/PHP-Laravel/040-security-standards.md#L41)`
 
 This ensures transparency and traceability for all sensitive operations.
 

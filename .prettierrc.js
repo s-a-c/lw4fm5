@@ -40,9 +40,6 @@ export default {
     // Format embedded content
     embeddedLanguageFormatting: "auto",
 
-    // Enforce consistent quote style in JSX attributes
-    jsxBracketSameLine: false,
-
     // Require pragma at the top of files to format them
     requirePragma: false,
 

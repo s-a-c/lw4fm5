@@ -55,7 +55,7 @@ Phase 1 provisions three social areas (lobby, greenroom, residence) with residen
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- ✅ Policy acknowledgement header present on all deliverables (`Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e`)
+- ✅ Policy acknowledgement header present on all deliverables (`Compliant with [.ai/AI-GUIDELINES.md](../../.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e`)
 - ✅ Test plan will precede implementation with red-green-refactor cycles documented in tasks
 - ✅ Solution remains within Storefront service boundaries and interfaces with other services only via existing APIs
 - ✅ Security baselines covered via Sanctum-auth API routes, form requests, MFA-capable auth, and RBAC policies

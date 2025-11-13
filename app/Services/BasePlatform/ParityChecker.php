@@ -29,7 +29,7 @@ final class ParityChecker implements ParityCheckerContract
      * @param  array<int, string>  $profiles
      * @return Collection<int, EnvironmentProfile>
      */
-    private function resolveProfiles(array $profiles)
+    private function resolveProfiles(array $profiles): Collection
     {
         $query = EnvironmentProfile::query()->where('status', 'supported');
 

@@ -12,14 +12,14 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 /**
- * Compliant with [AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v0921d4cfab198af1451ef177b6e47657b5d3ab0292f77bf232496291dee47183
+ * Compliant with [AI-GUIDELINES.md](../../.ai/AI-GUIDELINES.md) v0921d4cfab198af1451ef177b6e47657b5d3ab0292f77bf232496291dee47183
  */
 final class SupportCustomizationServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../../../config/filament/assets.php',
+            __DIR__.'/../../../config/filament/assets.php',
             'filament.assets',
         );
     }
@@ -58,6 +58,7 @@ final class SupportCustomizationServiceProvider extends ServiceProvider
 
             if ($this->shouldExcludeScript($script, $excludes)) {
                 $script->loadedOnRequest();
+
                 continue;
             }
 
@@ -90,7 +91,7 @@ final class SupportCustomizationServiceProvider extends ServiceProvider
     private function stringifyAttributes(array $attributes): Collection
     {
         return collect($attributes)
-            ->mapWithKeys(static fn ($value, string $key): array => [$key => (string) $value])
+            ->mapWithKeys(static fn (string|int|bool $value, string $key): array => [$key => (string) $value])
             ->filter();
     }
 
@@ -101,9 +102,9 @@ final class SupportCustomizationServiceProvider extends ServiceProvider
     private function normalizeIdentifiers(array $identifiers): array
     {
         return collect($identifiers)
-            ->map(static fn (string $identifier): string => trim($identifier))
+            ->map(static fn (string $identifier): string => mb_trim($identifier))
             ->filter()
-            ->map(static fn (string $identifier): string => strtolower($identifier))
+            ->map(static fn (string $identifier): string => mb_strtolower($identifier))
             ->values()
             ->all();
     }
@@ -140,6 +141,6 @@ final class SupportCustomizationServiceProvider extends ServiceProvider
     {
         $package = $script->getPackage() ?? 'app';
 
-        return strtolower(sprintf('%s:%s', $package, $script->getId()));
+        return mb_strtolower(sprintf('%s:%s', $package, $script->getId()));
     }
 }

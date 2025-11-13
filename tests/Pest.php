@@ -17,20 +17,24 @@ if (is_file($pestPluginRegistry)) {
     if ($contents !== false) {
         try {
             $plugins = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException) {
+        } catch (JsonException) {
             $plugins = null;
         }
 
         if (is_array($plugins)) {
+            $mutatePlugin = 'Pest\\Mutate\\Plugins\\Mutate';
+
             $filteredPlugins = array_values(array_filter(
                 $plugins,
-                static fn (string $plugin): bool => $plugin !== 'Pest\\Mutate\\Plugins\\Mutate',
+                static function (string $plugin) use ($mutatePlugin): bool {
+                    return $plugin !== $mutatePlugin;
+                },
             ));
 
             if ($filteredPlugins !== $plugins) {
                 try {
                     $encoded = json_encode($filteredPlugins, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
-                } catch (\JsonException) {
+                } catch (JsonException) {
                     $encoded = null;
                 }
 

@@ -1,7 +1,47 @@
 # Horizon and Octane Queue Management
 
-Compliant with [AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v0921d4cfab198af1451ef177b6e47657b5d3ab0292f77bf232496291dee47183
+Compliant with [AI-GUIDELINES.md](../../.ai/AI-GUIDELINES.md) v0921d4cfab198af1451ef177b6e47657b5d3ab0292f77bf232496291dee47183
 <!-- markdownlint-disable MD013 -->
+
+---
+
+<details>
+<summary>Expand for Table of Contents</summary>
+
+- [Horizon and Octane Queue Management](#horizon-and-octane-queue-management)
+  - [1 Introduction](#1-introduction)
+  - [2 Laravel Horizon](#2-laravel-horizon)
+    - [2.1 Package Overview](#21-package-overview)
+    - [2.2 Key Features](#22-key-features)
+    - [2.3 Installation Using Artisan Command](#23-installation-using-artisan-command)
+    - [2.4 What Gets Installed](#24-what-gets-installed)
+      - [2.4.1 Files Created](#241-files-created)
+      - [2.4.2 Configuration Updates](#242-configuration-updates)
+      - [2.4.3 Database Requirements](#243-database-requirements)
+    - [2.5 Configuration Steps](#25-configuration-steps)
+    - [2.6 Starting Horizon](#26-starting-horizon)
+    - [2.7 Accessing the Horizon Dashboard](#27-accessing-the-horizon-dashboard)
+  - [3 Laravel Octane](#3-laravel-octane)
+    - [3.1 Package Overview](#31-package-overview)
+    - [3.2 Key Features](#32-key-features)
+    - [3.3 Installation Using Artisan Command](#33-installation-using-artisan-command)
+    - [3.4 Choosing a Server](#34-choosing-a-server)
+    - [3.5 What Gets Installed](#35-what-gets-installed)
+      - [3.5.1 Files Created](#351-files-created)
+      - [3.5.2 Configuration Updates](#352-configuration-updates)
+    - [3.6 Configuration Steps](#36-configuration-steps)
+    - [3.7 Starting Octane](#37-starting-octane)
+    - [3.8 Important Considerations](#38-important-considerations)
+  - [4 Laravel Scout](#4-laravel-scout)
+    - [4.1 Package Overview](#41-package-overview)
+    - [4.2 Installation Verification](#42-installation-verification)
+  - [5 Environment Variables](#5-environment-variables)
+  - [6 Next Steps](#6-next-steps)
+  - [7 Navigation](#7-navigation)
+
+</details>
+
+---
 
 ## 1 Introduction
 

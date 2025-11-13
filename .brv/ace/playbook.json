@@ -10,12 +10,40 @@
         "timestamp": "2025-11-09T21:17:36.052Z"
       },
       "section": "Architecture"
+    },
+    "best-00002": {
+      "id": "best-00002",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-13T15:15:09.469Z"
+      },
+      "section": "Best Practices"
+    },
+    "plan-00003": {
+      "id": "plan-00003",
+      "metadata": {
+        "relatedFiles": [],
+        "tags": [
+          "manual"
+        ],
+        "timestamp": "2025-11-13T17:15:30.277Z"
+      },
+      "section": "Plan"
     }
   },
-  "nextId": 2,
+  "nextId": 4,
   "sections": {
     "Architecture": [
       "project-00001"
+    ],
+    "Best Practices": [
+      "best-00002"
+    ],
+    "Plan": [
+      "plan-00003"
     ]
   }
 }

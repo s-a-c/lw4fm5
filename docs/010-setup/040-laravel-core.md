@@ -1,6 +1,6 @@
 # Laravel Framework 12.x Core Setup
 
-Compliant with [AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v0921d4cfab198af1451ef177b6e47657b5d3ab0292f77bf232496291dee47183
+Compliant with [AI-GUIDELINES.md](../../.ai/AI-GUIDELINES.md) v0921d4cfab198af1451ef177b6e47657b5d3ab0292f77bf232496291dee47183
 <!-- markdownlint-disable MD013 -->
 
 ## 1 Introduction
@@ -8,7 +8,7 @@ Compliant with [AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v0921d4cfab198af1451ef17
 This document covers the installation and configuration of Laravel Framework 12.x and its core packages: Folio, Tinker, MCP (Model Context Protocol), API routes, Broadcasting, and the optional FrankenPHP runtime.
 
 > [!IMPORTANT]
-> **FrankenPHP Runtime** (`runtime/frankenphp-symfony`) is included in the project dependencies but is optional. It’s a high-performance PHP runtime for production deployments. For development, standard PHP (`php artisan serve`) or Laravel Octane are sufficient. See [queue-monitoring.md](080-queue-monitoring.md#laravel-octane) for Octane setup, or section 9 below for FrankenPHP details.
+> **FrankenPHP Runtime** (`runtime/frankenphp-symfony`) is included in the project dependencies but is optional. It’s a high-performance PHP runtime for production deployments. For development, standard PHP (`php artisan serve`) or Laravel Octane are sufficient. See [queue-monitoring.md](080-queue-monitoring.md#3-laravel-octane) for Octane setup, or section 9 below for FrankenPHP details.
 
 ## 2 Laravel Framework 12.x
 
@@ -67,9 +67,9 @@ php artisan --version
 
 ### 3.1 Package Overview
 
-**Package Name**: `livewire/livewire`  
-**Version**: `^4.0`  
-**Purpose**: Server-driven UI toolkit for building reactive Laravel components without writing JavaScript  
+**Package Name**: `livewire/livewire`
+**Version**: `^4.0`
+**Purpose**: Server-driven UI toolkit for building reactive Laravel components without writing JavaScript
 **Architectural Role**: Core presentation layer for interactive pages and components
 
 Livewire ships as a first-class dependency in the starter kit. It powers interactive experiences, integrates tightly with Volt single-file components, and underpins the Flux UI kits documented in [Livewire Ecosystem](050-livewire-ecosystem.md).
@@ -1293,7 +1293,7 @@ WantedBy=multi-user.target
 
 For development and many production scenarios, you may prefer:
 
-- **Laravel Octane**: High-performance application server for Laravel (see [queue-monitoring.md](080-queue-monitoring.md#laravel-octane))
+- **Laravel Octane**: High-performance application server for Laravel (see [queue-monitoring.md](080-queue-monitoring.md#3-laravel-octane))
 - **PHP-FPM with Nginx/Apache**: Traditional, well-supported setup
 - **Laravel Sail**: Docker-based development environment
 - **Standard PHP Built-in Server**: Simple development server (`php artisan serve`)

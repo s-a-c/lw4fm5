@@ -9,9 +9,10 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Livewire\LivewireManager;
 use Livewire\Mechanisms\ComponentRegistry;
+use Livewire\Volt\Component;
 use Livewire\Volt\ComponentResolver;
-use Livewire\Volt\MountedDirectory;
 use Livewire\Volt\MountedDirectories;
+use Livewire\Volt\MountedDirectory;
 use Livewire\Volt\Volt;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -69,8 +70,10 @@ final class VoltServiceProvider extends ServiceProvider
                 } catch (Throwable) {
                     continue;
                 }
-
-                if (! is_string($class) || ! class_exists($class)) {
+                if (! is_string($class)) {
+                    continue;
+                }
+                if (! class_exists($class)) {
                     continue;
                 }
 
@@ -102,21 +105,25 @@ final class VoltServiceProvider extends ServiceProvider
             }
 
             $filename = $file->getFilename();
-
-            if ($filename === false || ! Str::endsWith($filename, '.blade.php')) {
+            if ($filename === false) {
+                continue;
+            }
+            if (! Str::endsWith($filename, '.blade.php')) {
                 continue;
             }
 
             $contents = @file_get_contents($file->getPathname());
-
-            if ($contents === false || ! Str::contains($contents, ['Livewire\\Volt\\Component', '@volt'])) {
+            if ($contents === false) {
+                continue;
+            }
+            if (! Str::contains($contents, [Component::class, '@volt'])) {
                 continue;
             }
 
             $relativePath = Str::after($file->getPathname(), $directory->path.DIRECTORY_SEPARATOR);
             $relativePath = Str::replaceLast('.blade.php', '', $relativePath);
             $alias = str_replace(['/', '\\'], '.', $relativePath);
-            $alias = trim($alias, '.');
+            $alias = mb_trim($alias, '.');
 
             if ($alias === '') {
                 continue;

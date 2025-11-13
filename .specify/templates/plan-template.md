@@ -31,7 +31,7 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- ✅ Policy acknowledgement header present on all deliverables (`Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v<checksum>`)
+- ✅ Policy acknowledgement header present on all deliverables (`Compliant with [.ai/AI-GUIDELINES.md](../../.ai/AI-GUIDELINES.md) v<checksum>`)
 - ✅ Test plan approved before implementation, failing tests written (Red) before code (Green), refactor with tests green
 - ✅ Solution respects service boundaries (CRM, E-commerce, ERP, Storefront) and avoids cross-database access
 - ✅ Security baselines enforced (PII encryption, Sanctum tokens, FilamentShield RBAC, form request validation, rate limiting)

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 /**
- * Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
+ * Compliant with [.ai/AI-GUIDELINES.md](../../.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
  */
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -35,7 +35,7 @@ final class CredentialPolicy extends Model
      * @return Builder<self>
      */
     #[Scope]
-    protected function forContext($query, string $context)
+    protected function forContext(Builder $query, string $context): Builder
     {
         return $query->where('context', $context);
     }

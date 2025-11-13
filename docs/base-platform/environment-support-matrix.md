@@ -1,6 +1,6 @@
 # Environment Support Matrix
 
-Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
+Compliant with [.ai/AI-GUIDELINES.md](../../.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
 
 The matrix documents the supported local development environments and verifies that both native and containerized profiles remain in parity. Each row lists the runtime versions used during the most recent validation along with the automated checks that must pass. Update the table whenever prerequisites change and archive validation logs at `storage/app/base-platform/environment-support.log`.
 

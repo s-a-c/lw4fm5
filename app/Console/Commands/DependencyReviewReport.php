@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Services\BasePlatform\DependencyCatalogue;
+use App\Services\BasePlatform\DependencyRecord;
 use App\Support\BasePlatformMetrics;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
@@ -16,7 +17,7 @@ use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
+ * Compliant with [.ai/AI-GUIDELINES.md](../../.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
  */
 final class DependencyReviewReport extends Command
 {
@@ -110,7 +111,7 @@ final class DependencyReviewReport extends Command
         if ($overdue->isNotEmpty()) {
             $this->components->warn(sprintf(
                 'Overdue dependencies detected: %s',
-                $overdue->map(fn ($entry): string => $entry->name)->implode(', ')
+                $overdue->map(fn (DependencyRecord $entry): string => $entry->name)->implode(', ')
             ));
         }
 

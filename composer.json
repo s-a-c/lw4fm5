@@ -171,16 +171,16 @@
     "workflow:policy": [
       "php artisan policy:checksum-monitor"
     ],
-    "test:type-coverage": "pest --type-coverage --min=100",
+    "test:type-coverage": "php -d error_reporting=\"E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED\" -d memory_limit=1G vendor/bin/pest --type-coverage --min=100",
     "test:lint": [
       "pint --parallel --test",
       "rector --dry-run",
       "bun run test:lint"
     ],
-    "test:mutation": "vendor/bin/infection --min-msi=90 --threads=4",
-    "test:coverage": "pest --coverage",
+    "test:mutation": "php -d error_reporting=\"E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED\" -d memory_limit=1G vendor/bin/infection --min-msi=90 --threads=4",
+    "test:coverage": "php -d error_reporting=\"E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED\" -d memory_limit=1G vendor/bin/pest --coverage",
     "security:audit": "composer audit --locked || true",
-    "test:unit": "pest --parallel --coverage --exactly=100.0",
+    "test:unit": "php -d error_reporting=\"E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED\" -d memory_limit=1G vendor/bin/pest --coverage --exactly=100.0",
     "test:types": "phpstan",
     "test": [
       "@php artisan config:clear --ansi",
