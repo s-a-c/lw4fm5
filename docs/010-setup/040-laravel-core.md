@@ -1,0 +1,1454 @@
+# Laravel Framework 12.x Core Setup
+
+Compliant with [AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v0921d4cfab198af1451ef177b6e47657b5d3ab0292f77bf232496291dee47183
+<!-- markdownlint-disable MD013 -->
+
+## 1 Introduction
+
+This document covers the installation and configuration of Laravel Framework 12.x and its core packages: Folio, Tinker, MCP (Model Context Protocol), API routes, Broadcasting, and the optional FrankenPHP runtime.
+
+> [!IMPORTANT]
+> **FrankenPHP Runtime** (`runtime/frankenphp-symfony`) is included in the project dependencies but is optional. It’s a high-performance PHP runtime for production deployments. For development, standard PHP (`php artisan serve`) or Laravel Octane are sufficient. See [queue-monitoring.md](080-queue-monitoring.md#laravel-octane) for Octane setup, or section 9 below for FrankenPHP details.
+
+## 2 Laravel Framework 12.x
+
+### 2.1 Package Overview
+
+**Package Name**: `laravel/framework`
+**Version**: `^12.36`
+**Purpose**: Core Laravel framework providing routing, ORM, authentication, and more
+**Architectural Role**: Foundation layer providing core application services
+
+### 2.2 Key Features
+
+- Streamlined file structure (introduced in Laravel 11, continued in 12)
+- Service container and service providers
+- Eloquent ORM for database operations
+- Blade templating engine
+- Artisan command-line interface
+- Event system and listeners
+- Queue system for background jobs
+
+### 2.3 Laravel 12 Structure
+
+Laravel 12 uses a streamlined structure:
+
+- `bootstrap/app.php` - Application configuration (replaces `config/app.php` for many settings)
+- `bootstrap/providers.php` - Service provider registration
+- No `app/Console/Kernel.php` - Console commands auto-register
+- No `app/Http/Kernel.php` - Middleware registered in `bootstrap/app.php`
+
+**Source**: [Laravel 12 Application Structure](https://laravel.com/docs/12.x/structure)
+
+### 2.4 Installation Verification
+
+``` bash
+# Verify Laravel installation
+php artisan --version
+
+# Laravel Framework 12.x.x
+```
+
+### 2.5 Configuration Steps
+
+| Step \# | Task/Configuration Item | Command/File/Code | Expected Result | Verification Method |
+|----|----|----|----|----|
+| 1 | Verify installation | `php artisan --version` | Laravel Framework 12.x.x displayed | Check version number |
+| 2 | Configure application name | Edit `config/app.php` → `name` | Application name set | `php artisan tinker` → `config('app.name')` |
+| 3 | Configure environment | Copy `.env.example` to `.env` | Environment file created | `ls -la .env` |
+| 4 | Generate application key | `php artisan key:generate` | APP_KEY set in `.env` | Check `.env` file for APP_KEY |
+| 5 | Configure database connection (SQLite recommended for development) | Edit `.env` → set `DB_CONNECTION=sqlite` and `DB_DATABASE=database/database.sqlite` | SQLite database configured | `php artisan migrate:status` |
+| 5a | Enable SQLite WAL mode (optional but recommended) | Add WAL pragma to database configuration or run `PRAGMA journal_mode=WAL;` | WAL mode enabled for better concurrency | Check database file for WAL mode |
+| 6 | Install API routes | `php artisan install:api` | API routes file created and configured | File exists at `routes/api.php` and `bootstrap/app.php` updated |
+| 7 | Install broadcasting | `php artisan install:broadcasting` | Broadcasting routes file created and configured | File exists at `routes/channels.php` and `bootstrap/app.php` updated |
+| 8 | Clear configuration cache | `php artisan config:clear` | Configuration cache cleared | No errors in output |
+
+## 3 Livewire 4
+
+### 3.1 Package Overview
+
+**Package Name**: `livewire/livewire`  
+**Version**: `^4.0`  
+**Purpose**: Server-driven UI toolkit for building reactive Laravel components without writing JavaScript  
+**Architectural Role**: Core presentation layer for interactive pages and components
+
+Livewire ships as a first-class dependency in the starter kit. It powers interactive experiences, integrates tightly with Volt single-file components, and underpins the Flux UI kits documented in [Livewire Ecosystem](050-livewire-ecosystem.md).
+
+### 3.2 Key Features
+
+- **Reactive Components**: Build dynamic interfaces with PHP classes and Blade views
+- **Lifecycle Hooks**: Fine-grained control over component hydration and rendering
+- **Action & Event System**: Emit events between components and handle browser events declaratively
+- **File Uploads**: Secure, validated uploads with temporary storage
+- **Form Objects**: Strongly typed form handling with validation rules
+- **Volt Integration**: Supports Volt SFC syntax for co-locating class and template logic
+- **Testing Utilities**: Livewire testing helpers integrate with Pest for component assertions
+
+**Source**: [Livewire 4 Documentation](https://livewire.laravel.com/docs)
+
+### 3.3 Installation Verification
+
+``` bash
+# Confirm Livewire is available
+php artisan livewire:about
+
+# Verify Volt and Livewire are discovered
+php artisan package:discover --ansi | grep -i livewire
+```
+
+Expected output shows Livewire 4.x installed and packages auto-discovered.
+
+### 3.4 Configuration Steps
+
+Livewire works out of the box, but ensure the following steps during setup:
+
+| Step \# | Task/Configuration Item | Command/File/Code | Expected Result | Verification Method |
+|----|----|----|----|----|
+| 1 | Publish Livewire configuration (optional tweaks) | `php artisan livewire:publish --config` | `config/livewire.php` available for customization | Configuration file exists |
+| 2 | Publish Livewire assets (when customizing JS/CSS) | `php artisan livewire:publish --assets` | `resources/js/livewire/` assets created | Assets directory present |
+| 3 | Enable Volt (already included) | Ensure `livewire/volt` is present in `composer.json` | Volt components resolve correctly | `php artisan optimize:clear` then visit Volt pages |
+| 4 | Register Livewire middleware (if customizing) | Add middleware to `bootstrap/app.php` within the HTTP middleware stack | Middleware executed for Livewire requests | Check request lifecycle or logs |
+| 5 | Configure Livewire asset URL (for CDN deployments) | Set `asset_url` in `config/livewire.php` | Assets served from CDN/desired path | Inspect rendered HTML asset URLs |
+
+### 3.5 Example Component
+
+``` php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Livewire;
+
+use Livewire\Component;
+
+class DashboardStats extends Component
+{
+    public int $openTickets = 0;
+
+    public function mount(): void
+    {
+        $this->openTickets = auth()->user()?->openTickets()->count() ?? 0;
+    }
+
+    public function render(): \Illuminate\View\View
+    {
+        return view('livewire.dashboard-stats');
+    }
+}
+```
+
+Corresponding Blade view (`resources/views/livewire/dashboard-stats.blade.php`):
+
+``` blade
+<div class="rounded-xl bg-slate-900/5 p-6 dark:bg-slate-100/5">
+    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Open Tickets</p>
+    <p class="text-3xl font-semibold text-slate-900 dark:text-white">
+        {{ $openTickets }}
+    </p>
+</div>
+```
+
+For more advanced patterns (Volt SFCs, Flux UI components, and Pro integrations) see [Livewire Ecosystem](050-livewire-ecosystem.md).
+
+## 4 Laravel Folio
+
+### 4.1 Package Overview
+
+**Package Name**: `laravel/folio`
+**Version**: `dev-master`
+**Purpose**: File-based routing for Laravel applications
+**Architectural Role**: Simplifies routing by using file structure instead of route definitions
+
+### 4.2 Key Features
+
+- File-based routing (similar to Next.js)
+- Automatic route generation from file structure
+- Nested route support
+- Layout components
+- Route parameters from file names
+
+### 4.3 Principles and Patterns
+
+- **Convention over Configuration**: Routes are defined by file structure
+- **File-Based Routing Pattern**: Each Blade file becomes a route
+- **Layout Pattern**: Reusable layout components
+
+**Source**: [Laravel Folio Documentation](https://laravel.com/docs/12.x/folio)
+
+### 4.4 Installation Verification
+
+``` bash
+# Check if Folio is installed
+composer show laravel/folio
+
+# Verify Folio routes
+php artisan route:list | grep -i folio
+```
+
+### 4.5 Configuration Steps
+
+| Step \# | Task/Configuration Item | Command/File/Code | Expected Result | Verification Method |
+|----|----|----|----|----|
+| 1 | Create Folio page | `php artisan folio:page index` | Folio page created at `resources/views/pages/index.blade.php` | View file exists |
+| 2 | Configure Folio routes | Edit `bootstrap/app.php` → add Folio middleware | Folio routes accessible | Visit `/pages/index` in browser |
+| 3 | Set up layouts | Create `resources/views/layouts/app.blade.php` | Layout component available | Layout file exists |
+
+### 4.6 Example Configuration
+
+Create a Folio page using the artisan command:
+
+``` bash
+php artisan folio:page about
+```
+
+This creates a page at `resources/views/pages/about.blade.php`:
+
+``` blade
+<x-layouts.app>
+    <div>
+        <h1>About Us</h1>
+        <p>This page is automatically routed by Folio.</p>
+    </div>
+</x-layouts.app>
+```
+
+## 5 Laravel Tinker
+
+### 5.1 Package Overview
+
+**Package Name**: `laravel/tinker`
+**Version**: `^2.10`
+**Purpose**: Interactive REPL (Read-Eval-Print Loop) for Laravel applications
+**Architectural Role**: Development tool for testing and debugging
+
+### 5.2 Key Features
+
+- Interactive PHP shell with Laravel context
+- Access to all Laravel facades and services
+- Model manipulation
+- Service container access
+- Command execution
+
+**Source**: [Laravel Tinker Documentation](https://laravel.com/docs/12.x/tinker)
+
+### 5.3 Installation Verification
+
+``` bash
+# Verify Tinker installation
+php artisan tinker --version
+
+# Start Tinker
+php artisan tinker
+```
+
+### 5.4 Usage Examples
+
+``` php
+# In Tinker shell
+
+// Access models
+$user = User::first();
+
+// Use facades
+Cache::put('key', 'value', 3600);
+
+// Access services
+app('config')->get('app.name');
+
+// Create records
+User::create(['name' => 'John', 'email' => 'john@example.com']);
+```
+
+## 6 API Routes
+
+### 6.1 Overview
+
+API routes provide a way to build RESTful APIs or serve JSON responses for your application. In Laravel 12, API routes are installed using the `php artisan install:api` command, which sets up everything you need to start building APIs.
+
+**What is an API?**
+An API (Application Programming Interface) allows other applications or frontend frameworks to communicate with your Laravel application using JSON data instead of HTML pages. This is essential for building mobile apps, single-page applications (SPAs), or allowing third-party integrations.
+
+### 6.2 Key Features
+
+- Stateless authentication (typically via Laravel Sanctum)
+- API rate limiting to prevent abuse
+- JSON response formatting (automatic)
+- API resource classes for consistent data structure
+- API versioning support
+- CORS (Cross-Origin Resource Sharing) support
+
+### 6.3 Principles and Patterns
+
+- **RESTful Pattern**: Follow REST conventions for API endpoints (GET, POST, PUT, DELETE)
+- **Resource Pattern**: Use API Resources for consistent JSON formatting
+- **Stateless Authentication**: Use tokens (Sanctum) instead of sessions
+- **Versioning**: Support multiple API versions for backward compatibility
+
+**Source**: [Laravel Routing Documentation](https://laravel.com/docs/12.x/routing) \| [Laravel API Resources](https://laravel.com/docs/12.x/api-resources)
+
+### 6.4 Installation Using Artisan Command
+
+Use the `php artisan install:api` command to install API routes and authentication. This command will:
+
+- Create the `routes/api.php` file if it doesn’t exist
+- Prompt you to install Laravel Sanctum (recommended) or Laravel Passport for API authentication
+- Automatically configure `bootstrap/app.php` to enable API routes
+- Set up rate limiting for API endpoints
+
+**Installation Command:**
+
+``` bash
+php artisan install:api
+```
+
+**What Happens During Installation:**
+
+1. **Creates API Routes File**: The command creates `routes/api.php` if it doesn’t exist
+2. **Prompts for Authentication Package**: You’ll be asked if you want to install Laravel Sanctum (recommended) or Laravel Passport
+    - **Laravel Sanctum**: Lightweight, token-based authentication (recommended for most applications)
+    - **Laravel Passport**: OAuth2 server implementation (for more complex authentication needs)
+3. **Updates Bootstrap Configuration**: Automatically updates `bootstrap/app.php` to include API routes
+4. **Sets Up Rate Limiting**: Configures rate limiting middleware for API endpoints
+
+**Expected Output:**
+
+``` text
+Would you like to install Laravel Sanctum? (yes/no) [yes]:
+> yes
+
+  INFO  Installing laravel/sanctum.
+
+  INFO  Publishing Sanctum configuration...
+
+  INFO  Publishing Sanctum migrations...
+
+  INFO  Running migrations...
+
+  INFO  API routes file created successfully.
+  INFO  API routes enabled in bootstrap/app.php.
+```
+
+### 6.5 What Gets Installed
+
+#### 6.5.1 Files Created
+
+- `routes/api.php` - Contains all your API route definitions
+- `config/sanctum.php` - Sanctum configuration (if Sanctum is installed)
+- `database/migrations/YYYY_MM_DD_HHMMSS_create_personal_access_tokens_table.php` - Sanctum migration (if installed)
+
+#### 6.5.2 Configuration Updates
+
+- `bootstrap/app.php` - Updated to include API routes in `withRouting()`
+- `.env` - May add `SANCTUM_STATEFUL_DOMAINS` if using SPA authentication
+
+#### 6.5.3 Packages Installed (if chosen)
+
+- `laravel/sanctum` - Token-based authentication for APIs
+- Provides personal access tokens
+- Supports SPA authentication
+- Lightweight and easy to use
+
+Or
+
+- `laravel/passport` - OAuth2 server for APIs
+- Full OAuth2 implementation
+- Client credentials grant
+- More complex but more powerful
+
+### 6.6 Configuration Steps
+
+| Step \# | Task/Configuration Item | Command/File/Code | Expected Result | Verification Method |
+|----|----|----|----|----|
+| 1 | Install API routes | `php artisan install:api` | API routes file created and configured | File exists at `routes/api.php` |
+| 2 | Choose authentication (if prompted) | Select Sanctum (recommended) or Passport | Authentication package installed | Package in `composer.json` |
+| 3 | Run migrations (if Sanctum/Passport installed) | `php artisan migrate` | Authentication tables created | Tables exist in database |
+| 4 | Verify API routes are enabled | Check `bootstrap/app.php` for `api` parameter | API routes enabled | \`php artisan route:list |
+| grep api\` | 5 | Define API routes | Add routes to `routes/api.php` | API endpoints defined |
+| Routes visible in `php artisan route:list` | 6 | Test API endpoint | Visit `/api/status` or test with Postman | API responds with JSON |
+
+### 6.7 Post-Installation Configuration
+
+After running `php artisan install:api`, your `bootstrap/app.php` should look like this:
+
+``` php
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',  // ← API routes enabled
+        commands: __DIR__.'/../routes/console.php',
+        health: '/up',
+    )
+    ->withMiddleware(function (Middleware $middleware): void {
+        //
+    })
+    ->withExceptions(function (Exceptions $exceptions): void {
+        //
+    })->create();
+```
+
+### 6.8 Example API Routes File
+
+The `routes/api.php` file created by the install command will contain:
+
+``` php
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
+// Example: Public API endpoint
+Route::get('/status', function () {
+    return response()->json(['status' => 'ok',
+        'timestamp' => now()->toIso8601String(),
+    ]);
+});
+
+// Example: Protected API endpoint (requires authentication)
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+```
+
+**Understanding the Routes:**
+
+- **Public Route** (`/api/status`): Anyone can access this endpoint without authentication
+- **Protected Route** (`/api/user`): Requires authentication via Sanctum token
+
+### 6.9 Testing API Routes
+
+#### 6.9.1 Test Public Endpoint
+
+``` bash
+# Using curl
+curl http://localhost/api/status
+
+# Expected response:
+# {"status":"ok","timestamp":"2025-11-06T15:30:00+00:00"}
+```
+
+#### 6.9.2 Test Protected Endpoint
+
+For protected endpoints, you’ll need to authenticate first:
+
+``` bash
+# First, get an authentication token (example)
+# This would typically be done through a login endpoint
+
+# Then use the token in requests
+curl -H "Authorization: Bearer YOUR_TOKEN_HERE" http://localhost/api/user
+```
+
+### 6.10 API Rate Limiting
+
+API routes automatically have rate limiting applied to prevent abuse. By default, API routes are limited to 60 requests per minute per IP address.
+
+**What is Rate Limiting?**
+Rate limiting prevents a single user or IP address from making too many requests in a short time. This protects your server from being overwhelmed and helps prevent abuse.
+
+**Configuring Rate Limits:**
+
+Rate limits are configured in `bootstrap/app.php`:
+
+``` php
+->withMiddleware(function (Middleware $middleware): void {
+    $middleware->api(prepend: [\Illuminate\Http\Middleware\HandleCors::class,
+    ]);
+
+    // Custom rate limiting (optional)
+    $middleware->throttleApi('60,1'); // 60 requests per minute
+})
+```
+
+### 6.11 API Authentication with Sanctum
+
+If you installed Laravel Sanctum, you can authenticate API requests using tokens.
+
+#### 6.11.1 Creating Tokens
+
+``` php
+// In a controller or route
+use Illuminate\Support\Facades\Auth;
+
+$user = Auth::user();
+$token = $user->createToken('api-token')->plainTextToken;
+
+return response()->json(['token' => $token]);
+```
+
+#### 6.11.2 Using Tokens in Requests
+
+Include the token in the `Authorization` header:
+
+``` text
+Authorization: Bearer YOUR_TOKEN_HERE
+```
+
+#### 6.11.3 Revoking Tokens
+
+``` php
+// Revoke current token
+$user->currentAccessToken()->delete();
+
+// Revoke all tokens
+$user->tokens()->delete();
+```
+
+## 7 Broadcasting
+
+### 7.1 Overview
+
+Broadcasting allows your application to broadcast events to connected clients using WebSockets or other real-time communication methods. This enables real-time updates in your application without requiring users to refresh their browsers.
+
+**What is Broadcasting?**
+Broadcasting allows your Laravel application to send real-time updates to web browsers or mobile apps. For example, when a new message is posted, all connected users can see it immediately without refreshing the page. This is commonly used for chat applications, notifications, live updates, and collaborative features.
+
+**Real-World Examples:**
+\* **Chat Applications**: Messages appear instantly for all users
+\* **Notifications**: Real-time alerts when events occur
+\* **Live Dashboards**: Data updates automatically
+\* **Collaborative Editing**: See changes from other users in real-time
+
+### 7.2 Key Features
+
+- Real-time event broadcasting to connected clients
+- Private channels for authenticated users only
+- Presence channels that show who’s currently viewing/using a resource
+- WebSocket support via Laravel Echo (JavaScript library)
+- Multiple driver support (Pusher, Ably, Redis, Laravel Reverb)
+- Channel authorization for security
+
+### 7.3 Principles and Patterns
+
+- **Event-Driven Architecture**: Broadcast events when state changes in your application
+- **Channel Authorization**: Secure channels with policies to control who can listen
+- **Real-Time Updates**: Update UI without page refresh using WebSockets
+- **Scalability**: Use external services (Pusher, Ably) or Redis for production
+
+**Source**: [Laravel Broadcasting Documentation](https://laravel.com/docs/12.x/broadcasting)
+
+### 7.4 Installation Using Artisan Command
+
+Use the `php artisan install:broadcasting` command to install broadcasting. This command will:
+
+- Create the `routes/channels.php` file if it doesn’t exist
+- Prompt you to install a broadcasting driver (Laravel Reverb, Pusher, or Ably)
+- Automatically configure `bootstrap/app.php` to enable broadcasting routes
+- Set up the necessary configuration files
+
+**Installation Command:**
+
+``` bash
+php artisan install:broadcasting
+```
+
+**What Happens During Installation:**
+
+1. **Creates Channels File**: The command creates `routes/channels.php` if it doesn’t exist
+2. **Prompts for Broadcasting Driver**: You’ll be asked which broadcasting service you want to use:
+    - **Laravel Reverb** (recommended): Laravel’s own WebSocket server (free, open-source)
+    - **Pusher**: Commercial WebSocket service (requires account, free tier available)
+    - **Ably**: Commercial real-time messaging service (requires account)
+    - **Redis**: Use with Socket.IO or Laravel WebSockets (for self-hosted solutions)
+3. **Updates Bootstrap Configuration**: Automatically updates `bootstrap/app.php` to include broadcasting routes
+4. **Installs Driver Packages**: If you choose Reverb, Pusher, or Ably, the necessary packages are installed
+5. **Updates Environment File**: Adds necessary environment variables to `.env`
+
+**Expected Output:**
+
+``` text
+Which broadcasting driver would you like to install?
+  [0] Laravel Reverb
+  [1] Pusher
+  [2] Ably
+  [3] Redis
+  [4] None (install driver manually)
+ > 0
+
+  INFO  Installing laravel/reverb.
+
+  INFO  Publishing Reverb configuration...
+
+  INFO  Publishing Reverb migrations...
+
+  INFO  Broadcasting routes file created successfully.
+  INFO  Broadcasting routes enabled in bootstrap/app.php.
+  INFO  Environment variables added to .env file.
+```
+
+### 7.5 What Gets Installed
+
+#### 7.5.1 Files Created
+
+- `routes/channels.php` - Contains channel authorization logic
+- `config/reverb.php` - Reverb configuration (if Reverb is installed)
+- `config/broadcasting.php` - Broadcasting configuration (if not already exists)
+- `database/migrations/YYYY_MM_DD_HHMMSS_create_reverb_apps_table.php` - Reverb migration (if installed)
+
+#### 7.5.2 Configuration Updates
+
+- `bootstrap/app.php` - Updated to include `channels` parameter in `withRouting()`
+- `.env` - Adds broadcasting-related environment variables:
+- `BROADCAST_DRIVER` - The broadcasting driver to use (reverb, pusher, ably, redis, log)
+- `REVERB_*` variables (if Reverb is installed)
+- `PUSHER_*` variables (if Pusher is installed)
+- `ABLY_KEY` (if Ably is installed)
+
+#### 7.5.3 Packages Installed (depending on choice)
+
+- **Laravel Reverb** (`laravel/reverb`) - Laravel’s WebSocket server
+- Free and open-source
+- Built specifically for Laravel
+- Requires Node.js for the WebSocket server
+- Best for development and small to medium applications
+- **Pusher** (`pusher/pusher-php-server`) - Commercial WebSocket service
+- Hosted service (no server management)
+- Free tier available (up to 200k messages/day)
+- Easy to set up
+- Best for production applications
+- **Ably** (`ably/ably-php`) - Commercial real-time messaging
+- Hosted service
+- Free tier available
+- More features than Pusher
+- Best for complex real-time applications
+- **Redis** (already included in Laravel) - Self-hosted solution
+- Requires additional setup (Socket.IO or Laravel WebSockets)
+- More control but more complex
+- Best for large-scale, self-hosted applications
+
+### 7.6 Configuration Steps
+
+| Step \# | Task/Configuration Item | Command/File/Code | Expected Result | Verification Method |
+|----|----|----|----|----|
+| 1 | Install broadcasting | `php artisan install:broadcasting` | Broadcasting routes file created and configured | File exists at `routes/channels.php` |
+| 2 | Choose broadcasting driver (if prompted) | Select Reverb, Pusher, Ably, or Redis | Broadcasting driver installed | Package in `composer.json` (if applicable) |
+| 3 | Run migrations (if Reverb installed) | `php artisan migrate` | Reverb tables created | Tables exist in database |
+| 4 | Verify broadcasting routes are enabled | Check `bootstrap/app.php` for `channels` parameter | Broadcasting routes enabled | \`php artisan route:list |
+| grep broadcasting\` | 5 | Configure broadcasting driver | Edit `.env` → set `BROADCAST_DRIVER` | Broadcasting driver configured |
+| Check `.env` file for `BROADCAST_DRIVER` | 6 | Start Reverb server (if using Reverb) | `php artisan reverb:start` | Reverb server running |
+| Server responds on configured port | 7 | Define channel authorization | Add channel routes to `routes/channels.php` | Channels authorized |
+
+### 7.7 Post-Installation Configuration
+
+After running `php artisan install:broadcasting`, your `bootstrap/app.php` should look like this:
+
+``` php
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
+        channels: __DIR__.'/../routes/channels.php',  // ← Broadcasting routes enabled
+        commands: __DIR__.'/../routes/console.php',
+        health: '/up',
+    )
+    ->withMiddleware(function (Middleware $middleware): void {
+        //
+    })
+    ->withExceptions(function (Exceptions $exceptions): void {
+        //
+    })->create();
+```
+
+### 7.8 Broadcasting Drivers
+
+The project supports multiple broadcasting drivers. Choose the one that best fits your needs:
+
+#### 7.8.1 Laravel Reverb (Recommended for Development)
+
+**What is Reverb?**
+Laravel Reverb is Laravel’s official WebSocket server. It’s free, open-source, and built specifically for Laravel applications.
+
+**Pros:**
+\* Free and open-source
+\* Built specifically for Laravel
+\* Easy to set up and configure
+\* No external service required (self-hosted)
+\* Perfect for development and small to medium applications
+
+**Cons:**
+\* Requires Node.js to run
+\* You manage the server yourself
+\* May need scaling solutions for very large applications
+
+**Setup:**
+
+1. Install Reverb during `php artisan install:broadcasting`
+2. Run migrations: `php artisan migrate`
+3. Start the server: `php artisan reverb:start`
+4. Configure frontend to connect to Reverb
+
+**Configuration in `.env`:**
+
+``` text
+BROADCAST_DRIVER=reverb
+REVERB_APP_ID=your-app-id
+REVERB_APP_KEY=your-app-key
+REVERB_APP_SECRET=your-app-secret
+REVERB_HOST=localhost
+REVERB_PORT=8080
+REVERB_SCHEME=http
+```
+
+#### 7.8.2 Pusher (Recommended for Production)
+
+**What is Pusher?**
+Pusher is a hosted WebSocket service that handles all the infrastructure for you.
+
+**Pros:**
+\* Hosted service (no server management)
+\* Free tier available (up to 200k messages/day, 100 concurrent connections)
+\* Very easy to set up
+\* Reliable and scalable
+\* Great for production applications
+
+**Cons:**
+\* Costs money after free tier
+\* External dependency
+
+**Setup:**
+
+1. Create a Pusher account at <https://pusher.com>
+2. Create a new app in your Pusher dashboard
+3. Get your credentials (App ID, Key, Secret, Cluster)
+4. Install Pusher during `php artisan install:broadcasting`
+5. Add credentials to `.env`
+
+**Configuration in `.env`:**
+
+``` text
+BROADCAST_DRIVER=pusher
+PUSHER_APP_ID=your-app-id
+PUSHER_APP_KEY=your-app-key
+PUSHER_APP_SECRET=your-app-secret
+PUSHER_APP_CLUSTER=mt1
+```
+
+#### 7.8.3 Ably
+
+**What is Ably?**
+Ably is a commercial real-time messaging service with more features than Pusher.
+
+**Pros:**
+\* Hosted service
+\* Free tier available
+\* More features than Pusher
+\* Better for complex real-time applications
+
+**Cons:**
+\* Costs money after free tier
+\* External dependency
+\* More complex than Pusher
+
+**Setup:**
+
+1. Create an Ably account at <https://ably.com>
+2. Get your API key
+3. Install Ably during `php artisan install:broadcasting`
+4. Add API key to `.env`
+
+**Configuration in `.env`:**
+
+``` text
+BROADCAST_DRIVER=ably
+ABLY_KEY=your-api-key
+```
+
+#### 7.8.4 Redis (Self-Hosted)
+
+**What is Redis Broadcasting?**
+Use Redis with Socket.IO or Laravel WebSockets for a self-hosted solution.
+
+**Pros:**
+\* Full control over infrastructure
+\* No external dependencies
+\* Can be cost-effective for large scale
+
+**Cons:**
+\* More complex setup
+\* Requires additional packages (Socket.IO or Laravel WebSockets)
+\* You manage everything yourself
+
+**Setup:**
+
+1. Install and configure Redis
+2. Install Socket.IO or Laravel WebSockets
+3. Configure Redis in `.env`
+4. Set up WebSocket server
+
+**Configuration in `.env`:**
+
+``` text
+BROADCAST_DRIVER=redis
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+```
+
+#### 7.8.5 Log Driver (Development Only)
+
+**What is the Log Driver?**
+The log driver writes all broadcasts to Laravel’s log file. Useful for development and debugging.
+
+**Pros:**
+\* No setup required
+\* Good for testing
+\* See all broadcasts in log files
+
+**Cons:**
+\* Not for production
+\* No real-time updates
+\* Only for development/testing
+
+**Configuration in `.env`:**
+
+``` text
+BROADCAST_DRIVER=log
+```
+
+### 7.9 Example Channel Configuration
+
+The `routes/channels.php` file created by the install command will contain authorization logic for your broadcast channels. Here’s a comprehensive example:
+
+``` php
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Support\Facades\Broadcast;
+use App\Models\User;
+
+// Public channel - anyone can access
+// Channel name: public-channel
+Broadcast::channel('public-channel', function () {
+    return true; // Return true to allow access
+});
+
+// Private channel - requires authentication
+// Channel name: private-channel
+// Only authenticated users can access
+Broadcast::channel('private-channel', function (User $user) {
+    return ['id' => $user->id, 'name' => $user->name];
+    // Return user data to be available in the frontend
+});
+
+// Private channel with authorization logic
+// Channel name: private-user.{userId}
+// Only the specific user can access
+Broadcast::channel('private-user.{userId}', function (User $user, string $userId) {
+    return (int) $user->id === (int) $userId;
+    // Return true if the authenticated user matches the channel's userId
+});
+
+// Presence channel - shows who's present
+// Channel name: presence-channel
+// Returns user data that will be visible to all subscribers
+Broadcast::channel('presence-channel', function (User $user) {
+    return ['id' => $user->id,
+        'name' => $user->name,
+        'email' => $user->email,
+    ];
+});
+
+// Presence channel for a specific room
+// Channel name: presence-room.{roomId}
+Broadcast::channel('presence-room.{roomId}', function (User $user, string $roomId) {
+    // Check if user has access to this room
+    if ($user->hasAccessToRoom($roomId)) {
+        return ['id' => $user->id,
+            'name' => $user->name,
+        ];
+    }
+
+    return false; // Deny access
+});
+```
+
+**Understanding Channel Types:**
+
+- **Public Channels**: Anyone can subscribe, no authentication required
+- **Private Channels**: Require authentication, only authenticated users can subscribe
+- **Presence Channels**: Like private channels, but also show who’s currently subscribed
+
+### 7.10 Broadcasting Events
+
+To broadcast events to connected clients, create an event class that implements the `ShouldBroadcast` interface.
+
+#### 7.10.1 Creating a Broadcast Event
+
+Use the artisan command to create an event:
+
+``` bash
+php artisan make:event UserStatusUpdated
+```
+
+Then implement the `ShouldBroadcast` interface:
+
+``` php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Events;
+
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Queue\SerializesModels;
+
+class UserStatusUpdated implements ShouldBroadcast
+{
+    use InteractsWithSockets, SerializesModels;
+
+    /**
+
+     * Create a new event instance.
+
+     */
+    public function __construct(
+        public string $userId,
+        public string $status
+    ) {}
+
+    /**
+
+     * Get the channels the event should broadcast on.
+
+     *
+
+     * @return array<int, \Illuminate\Broadcasting\Channel>
+
+     */
+    public function broadcastOn(): array
+    {
+        return [new Channel('user-status'),
+        ];
+    }
+
+    /**
+
+     * The event's broadcast name (optional).
+     * By default, the event class name is used.
+
+     */
+    public function broadcastAs(): string
+    {
+        return 'status.updated';
+    }
+
+    /**
+
+     * Get the data to broadcast (optional).
+     * By default, all public properties are broadcast.
+
+     */
+    public function broadcastWith(): array
+    {
+        return ['user_id' => $this->userId,
+            'status' => $this->status,
+            'updated_at' => now()->toIso8601String(),
+        ];
+    }
+}
+```
+
+#### 7.10.2 Broadcasting the Event
+
+To broadcast an event, use the `event()` helper or dispatch it:
+
+``` php
+use App\Events\UserStatusUpdated;
+
+// Broadcast the event
+event(new UserStatusUpdated(userId: '123', status: 'online'));
+
+// Or dispatch it
+UserStatusUpdated::dispatch(userId: '123', status: 'online');
+```
+
+#### 7.10.3 Private Channel Broadcasting
+
+For private channels, use `PrivateChannel` instead of `Channel`:
+
+``` php
+use Illuminate\Broadcasting\PrivateChannel;
+
+public function broadcastOn(): array
+{
+    return [new PrivateChannel('user.' . $this->userId),
+    ];
+}
+```
+
+#### 7.10.4 Presence Channel Broadcasting
+
+For presence channels, use `PresenceChannel`:
+
+``` php
+use Illuminate\Broadcasting\PresenceChannel;
+
+public function broadcastOn(): array
+{
+    return [new PresenceChannel('room.' . $this->roomId),
+    ];
+}
+```
+
+#### 7.10.5 Queueing Broadcast Events
+
+By default, broadcast events are queued. To disable queuing for faster broadcasts, use `ShouldBroadcastNow`:
+
+``` php
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+
+class UserStatusUpdated implements ShouldBroadcastNow
+{
+    // ...
+}
+```
+
+**Note**: Synchronous broadcasting (using `ShouldBroadcastNow`) will block the HTTP request until the broadcast completes. Use queued broadcasting in production for better performance.
+
+### 7.11 Frontend Integration
+
+To receive broadcasts in your frontend, you’ll need to install and configure Laravel Echo. This is covered in the frontend documentation. For now, here’s a quick overview:
+
+1. Install Laravel Echo and Pusher JS (or Reverb client)
+2. Configure Echo to connect to your broadcasting server
+3. Listen to channels and events
+4. Update your UI when events are received
+
+See [frontend-build.md](130-frontend-build.md#broadcasting) for complete frontend setup instructions.
+
+## 8 Laravel MCP (Model Context Protocol)
+
+### 8.1 Package Overview
+
+**Package Name**: `laravel/mcp`
+**Version**: `^v0.3`
+**Purpose**: Model Context Protocol integration for Laravel applications
+**Architectural Role**: Enables AI assistants (like Cursor, Claude, etc.) to interact with your Laravel application through a standardized protocol
+
+**What is MCP?**
+The Model Context Protocol (MCP) is a standardized way for AI assistants to interact with applications and access their context. Laravel MCP provides an MCP server that allows AI assistants to:
+\* Understand your application’s structure
+\* Query your database schema
+\* Execute database queries
+\* Access configuration
+\* Read routes and models
+\* Perform various development tasks
+
+**Why is this useful?**
+When using AI coding assistants (like those in Cursor, VS Code, or other IDEs), MCP allows the AI to:
+\* Understand your codebase structure
+\* Make informed suggestions based on your actual database schema
+\* Help with database queries and operations
+\* Provide more accurate code suggestions
+\* Understand your application’s configuration
+
+**Real-World Example:**
+Instead of asking "create a user model", you can ask the AI "create a user model based on my existing database schema", and the AI can inspect your actual database structure to create the model correctly.
+
+### 8.2 Key Features
+
+- **MCP Server Implementation**: Provides a full MCP server for Laravel applications
+- **Database Schema Introspection**: AI can understand your database structure
+- **Query Execution**: AI can execute read-only database queries to understand data
+- **Configuration Access**: AI can read your application configuration
+- **Route Discovery**: AI can see all your application routes
+- **Model Access**: AI can understand your Eloquent models and relationships
+- **Laravel Boost Integration**: Works seamlessly with Laravel Boost tools
+
+### 8.3 Installation Verification
+
+``` bash
+# Check if MCP package is installed
+composer show laravel/mcp
+
+# Expected output shows version ^v0.3
+```
+
+**Note**: MCP doesn’t require a separate installation command. It’s automatically available once the package is installed via Composer.
+
+### 8.4 Configuration
+
+Laravel MCP works out of the box with minimal configuration. However, if you’re using it with an AI assistant client (like Cursor), you’ll need to configure the client to connect to the MCP server.
+
+#### 8.4.1 MCP Server Configuration
+
+The MCP server is accessed via Laravel Boost:
+
+``` bash
+# The MCP server is started via Laravel Boost
+php artisan boost:mcp
+```
+
+#### 8.4.2 Client Configuration
+
+For AI assistants that support MCP (like Cursor), configure them to connect to the Laravel MCP server. The configuration typically goes in an `mcp.json` file:
+
+``` json
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "php",
+            "args": ["artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}
+```
+
+**Where to put this configuration:**
+\* **Cursor**: Place in `.cursor/mcp.json` or `mcp.json` in your project root
+\* **Other clients**: Consult your client’s documentation for MCP configuration
+
+### 8.5 What MCP Provides to AI Assistants
+
+When properly configured, AI assistants can:
+
+- **Access Application Info**: Understand PHP version, Laravel version, installed packages
+- **Database Schema**: See all tables, columns, relationships, indexes
+- **Database Queries**: Execute read-only queries to understand data
+- **Routes**: See all application routes and their methods
+- **Configuration**: Read configuration values
+- **Environment Variables**: See available environment variables
+- **Artisan Commands**: List and understand available Artisan commands
+- **Search Documentation**: Search Laravel documentation specific to your package versions
+- **Browser Logs**: Access browser console logs for debugging
+- **Application Logs**: Read application log entries
+
+### 8.6 Configuration Steps
+
+| Step \# | Task/Configuration Item | Command/File/Code | Expected Result | Verification Method |
+|----|----|----|----|----|
+| 1 | Verify MCP package installation | `composer show laravel/mcp` | Package information displayed with version ^v0.3 | Version shown in output |
+| 2 | Verify Laravel Boost is installed | `composer show laravel/boost` | Laravel Boost package information displayed | Package exists (usually in require-dev) |
+| 3 | Test MCP server (if using with client) | Configure MCP client (Cursor, etc.) to use `php artisan boost:mcp` | MCP server starts and responds | Client connects successfully |
+| 4 | Verify MCP capabilities | Use AI assistant features that require MCP | AI can access application context | Database schema visible to AI |
+
+### 8.7 Usage with AI Assistants
+
+Once configured, you can use natural language to ask your AI assistant to:
+
+- "Show me all the columns in the users table"
+- "Create a migration to add a status column to the orders table"
+- "What routes are available in my application?"
+- "Show me the configuration for the database connection"
+- "Create a model based on my existing posts table schema"
+
+The AI will use MCP to access your application’s actual structure and provide accurate, context-aware responses.
+
+### 8.8 Troubleshooting
+
+#### 8.8.1 MCP Server Not Starting
+
+**Symptom**: AI assistant can’t connect to MCP server
+
+**Solution**:
+
+1. Verify Laravel Boost is installed: `composer show laravel/boost`
+2. Ensure you’re running the command from the project root
+3. Check that PHP is in your system PATH
+4. Verify the MCP configuration in your client’s settings
+
+#### 8.8.2 Database Access Issues
+
+**Symptom**: AI can’t access database schema
+
+**Solution**:
+
+1. Verify database connection is configured in `.env`
+2. Ensure database exists and is accessible
+3. Check database credentials are correct
+4. Run `php artisan migrate:status` to verify connection
+
+## 9 FrankenPHP Runtime (Optional)
+
+### 9.1 Package Overview
+
+**Package Name**: `runtime/frankenphp-symfony`
+**Version**: `^0.2.0`
+**Purpose**: High-performance PHP runtime built on top of Caddy server
+**Architectural Role**: Alternative PHP runtime for production deployments, providing better performance than traditional PHP-FPM
+
+**What is FrankenPHP?**
+FrankenPHP is a modern PHP application server written in Go. It combines PHP with the Caddy web server to provide:
+\* Better performance than PHP-FPM
+\* Built-in support for HTTP/2 and HTTP/3
+\* Automatic HTTPS with Let’s Encrypt
+\* Better resource efficiency
+\* Native support for early hints and server push
+
+**Why use FrankenPHP?**
+\* **Performance**: Significantly faster than traditional PHP-FPM
+\* **Modern Protocols**: Built-in support for HTTP/2 and HTTP/3
+\* **Easy HTTPS**: Automatic SSL/TLS certificate management
+\* **Resource Efficiency**: Lower memory footprint and better concurrency
+\* **Production Ready**: Used by many high-traffic Laravel applications
+
+**When to use FrankenPHP:**
+\* **Production deployments**: Best for production environments
+\* **High-traffic applications**: Applications that need better performance
+\* **Modern infrastructure**: When you want HTTP/2/3 support
+\* **Simplified deployment**: When you want built-in HTTPS management
+
+**When NOT to use FrankenPHP:**
+\* **Development**: Standard PHP or Laravel Octane is usually sufficient
+\* **Legacy systems**: If your infrastructure requires PHP-FPM
+\* **Simple applications**: For small applications, the performance gain may not be necessary
+
+### 9.2 Key Features
+
+- **High Performance**: Significantly faster than PHP-FPM
+- **HTTP/2 and HTTP/3 Support**: Modern protocol support out of the box
+- **Automatic HTTPS**: Built-in Let’s Encrypt integration
+- **Early Hints**: Support for HTTP 103 Early Hints for faster page loads
+- **Worker Mode**: Run PHP workers for better performance
+- **Built-in Caddy Server**: No need for separate web server configuration
+- **Low Memory Footprint**: More efficient resource usage
+
+### 9.3 Installation
+
+FrankenPHP is already included in `composer.json` but is optional. To use it, you need to install the FrankenPHP binary.
+
+#### 9.3.1 Installation Methods
+
+##### 9.3.1.1 Using Docker (Recommended for Development)
+
+FrankenPHP can be used with Docker. See the official FrankenPHP documentation for Docker setup.
+
+##### 9.3.1.2 Direct Installation
+
+Download and install the FrankenPHP binary for your operating system from the official FrankenPHP releases.
+
+##### 9.3.1.3 Using Laravel Herd (macOS)
+
+If you’re using Laravel Herd on macOS, FrankenPHP support may be available through Herd’s configuration.
+
+### 9.4 Configuration
+
+#### 9.4.1 Basic Configuration
+
+To use FrankenPHP, you typically run your Laravel application using the FrankenPHP binary instead of `php artisan serve`:
+
+``` bash
+# php artisan serve
+# Use FrankenPHP to serve your application
+frankenphp run
+```
+
+#### 9.4.2 Production Configuration
+
+For production, FrankenPHP can be configured as a system service. Configuration typically involves:
+
+1. Creating a systemd service file (Linux)
+2. Configuring Caddy options
+3. Setting up SSL certificates
+4. Configuring worker processes
+
+**Example systemd service (Linux):**
+
+``` ini
+[Unit]
+Description=FrankenPHP for Laravel
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/your-app
+ExecStart=/usr/local/bin/frankenphp run
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+### 9.5 Performance Considerations
+
+**Performance Benefits:**
+\* **2-3x faster** than PHP-FPM in many scenarios
+\* **Better concurrency**: Handles more simultaneous requests
+\* **Lower latency**: Faster response times
+\* **Better resource usage**: More efficient memory and CPU usage
+
+**When Performance Matters:**
+\* High-traffic applications
+\* API endpoints with many requests
+\* Applications serving static assets
+\* Applications with many concurrent users
+
+### 9.6 Configuration Steps
+
+| Step \# | Task/Configuration Item | Command/File/Code | Expected Result | Verification Method |
+|----|----|----|----|----|
+| 1 | Verify package is installed | `composer show runtime/frankenphp-symfony` | Package information displayed | Version ^0.2.0 shown |
+| 2 | Install FrankenPHP binary | Download from official releases or use Docker | FrankenPHP binary available | `frankenphp --version` works |
+| 3 | Test FrankenPHP (development) | `frankenphp run` in project directory | Application served on configured port | Application accessible in browser |
+| 4 | Configure for production | Set up systemd service or process manager | FrankenPHP runs as service | Service status shows running |
+
+### 9.7 Alternatives to FrankenPHP
+
+For development and many production scenarios, you may prefer:
+
+- **Laravel Octane**: High-performance application server for Laravel (see [queue-monitoring.md](080-queue-monitoring.md#laravel-octane))
+- **PHP-FPM with Nginx/Apache**: Traditional, well-supported setup
+- **Laravel Sail**: Docker-based development environment
+- **Standard PHP Built-in Server**: Simple development server (`php artisan serve`)
+
+### 9.8 When to Use FrankenPHP vs. Octane
+
+**Use FrankenPHP when:**
+\* You want built-in web server (Caddy)
+\* You need automatic HTTPS management
+\* You want HTTP/2/3 support out of the box
+\* You prefer a single binary solution
+
+**Use Laravel Octane when:**
+\* You’re already using Nginx or another web server
+\* You want more control over server configuration
+\* You prefer Laravel-specific optimizations
+\* You want RoadRunner or Swoole support
+
+**Note**: You can use both, but typically you’d choose one based on your infrastructure needs.
+
+## 10 Environment Variables
+
+| Variable | Description | Default |
+|----|----|----|
+| APP_NAME | Application name | Laravel |
+| APP_ENV | Application environment | local |
+| APP_KEY | Encryption key | (generated) |
+| APP_DEBUG | Debug mode | true |
+| APP_URL | Application URL | <http://localhost> |
+| BROADCAST_DRIVER | Broadcasting driver (pusher/ably/redis/log) | log |
+| PUSHER_APP_ID | Pusher application ID | (empty) |
+| PUSHER_APP_KEY | Pusher application key | (empty) |
+| PUSHER_APP_SECRET | Pusher application secret | (empty) |
+| PUSHER_APP_CLUSTER | Pusher cluster | mt1 |
+| ABLY_KEY | Ably API key | (empty) |
+| DB_CONNECTION | Database driver (sqlite for development, mysql/pgsql for production) | sqlite |
+| DB_DATABASE | Database path (SQLite) or name (MySQL/PostgreSQL) | database/database.sqlite |
+| DB_HOST | Database host (MySQL/PostgreSQL only) | 127.0.0.1 |
+| DB_PORT | Database port (MySQL/PostgreSQL only) | 3306 |
+| DB_USERNAME | Database user (MySQL/PostgreSQL only) | root |
+| DB_PASSWORD | Database password (MySQL/PostgreSQL only) | (empty) |
+
+> [!NOTE]
+> For development, SQLite with Write-Ahead Logging (WAL) mode is recommended. Configure WAL mode in your database configuration or migration.
+
+### 10.1 SQLite WAL Mode Configuration
+
+SQLite Write-Ahead Logging (WAL) mode provides better concurrency and performance. Enable WAL mode after creating your database:
+
+``` php
+// In a migration or database service provider
+use Illuminate\Support\Facades\DB;
+
+DB::statement('PRAGMA journal_mode=WAL;');
+```
+
+Alternatively, enable WAL mode via a database service provider or after connection:
+
+``` php
+// In AppServiceProvider or a dedicated service
+use Illuminate\Support\Facades\DB;
+
+public function boot(): void
+{
+    if (config('database.default') === 'sqlite') {
+        DB::statement('PRAGMA journal_mode=WAL;');
+    }
+}
+```
+
+**Benefits of WAL Mode:**
+
+- Better read concurrency (readers don't block writers)
+- Improved performance for concurrent operations
+- Faster checkpoint operations
+- Recommended for development environments
+
+## 11 Integration Points
+
+### 11.1 With Other Packages
+
+- **Livewire**: Uses Laravel's service container for dependency injection
+- **Horizon**: Uses Laravel's queue system
+- **Telescope**: Uses Laravel's event system
+- **Fortify**: Uses Laravel's authentication system
+
+### 11.2 Service Providers
+
+Auto-discovery is enabled for most packages. Check `bootstrap/providers.php` for custom service providers.
+
+### 11.3 With Broadcasting
+
+- **Livewire**: Can use broadcasting for real-time updates
+- **Events**: Broadcast events for real-time notifications
+- **WebSockets**: Connect via Laravel Echo and WebSocket servers
+
+### 11.4 With API
+
+- **Sanctum**: Token-based authentication for API
+- **API Resources**: Consistent JSON responses
+- **Rate Limiting**: Protect API endpoints
+
+## 12 Troubleshooting
+
+### 12.1 Application Key Not Set
+
+**Symptom**: Encryption errors or session issues
+
+**Solution**:
+
+``` bash
+php artisan key:generate
+```
+
+### 12.2 Configuration Cache
+
+**Symptom**: Changes to `.env` not reflected
+
+**Solution**:
+
+``` bash
+php artisan config:clear
+php artisan cache:clear
+```
+
+### 12.3 API Routes Not Working
+
+**Symptom**: API endpoints return 404
+
+**Solution**: Verify API routes are enabled in `bootstrap/app.php`:
+
+``` php
+->withRouting(
+    api: __DIR__.'/../routes/api.php',
+    // ...
+)
+```
+
+### 12.4 Broadcasting Not Working
+
+**Symptom**: Events not broadcasting to clients
+
+**Solution**:
+
+1. Verify `channels` parameter in `bootstrap/app.php`
+2. Check `BROADCAST_DRIVER` in `.env`
+3. Verify broadcasting driver is installed (Pusher SDK, etc.)
+4. Check channel authorization in `routes/channels.php`
+
+## 13 Next Steps
+
+After configuring Laravel core:
+
+- [Livewire Ecosystem](050-livewire-ecosystem.md) – Set up Livewire 4, Volt, and Flux
+
+## 14 Navigation
+
+[← PHP Runtime Setup](030-php-runtime.md) | [↑ Top](#laravel-framework-12x-core-setup) | [Livewire 4, Volt, Flux, and Flux Pro Setup →](050-livewire-ecosystem.md)

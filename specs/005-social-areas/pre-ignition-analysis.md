@@ -81,7 +81,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 - **Finding**: No Prometheus client config or structured logging helper exists; `LOG_CHANNEL` remains `stack` without JSON configuration.
 - **Impact**: Fails non-functional requirements (structured JSON logs with `trace_id`, SLA metric emission).
 - **Priority**: P1
-- **Action**: Plan early addition of logging formatter and metrics exporter before integration tests (`T055`, `T059`). Document instrumentation steps in `docs/010-setup/090-observability.adoc` (ties to `T049`, `T056`).
+- **Action**: Plan early addition of logging formatter and metrics exporter before integration tests (`T055`, `T059`). Document instrumentation steps in `docs/010-setup/090-observability.md` (ties to `T049`, `T056`).
 
 ### 4.5. F5. Database Schema Prep
 

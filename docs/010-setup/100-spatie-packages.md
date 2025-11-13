@@ -1,55 +1,53 @@
-= Spatie Laravel Packages Configuration
+# Spatie Laravel Packages Configuration
 
-:docinfo shared:
-:toc:
-:toc-title: Table of Contents
+Compliant with [AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v0921d4cfab198af1451ef177b6e47657b5d3ab0292f77bf232496291dee47183
+<!-- markdownlint-disable MD013 -->
 
-== 1. Introduction
+## 1 Introduction
 
 This document covers all Spatie Laravel packages used in the project, including their configuration and integration.
 
-NOTE: All Spatie packages follow Laravel conventions and use auto-discovery. For detailed documentation, see the official Spatie package documentation at https://spatie.be/open-source[spatie.be/open-source] or individual package repositories on GitHub.
+> [!NOTE]
+> All Spatie packages follow Laravel conventions and use auto-discovery. For detailed documentation, see the official Spatie package documentation at [spatie.be/open-source](https://spatie.be/open-source) or individual package repositories on GitHub.
 
-== 2. Package List
+## 2 Package List
 
 The project uses the following Spatie packages:
 
-* `spatie/laravel-activitylog` ^4.10 - Activity logging
-* `spatie/laravel-analytics` ^5.6 - Google Analytics integration
-* `spatie/laravel-backup` ^9.3 - Database and file backups
-* `spatie/laravel-event-sourcing` ^7.12 - Event sourcing implementation
-* `spatie/laravel-health` ^1.34 - Health check endpoints
-* `spatie/laravel-markdown` ^2.7 - Markdown rendering
-* `spatie/laravel-medialibrary` ^11.17 - File and media management
-* `spatie/laravel-schedule-monitor` ^4.1 - Scheduled task monitoring
-* `spatie/laravel-settings` ^3.5 - Application settings management
+- `spatie/laravel-activitylog` ^4.10 - Activity logging
+- `spatie/laravel-analytics` ^5.6 - Google Analytics integration
+- `spatie/laravel-backup` ^9.3 - Database and file backups
+- `spatie/laravel-event-sourcing` ^7.12 - Event sourcing implementation
+- `spatie/laravel-health` ^1.34 - Health check endpoints
+- `spatie/laravel-markdown` ^2.7 - Markdown rendering
+- `spatie/laravel-medialibrary` ^11.17 - File and media management
+- `spatie/laravel-schedule-monitor` ^4.1 - Scheduled task monitoring
+- `spatie/laravel-settings` ^3.5 - Application settings management
 
-== 3. Activity Log
+## 3 Activity Log
 
-=== 3.1. Package Overview
+### 3.1 Package Overview
 
 **Package**: `spatie/laravel-activitylog` ^4.10
 **Purpose**: Log activity changes to your models
 **Key Features**:
-* Automatic logging of model changes
-* Custom activity logging
-* Log viewer and search
-* Activity descriptions and properties
+\* Automatic logging of model changes
+\* Custom activity logging
+\* Log viewer and search
+\* Activity descriptions and properties
 
-=== 3.2. Configuration
+### 3.2 Configuration
 
-[source,bash]
-----
+``` bash
 php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProvider" --tag="activitylog-migrations"
 php artisan migrate
-----
+```
 
-=== 3.3. Usage Examples
+### 3.3 Usage Examples
 
-==== 3.3.1. Basic Logging
+#### 3.3.1 Basic Logging
 
-[source,php]
-----
+``` php
 use Spatie\Activitylog\Models\Activity;
 
 // Log a simple message
@@ -59,14 +57,13 @@ activity()->log('User logged in');
 activity()
     ->withProperties(['ip' => request()->ip()])
     ->log('User logged in');
-----
+```
 
-==== 3.3.2. Model Activity Logging
+#### 3.3.2 Model Activity Logging
 
 Add the `LogsActivity` trait to your model:
 
-[source,php]
-----
+``` php
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
@@ -82,12 +79,11 @@ class User extends Model
             ->dontSubmitEmptyLogs();
     }
 }
-----
+```
 
-==== 3.3.3. Retrieving Activity Logs
+#### 3.3.3 Retrieving Activity Logs
 
-[source,php]
-----
+``` php
 // Get all activities for a model
 $user->activities;
 
@@ -96,36 +92,34 @@ Activity::forSubject($user)->get();
 
 // Get activities by description
 Activity::where('description', 'updated')->get();
-----
+```
 
-== 4. Analytics
+## 4 Analytics
 
-=== 4.1. Package Overview
+### 4.1 Package Overview
 
 **Package**: `spatie/laravel-analytics` ^5.6
 **Purpose**: Retrieve data from Google Analytics
 **Key Features**:
-* Fetch analytics data
-* Real-time reporting
-* Custom date ranges
-* Multiple metrics and dimensions
+\* Fetch analytics data
+\* Real-time reporting
+\* Custom date ranges
+\* Multiple metrics and dimensions
 
-=== 4.2. Configuration
+### 4.2 Configuration
 
 Requires Google Analytics credentials. Set in `.env`:
 
-[source,env]
-----
+``` env
 ANALYTICS_PROPERTY_ID=your-property-id
 ANALYTICS_CREDENTIALS=/path/to/credentials.json
-----
+```
 
-=== 4.3. Usage Examples
+### 4.3 Usage Examples
 
-==== 4.3.1. Basic Analytics Query
+#### 4.3.1 Basic Analytics Query
 
-[source,php]
-----
+``` php
 use Spatie\Analytics\Facades\Analytics;
 use Spatie\Analytics\Period;
 
@@ -137,12 +131,11 @@ $mostVisitedPages = Analytics::fetchMostVisitedPages(Period::days(30));
 
 // Get top referrers
 $topReferrers = Analytics::fetchTopReferrers(Period::days(30));
-----
+```
 
-==== 4.3.2. Custom Queries
+#### 4.3.2 Custom Queries
 
-[source,php]
-----
+``` php
 use Spatie\Analytics\Facades\Analytics;
 use Spatie\Analytics\Period;
 
@@ -151,36 +144,34 @@ $response = Analytics::get(
     ['activeUsers', 'screenPageViews'],
     ['pageTitle', 'pagePath']
 );
-----
+```
 
-== 5. Backup
+## 5 Backup
 
-=== 5.1. Package Overview
+### 5.1 Package Overview
 
 **Package**: `spatie/laravel-backup` ^9.3
 **Purpose**: Backup your application and database
 **Key Features**:
-* Database backups
-* File backups
-* Multiple storage destinations
-* Backup scheduling
-* Cleanup of old backups
+\* Database backups
+\* File backups
+\* Multiple storage destinations
+\* Backup scheduling
+\* Cleanup of old backups
 
-=== 5.2. Configuration
+### 5.2 Configuration
 
-[source,bash]
-----
+``` bash
 php artisan vendor:publish --provider="Spatie\Backup\BackupServiceProvider"
-----
+```
 
 Configure backup destinations in `config/backup.php`.
 
-=== 5.3. Usage Examples
+### 5.3 Usage Examples
 
-==== 5.3.1. Manual Backup
+#### 5.3.1 Manual Backup
 
-[source,bash]
-----
+``` bash
 # Create a backup
 php artisan backup:run
 
@@ -189,57 +180,53 @@ php artisan backup:run --only-db
 
 # Backup only files
 php artisan backup:run --only-files
-----
+```
 
-==== 5.3.2. Scheduled Backups
+#### 5.3.2 Scheduled Backups
 
 Add to `app/Console/Kernel.php` or use task scheduling:
 
-[source,php]
-----
+``` php
 use Illuminate\Support\Facades\Schedule;
 
 Schedule::command('backup:run')->daily();
 Schedule::command('backup:clean')->daily();
-----
+```
 
-==== 5.3.3. Programmatic Backup
+#### 5.3.3 Programmatic Backup
 
-[source,php]
-----
+``` php
 use Spatie\Backup\Tasks\Backup\BackupJob;
 
 $backupJob = new BackupJob();
 $backupJob->run();
-----
+```
 
-== 6. Event Sourcing
+## 6 Event Sourcing
 
-=== 6.1. Package Overview
+### 6.1 Package Overview
 
 **Package**: `spatie/laravel-event-sourcing` ^7.12
 **Purpose**: Event sourcing implementation for Laravel
 **Key Features**:
-* Event store
-* Aggregate roots
-* Projectors and reactors
-* Snapshots
-* Event replay
+\* Event store
+\* Aggregate roots
+\* Projectors and reactors
+\* Snapshots
+\* Event replay
 
-=== 6.2. Configuration
+### 6.2 Configuration
 
-[source,bash]
-----
+``` bash
 php artisan vendor:publish --provider="Spatie\EventSourcing\EventSourcingServiceProvider"
 php artisan migrate
-----
+```
 
-=== 6.3. Usage Examples
+### 6.3 Usage Examples
 
-==== 6.3.1. Creating Events
+#### 6.3.1 Creating Events
 
-[source,php]
-----
+``` php
 use Spatie\EventSourcing\StoredEvents\ShouldBeStored;
 
 class MoneyAdded extends ShouldBeStored
@@ -248,12 +235,11 @@ class MoneyAdded extends ShouldBeStored
         public int $amount
     ) {}
 }
-----
+```
 
-==== 6.3.2. Aggregate Root
+#### 6.3.2 Aggregate Root
 
-[source,php]
-----
+``` php
 use Spatie\EventSourcing\AggregateRoots\AggregateRoot;
 
 class Account extends AggregateRoot
@@ -272,49 +258,46 @@ class Account extends AggregateRoot
         $this->balance += $event->amount;
     }
 }
-----
+```
 
-==== 6.3.3. Using Aggregates
+#### 6.3.3 Using Aggregates
 
-[source,php]
-----
+``` php
 $account = Account::retrieve($accountId);
 $account->addMoney(100);
 $account->persist();
-----
+```
 
-== 7. Health
+## 7 Health
 
-=== 7.1. Package Overview
+### 7.1 Package Overview
 
 **Package**: `spatie/laravel-health` ^1.34
 **Purpose**: Health check endpoints for your application
 **Key Features**:
-* Multiple health checks
-* Database connectivity
-* Cache status
-* Queue status
-* Custom checks
+\* Multiple health checks
+\* Database connectivity
+\* Cache status
+\* Queue status
+\* Custom checks
 
-=== 7.2. Configuration
+### 7.2 Configuration
 
 Health checks are automatically available at `/health` endpoint.
 
-=== 7.3. Usage Examples
+### 7.3 Usage Examples
 
-==== 7.3.1. Default Health Checks
+#### 7.3.1 Default Health Checks
 
 Access the health endpoint:
 
-[source,bash]
-----
+``` bash
 curl http://localhost/health
-----
+```
 
-==== 7.3.2. Custom Health Checks
+#### 7.3.2 Custom Health Checks
 
-[source,php]
-----
+``` php
 use Spatie\Health\Checks\Check;
 use Spatie\Health\Checks\Result;
 
@@ -325,111 +308,103 @@ Check::make('custom-check')
             ->ok()
             ->shortSummary('All good');
     });
-----
+```
 
-==== 7.3.3. Available Checks
+#### 7.3.3 Available Checks
 
-[source,php]
-----
+``` php
 use Spatie\Health\Facades\Health;
 use Spatie\Health\Checks\Checks\DatabaseCheck;
 use Spatie\Health\Checks\Checks\CacheCheck;
 use Spatie\Health\Checks\Checks\QueueCheck;
 
-Health::checks([
-    DatabaseCheck::new(),
+Health::checks([DatabaseCheck::new(),
     CacheCheck::new(),
     QueueCheck::new(),
 ]);
-----
+```
 
-== 8. Markdown
+## 8 Markdown
 
-=== 8.1. Package Overview
+### 8.1 Package Overview
 
 **Package**: `spatie/laravel-markdown` ^2.7
 **Purpose**: Render Markdown to HTML
 **Key Features**:
-* Markdown rendering
-* Code highlighting
-* Table of contents
-* Custom extensions
+\* Markdown rendering
+\* Code highlighting
+\* Table of contents
+\* Custom extensions
 
-=== 8.2. Usage Examples
+### 8.2 Usage Examples
 
-==== 8.2.1. Basic Usage
+#### 8.2.1 Basic Usage
 
-[source,php]
-----
+``` php
 use Spatie\LaravelMarkdown\MarkdownRenderer;
 
 $html = app(MarkdownRenderer::class)->toHtml($markdown);
-----
+```
 
-==== 8.2.2. With Blade Directive
+#### 8.2.2 With Blade Directive
 
-[source,blade]
-----
+``` blade
 @markdown
 # Hello World
 
 This is **bold** and this is *italic*.
 @endmarkdown
-----
+```
 
-==== 8.2.3. With Code Highlighting
+#### 8.2.3 With Code Highlighting
 
-[source,php]
-----
+``` php
 use Spatie\LaravelMarkdown\MarkdownRenderer;
 
 $renderer = app(MarkdownRenderer::class)
     ->highlightCode();
 
 $html = $renderer->toHtml($markdown);
-----
+```
 
-==== 8.2.4. Generating Table of Contents
+#### 8.2.4 Generating Table of Contents
 
-[source,php]
-----
+``` php
 use Spatie\LaravelMarkdown\MarkdownRenderer;
 
 $renderer = app(MarkdownRenderer::class)
     ->addTableOfContents();
 
 $html = $renderer->toHtml($markdown);
-----
+```
 
-== 9. Media Library
+## 9 Media Library
 
-=== 9.1. Package Overview
+### 9.1 Package Overview
 
 **Package**: `spatie/laravel-medialibrary` ^11.17
 **Purpose**: Associate files with Eloquent models
 **Key Features**:
-* File uploads
-* Image conversions
-* Multiple collections
-* Responsive images
-* URL generation
+\* File uploads
+\* Image conversions
+\* Multiple collections
+\* Responsive images
+\* URL generation
 
-=== 9.2. Configuration
+### 9.2 Configuration
 
-[source,bash]
-----
+``` bash
 php artisan vendor:publish --provider="Spatie\MediaLibrary\MediaLibraryServiceProvider" --tag="migrations"
 php artisan migrate
-----
+```
 
-=== 9.3. Usage Examples
+### 9.3 Usage Examples
 
-==== 9.3.1. Adding Files to Models
+#### 9.3.1 Adding Files to Models
 
 Add the `HasMedia` trait to your model:
 
-[source,php]
-----
+``` php
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -439,12 +414,11 @@ class Post extends Model implements HasMedia
 
     // ...
 }
-----
+```
 
-==== 9.3.2. Uploading Files
+#### 9.3.2 Uploading Files
 
-[source,php]
-----
+``` php
 $post = Post::find(1);
 
 // Add file
@@ -458,12 +432,11 @@ $post->addMediaFromUrl('https://example.com/image.jpg')
 // Add from disk
 $post->addMediaFromDisk('path/to/file.jpg', 'local')
     ->toMediaCollection('images');
-----
+```
 
-==== 9.3.3. Image Conversions
+#### 9.3.3 Image Conversions
 
-[source,php]
-----
+``` php
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Image\Enums\Fit;
 
@@ -474,12 +447,11 @@ public function registerMediaConversions(?Media $media = null): void
         ->height(150)
         ->fit(Fit::Crop, 150, 150);
 }
-----
+```
 
-==== 9.3.4. Retrieving Media
+#### 9.3.4 Retrieving Media
 
-[source,php]
-----
+``` php
 // Get first media item
 $media = $post->getFirstMedia('images');
 
@@ -488,34 +460,33 @@ $url = $post->getFirstMediaUrl('images');
 
 // Get all media
 $allMedia = $post->getMedia('images');
-----
+```
 
-== 10. Schedule Monitor
+## 10 Schedule Monitor
 
-=== 10.1. Package Overview
+### 10.1 Package Overview
 
 **Package**: `spatie/laravel-schedule-monitor` ^4.1
 **Purpose**: Monitor Laravel scheduled tasks
 **Key Features**:
-* Automatic task monitoring
-* Task execution tracking
-* Failure notifications
-* Execution time tracking
+\* Automatic task monitoring
+\* Task execution tracking
+\* Failure notifications
+\* Execution time tracking
 
-=== 10.2. Configuration
+### 10.2 Configuration
 
 Automatically monitors scheduled tasks. No additional configuration required.
 
-=== 10.3. Usage Examples
+### 10.3 Usage Examples
 
-==== 10.3.1. Automatic Monitoring
+#### 10.3.1 Automatic Monitoring
 
 The package automatically monitors all scheduled tasks defined in your `app/Console/Kernel.php` or `routes/console.php`.
 
-==== 10.3.2. Checking Task Status
+#### 10.3.2 Checking Task Status
 
-[source,php]
-----
+``` php
 use Spatie\ScheduleMonitor\Models\MonitoredScheduledTask;
 
 // Get all monitored tasks
@@ -526,12 +497,11 @@ $task = MonitoredScheduledTask::where('name', 'your-command')->first();
 if ($task->isHealthy()) {
     // Task is running as expected
 }
-----
+```
 
-==== 10.3.3. Task Statistics
+#### 10.3.3 Task Statistics
 
-[source,php]
-----
+``` php
 $task = MonitoredScheduledTask::where('name', 'your-command')->first();
 
 // Get last run time
@@ -539,35 +509,33 @@ $lastRun = $task->last_started_at;
 
 // Get average execution time
 $avgTime = $task->average_execution_time_in_seconds;
-----
+```
 
-== 11. Settings
+## 11 Settings
 
-=== 11.1. Package Overview
+### 11.1 Package Overview
 
 **Package**: `spatie/laravel-settings` ^3.5
 **Purpose**: Manage application settings
 **Key Features**:
-* Type-safe settings
-* Settings groups
-* Caching
-* Validation
-* Default values
+\* Type-safe settings
+\* Settings groups
+\* Caching
+\* Validation
+\* Default values
 
-=== 11.2. Configuration
+### 11.2 Configuration
 
-[source,bash]
-----
+``` bash
 php artisan vendor:publish --provider="Spatie\LaravelSettings\LaravelSettingsServiceProvider" --tag="migrations"
 php artisan migrate
-----
+```
 
-=== 11.3. Usage Examples
+### 11.3 Usage Examples
 
-==== 11.3.1. Creating Settings Class
+#### 11.3.1 Creating Settings Class
 
-[source,php]
-----
+``` php
 use Spatie\LaravelSettings\Settings;
 
 class GeneralSettings extends Settings
@@ -581,12 +549,11 @@ class GeneralSettings extends Settings
         return 'general';
     }
 }
-----
+```
 
-==== 11.3.2. Using Settings
+#### 11.3.2 Using Settings
 
-[source,php]
-----
+``` php
 use App\Settings\GeneralSettings;
 
 // Get settings
@@ -602,12 +569,11 @@ use Spatie\LaravelSettings\Facades\Settings;
 
 Settings::group(GeneralSettings::class)->site_name = 'New Name';
 Settings::group(GeneralSettings::class)->save();
-----
+```
 
-==== 11.3.3. Settings with Defaults
+#### 11.3.3 Settings with Defaults
 
-[source,php]
-----
+``` php
 use Spatie\LaravelSettings\Settings;
 
 class GeneralSettings extends Settings
@@ -621,12 +587,12 @@ class GeneralSettings extends Settings
         return 'general';
     }
 }
-----
+```
 
-== 12. Next Steps
+## 12 Next Steps
 
-xref:110-search-analytics.adoc[Next: Search & Analytics →]
+[Search & Analytics →](110-search-analytics.md)
 
-== 13. Navigation
+## 13 Navigation
 
-xref:090-observability.adoc[← Observability] | xref:110-search-analytics.adoc[Next: Search & Analytics →]
+[← Telescope, Activity Log, and Health Checks](090-observability.md) | [↑ Top](#spatie-laravel-packages-configuration) | [Scout, Typesense, and Analytics Setup →](110-search-analytics.md)

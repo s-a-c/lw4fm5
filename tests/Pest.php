@@ -9,6 +9,39 @@ use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
+$pestPluginRegistry = dirname(__DIR__).DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'pest-plugins.json';
+
+if (is_file($pestPluginRegistry)) {
+    $contents = file_get_contents($pestPluginRegistry);
+
+    if ($contents !== false) {
+        try {
+            $plugins = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            $plugins = null;
+        }
+
+        if (is_array($plugins)) {
+            $filteredPlugins = array_values(array_filter(
+                $plugins,
+                static fn (string $plugin): bool => $plugin !== 'Pest\\Mutate\\Plugins\\Mutate',
+            ));
+
+            if ($filteredPlugins !== $plugins) {
+                try {
+                    $encoded = json_encode($filteredPlugins, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
+                } catch (\JsonException) {
+                    $encoded = null;
+                }
+
+                if ($encoded !== null) {
+                    file_put_contents($pestPluginRegistry, $encoded);
+                }
+            }
+        }
+    }
+}
+
 /*
 |--------------------------------------------------------------------------
 | Test Case & Defaults

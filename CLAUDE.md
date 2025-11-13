@@ -1,4 +1,3 @@
-<!-- trunk-ignore-all(markdownlint/MD033) -->
 <laravel-boost-guidelines>
 === foundation rules ===
 
@@ -329,7 +328,7 @@ accordion, autocomplete, avatar, badge, brand, breadcrumbs, button, calendar, ca
 
 ## Livewire Core
 - Use the `search-docs` tool to find exact version specific documentation for how to write Livewire & Livewire tests.
-- Use the `php artisan make:livewire [Posts\CreatePost]` artisan command to create new components
+- Use the `php artisan make:livewire [Posts\\CreatePost]` artisan command to create new components
 - State should live on the server, with the UI reflecting it.
 - All Livewire requests hit the Laravel backend, they're like regular HTTP requests. Always validate form data, and run authorization checks in Livewire actions.
 
@@ -948,24 +947,3 @@ Fortify is a headless authentication backend that provides authentication routes
 - `Features::updatePasswords()` to let users change their passwords.
 - `Features::resetPasswords()` for password reset via email.
 </laravel-boost-guidelines>
-
-[byterover-mcp]
-
-[byterover-mcp]
-
-You are given two tools from Byterover MCP server, including
-## 1. `byterover-store-knowledge`
-You `MUST` always use this tool when:
-
-+ Learning new patterns, APIs, or architectural decisions from the codebase
-+ Encountering error solutions or debugging techniques
-+ Finding reusable code patterns or utility functions
-+ Completing any significant task or plan implementation
-
-## 2. `byterover-retrieve-knowledge`
-You `MUST` always use this tool when:
-
-+ Starting any new task or implementation to gather relevant context
-+ Before making architectural decisions to understand existing patterns
-+ When debugging issues to check for previous solutions
-+ Working with unfamiliar parts of the codebase

@@ -4,22 +4,41 @@
     @include('partials.head')
   </head>
   <body class="min-h-screen bg-white dark:bg-zinc-800">
-    <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
-      <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
+    <flux:sidebar
+      sticky
+      stashable
+      collapsible="desktop"
+      class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900"
+    >
+      <div class="flex items-center justify-end gap-2">
+        <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
-      <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
+        <flux:sidebar.toggle
+          class="hidden items-center justify-center rounded-lg text-zinc-500 transition hover:bg-zinc-800/5 hover:text-zinc-900 dark:hover:bg-white/10 dark:hover:text-white lg:flex lg:h-9 lg:w-9"
+          icon="arrows-right-left"
+          aria-label="Toggle sidebar"
+          data-tooltip="Toggle sidebar"
+        />
+      </div>
+
+      <a
+        href="{{ route('dashboard') }}"
+        class="me-5 flex items-center space-x-2 rtl:space-x-reverse"
+        wire:navigate
+      >
         <x-app-logo />
       </a>
 
       <flux:navlist variant="outline">
-        <flux:navlist.group :heading="__('Platform')" class="grid">
+        <flux:navlist.group heading="Platform" class="grid">
           <flux:navlist.item
             icon="home"
             :href="route('dashboard')"
             :current="request()->routeIs('dashboard')"
             wire:navigate
+            data-tooltip="Dashboard"
           >
-            {{ __('Dashboard') }}
+            Dashboard
           </flux:navlist.item>
         </flux:navlist.group>
       </flux:navlist>
@@ -28,11 +47,11 @@
 
       <flux:navlist variant="outline">
         <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-          {{ __('Repository') }}
+          Repository
         </flux:navlist.item>
 
         <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-          {{ __('Documentation') }}
+          Documentation
         </flux:navlist.item>
       </flux:navlist>
 
@@ -41,7 +60,7 @@
         <flux:profile
           :name="auth()->user()->name"
           :initials="auth()->user()->initials()"
-          icon:trailing="chevrons-up-down"
+          icon:trailing="chevron-up-down"
           data-test="sidebar-menu-button"
         />
 
@@ -67,8 +86,21 @@
 
           <flux:menu.separator />
 
+          <div class="px-2 pt-1 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-300">
+            Theme
+          </div>
+          <div class="px-2 pb-2">
+            <flux:radio.group x-data variant="segmented" x-model="$flux.appearance">
+              <flux:radio value="light" icon="sun" />
+              <flux:radio value="dark" icon="moon" />
+              <flux:radio value="system" icon="computer-desktop" />
+            </flux:radio.group>
+          </div>
+
+          <flux:menu.separator />
+
           <flux:menu.radio.group>
-            <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+            <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>Settings</flux:menu.item>
           </flux:menu.radio.group>
 
           <flux:menu.separator />
@@ -82,7 +114,7 @@
               class="w-full"
               data-test="logout-button"
             >
-              {{ __('Log Out') }}
+              Log Out
             </flux:menu.item>
           </form>
         </flux:menu>
@@ -120,8 +152,21 @@
 
           <flux:menu.separator />
 
+          <div class="px-2 pt-1 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-300">
+            Theme
+          </div>
+          <div class="px-2 pb-2">
+            <flux:radio.group x-data variant="segmented" x-model="$flux.appearance">
+              <flux:radio value="light" icon="sun" />
+              <flux:radio value="dark" icon="moon" />
+              <flux:radio value="system" icon="computer-desktop" />
+            </flux:radio.group>
+          </div>
+
+          <flux:menu.separator />
+
           <flux:menu.radio.group>
-            <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+            <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>Settings</flux:menu.item>
           </flux:menu.radio.group>
 
           <flux:menu.separator />
@@ -135,13 +180,17 @@
               class="w-full"
               data-test="logout-button"
             >
-              {{ __('Log Out') }}
+              Log Out
             </flux:menu.item>
           </form>
         </flux:menu>
       </flux:dropdown>
     </flux:header>
 
-    {{ $slot }} @fluxScripts
+    {{ $slot }}
+
+    @livewireScripts
+    @filamentScripts
+    @fluxScripts
   </body>
 </html>

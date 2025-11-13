@@ -146,7 +146,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 - [ ] T043 [US3] Register lobby routes, anonymous guards, and rate limiter in `routes/api.php` and `bootstrap/app.php`
 - [ ] T044 [US3] Create `app/Notifications/SocialAreas/LobbyInvitationSubmitted.php` to alert resident hosts
 - [ ] T045 [US3] Extend `SocialAreasSeeder` to publish sample lobby announcements for acceptance testing
-- [ ] T056 [US3] Document SLA monitoring setup in `docs/010-setup/090-observability.adoc`, highlighting queue timing dashboards for SC-002 and SC-004
+- [ ] T056 [US3] Document SLA monitoring setup in `docs/010-setup/090-observability.md`, highlighting queue timing dashboards for SC-002 and SC-004
 
 **Checkpoint**: All user stories functional and independently testable.
 
@@ -159,7 +159,7 @@ Compliant with [.ai/AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc8
 - [ ] T046 [P] Refresh `contracts/openapi.yaml` and add contract tests in `tests/Feature/SocialAreas/OpenApiComplianceTest.php`
 - [ ] T047 [P] Update `quickstart.md` verification steps after end-to-end run-through
 - [ ] T048 Add architecture tests in `tests/Unit/Arch/SocialAreasArchitectureTest.php` enforcing policies and route namespaces
-- [ ] T049 Capture queue + schedule monitoring playbook in `docs/010-setup/090-observability.adoc`
+- [ ] T049 Capture queue + schedule monitoring playbook in `docs/010-setup/090-observability.md`
 - [ ] T050 Execute full pipeline: `php artisan test --group=social-areas`, `php artisan schedule:run`, `bun run build`, and record results in task notes
 - [ ] T057 Configure Prometheus/Horizon alert rules for SLA breaches (greenroom latency, invitation response time, queue backlog, purge failures) and document escalation steps
 - [ ] T058 Implement user-facing degradation banner and retry-after messaging triggered when SLA alerts fire, including feature tests covering the fallback experience

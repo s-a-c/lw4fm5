@@ -1,167 +1,165 @@
-= Development Dependencies Setup
+# Development Dependencies Setup
 
-:docinfo shared:
-:toc:
-:toc-title: Table of Contents
+Compliant with [AI-GUIDELINES.md](.ai/AI-GUIDELINES.md) v0921d4cfab198af1451ef177b6e47657b5d3ab0292f77bf232496291dee47183
+<!-- markdownlint-disable MD013 -->
 
-== 1. Introduction
+## 1 Introduction
 
 This document covers all development dependencies including debugging tools, code quality tools, testing frameworks, and development utilities.
 
-== 2. Debugging Tools
+## 2 Debugging Tools
 
-=== 2.1. Laravel Debugbar
+### 2.1 Laravel Debugbar
 
 **Package**: `barryvdh/laravel-debugbar` ^3.13
 **Purpose**: Debug toolbar for Laravel applications
 **Verification**: `composer show barryvdh/laravel-debugbar`
 
-=== 2.2. Laravel IDE Helper
+### 2.2 Laravel IDE Helper
 
 **Package**: `barryvdh/laravel-ide-helper` ^3.6
 **Purpose**: IDE autocomplete and helper files
 **Commands**:
-[source,bash]
-----
+
+``` bash
 php artisan ide-helper:generate
 php artisan ide-helper:models
 php artisan ide-helper:meta
-----
+```
 
-=== 2.3. Ray
+### 2.3 Ray
 
 **Package**: `spatie/laravel-ray` ^1.41
 **Purpose**: Debugging tool for Laravel
 **Usage**: `ray($variable)` in code
 
-=== 2.4. Web Tinker
+### 2.4 Web Tinker
 
 **Package**: `spatie/laravel-web-tinker` ^1.10
 **Purpose**: Web-based REPL for Laravel
 **Access**: Available at `/tinker` route
 
-== 3. Code Quality Tools
+## 3 Code Quality Tools
 
-=== 3.1. Larastan (PHPStan)
+### 3.1 Larastan (PHPStan)
 
 **Package**: `larastan/larastan` ^3.8
 **Purpose**: Static analysis for Laravel
 **Command**: `composer analyse` or `vendor/bin/phpstan analyse`
 
-=== 3.2. Laravel Pint
+### 3.2 Laravel Pint
 
 **Package**: `laravel/pint` ^1.25
 **Purpose**: Code formatter
 **Command**: `vendor/bin/pint` or `composer cs-fix`
 
-=== 3.3. Rector
+### 3.3 Rector
 
 **Package**: `rector/rector` ^2.2
 **Purpose**: Automated code refactoring
 **Command**: `vendor/bin/rector`
 
-=== 3.4. Type Perfect
+### 3.4 Type Perfect
 
 **Package**: `rector/type-perfect` ^2.1
 **Purpose**: Additional type checking for Rector
 **Usage**: Works with Rector automatically
 
-== 4. Testing Framework
+## 4 Testing Framework
 
-=== 4.1. Pest 4
+### 4.1 Pest 4
 
 **Package**: `pestphp/pest` ^4.1
 **Purpose**: Modern testing framework
 **Key Features**:
-* Browser testing
-* Type coverage
-* Visual regression testing
-* Test sharding
+\* Browser testing
+\* Type coverage
+\* Visual regression testing
+\* Test sharding
 
 **Commands**:
-[source,bash]
-----
+
+``` bash
 php artisan test
 pest --filter test_name
 pest --type-coverage
-----
+```
 
-IMPORTANT: This project uses **Pest 4 exclusively** for all tests. PHPUnit is installed as a dependency of Pest but should not be used directly. All tests must be written in Pest syntax. Any existing PHPUnit tests should be migrated to Pest.
+> [!IMPORTANT]
+> This project uses **Pest 4 exclusively** for all tests. PHPUnit is installed as a dependency of Pest but should not be used directly. All tests must be written in Pest syntax. Any existing PHPUnit tests should be migrated to Pest.
 
-**Source**: https://pestphp.com/docs[Pest Documentation] | https://pestphp.com/docs/browser-testing[Pest Browser Testing]
+**Source**: [Pest Documentation](https://pestphp.com/docs) \| [Pest Browser Testing](https://pestphp.com/docs/browser-testing)
 
-=== 4.2. Pest Plugins
+### 4.2 Pest Plugins
 
-* `pestphp/pest-plugin-arch` ^4.0 - Architecture testing
-* `pestphp/pest-plugin-browser` ^4.1 - Browser testing
-* `pestphp/pest-plugin-faker` ^4.0 - Faker integration
-* `pestphp/pest-plugin-laravel` ^4.0 - Laravel integration
-* `pestphp/pest-plugin-profanity` ^4.2 - Profanity detection
-* `pestphp/pest-plugin-type-coverage` ^4.0 - Type coverage
+- `pestphp/pest-plugin-arch` ^4.0 - Architecture testing
+- `pestphp/pest-plugin-browser` ^4.1 - Browser testing
+- `pestphp/pest-plugin-faker` ^4.0 - Faker integration
+- `pestphp/pest-plugin-laravel` ^4.0 - Laravel integration
+- `pestphp/pest-plugin-profanity` ^4.2 - Profanity detection
+- `pestphp/pest-plugin-type-coverage` ^4.0 - Type coverage
 
-=== 4.3. PHPUnit
+### 4.3 PHPUnit
 
 **Package**: `phpunit/phpunit` ^12.4
 **Purpose**: PHP testing framework (dependency of Pest 4, not used directly)
 
-NOTE: PHPUnit is installed as a dependency of Pest 4 but should not be used directly. All tests must be written using Pest syntax.
+> [!NOTE]
+> PHPUnit is installed as a dependency of Pest 4 but should not be used directly. All tests must be written using Pest syntax.
 
-=== 4.4. Mockery
+### 4.4 Mockery
 
 **Package**: `mockery/mockery` ^1.6
 **Purpose**: Mocking framework for tests
 
-=== 4.5. Laravel Test Assertions
+### 4.5 Laravel Test Assertions
 
 **Package**: `jasonmccreary/laravel-test-assertions` ^2.8
 **Purpose**: Additional test assertions for Laravel
 
-=== 4.6. Browser Testing (Playwright)
+### 4.6 Browser Testing (Playwright)
 
 **Package**: `playwright` ^1.56.1 (frontend dependency)
 **Purpose**: End-to-end browser testing framework
 **Architectural Role**: Provides real browser testing capabilities for Pest 4
 
-==== 4.6.1. Installation
+#### 4.6.1 Installation
 
 Playwright is installed via Bun:
 
-[source,bash]
-----
+``` bash
 # Install Playwright browsers
 bunx playwright install --with-deps
 
 # Or use the npm script
 bun run playwright:install
-----
+```
 
 The `--with-deps` flag installs system dependencies required for browsers.
 
-==== 4.6.2. Browser Installation
+#### 4.6.2 Browser Installation
 
 Playwright supports multiple browsers:
 
-* **Chromium** - Google Chrome/Edge (default)
-* **Firefox** - Mozilla Firefox
-* **WebKit** - Safari engine
+- **Chromium** - Google Chrome/Edge (default)
+- **Firefox** - Mozilla Firefox
+- **WebKit** - Safari engine
 
 All browsers are installed by default. To install specific browsers:
 
-[source,bash]
-----
+``` bash
 # Install only Chromium
 bunx playwright install chromium
 
 # Install all browsers
 bunx playwright install --with-deps
-----
+```
 
-==== 4.6.3. Configuration
+#### 4.6.3 Configuration
 
 Playwright configuration is typically in `playwright.config.ts` or integrated with Pest 4. For Pest 4 browser testing:
 
-[source,php]
-----
+``` php
 // tests/Browser/ExampleTest.php
 use Pest\Laravel\Laravel;
 
@@ -171,12 +169,11 @@ it('can visit homepage', function () {
                 ->assertSee('Welcome');
     });
 });
-----
+```
 
-==== 4.6.4. Running Browser Tests
+#### 4.6.4 Running Browser Tests
 
-[source,bash]
-----
+``` bash
 # Run all browser tests
 bun run test:browser
 
@@ -191,23 +188,22 @@ bunx playwright test --headed
 
 # Run specific browser
 bunx playwright test --project=chromium
-----
+```
 
-**Source**: https://playwright.dev/docs/intro[Playwright Documentation] | https://playwright.dev/docs/running-tests[Playwright Running Tests]
+**Source**: [Playwright Documentation](https://playwright.dev/docs/intro) \| [Playwright Running Tests](https://playwright.dev/docs/running-tests)
 
-==== 4.6.5. System Dependencies
+#### 4.6.5 System Dependencies
 
 Playwright requires system dependencies. On Ubuntu/Debian:
 
-[source,bash]
-----
+``` bash
 # Install system dependencies
 bunx playwright install-deps
-----
+```
 
 On macOS, dependencies are usually installed automatically. On Windows, no additional setup is needed.
 
-==== 4.6.6. Troubleshooting
+#### 4.6.6 Troubleshooting
 
 **Issue**: Browsers not found
 **Solution**: Run `bunx playwright install --with-deps`
@@ -218,12 +214,11 @@ On macOS, dependencies are usually installed automatically. On Windows, no addit
 **Issue**: Slow test execution
 **Solution**: Use `--workers=1` to run tests sequentially, or optimize test setup
 
-==== 4.6.7. Integration with Pest 4
+#### 4.6.7 Integration with Pest 4
 
-Pest 4's browser testing plugin integrates Playwright:
+Pest 4’s browser testing plugin integrates Playwright:
 
-[source,php]
-----
+``` php
 use function Pest\Laravel\visit;
 
 it('can visit homepage', function () {
@@ -234,91 +229,91 @@ it('can visit homepage', function () {
          ->click('Sign In')
          ->assertSee('Email');
 });
-----
+```
 
-See xref:120-development-tools.adoc#pest-4[Pest 4] section for more details on browser testing patterns.
+See [Testing Framework: Pest 4](#41-pest-4) section for more details on browser testing patterns.
 
-== 5. Development Utilities
+## 5 Development Utilities
 
-=== 5.1. Laravel Boost
+### 5.1 Laravel Boost
 
 **Package**: `laravel/boost` ^1.6
 **Purpose**: Development tools and MCP server
 
-=== 5.2. Laravel Pail
+### 5.2 Laravel Pail
 
 **Package**: `laravel/pail` ^1.2
 **Purpose**: Real-time log viewer
 **Command**: `php artisan pail`
 
-=== 5.3. Laravel Sail
+### 5.3 Laravel Sail
 
 **Package**: `laravel/sail` ^1.47
 **Purpose**: Docker-based development environment
 
-=== 5.4. Blueprint
+### 5.4 Blueprint
 
 **Package**: `laravel-shift/blueprint` ^2.12
 **Purpose**: Code generation from YAML definitions
 
-=== 5.5. Solo
+### 5.5 Solo
 
 **Package**: `soloterm/solo` ^0.5.0
 **Purpose**: Terminal utilities
 
-== 6. Spatie Dev Tools
+## 6 Spatie Dev Tools
 
-=== 6.1. Blade Comments
+### 6.1 Blade Comments
 
 **Package**: `spatie/laravel-blade-comments` ^2.0
 **Purpose**: HTML comments in Blade templates
 
-=== 6.2. Horizon Watcher
+### 6.2 Horizon Watcher
 
 **Package**: `spatie/laravel-horizon-watcher` ^1.1
 **Purpose**: Monitor Horizon status
 
-=== 6.3. Login Link
+### 6.3 Login Link
 
 **Package**: `spatie/laravel-login-link` ^1.6
 **Purpose**: Secure login links for development
 
-=== 6.4. Missing Page Redirector
+### 6.4 Missing Page Redirector
 
 **Package**: `spatie/laravel-missing-page-redirector` ^2.11
 **Purpose**: Redirect 404s to similar pages
 
-=== 6.5. Queueable Action
+### 6.5 Queueable Action
 
 **Package**: `spatie/laravel-queueable-action` ^2.16
 **Purpose**: Queue actions as jobs
 
-=== 6.6. Pest Snapshots
+### 6.6 Pest Snapshots
 
 **Package**: `spatie/pest-plugin-snapshots` ^2.2
 **Purpose**: Snapshot testing for Pest
 
-== 7. Other Dev Tools
+## 7 Other Dev Tools
 
-=== 7.1. Composer Normalize
+### 7.1 Composer Normalize
 
 **Package**: `ergebnis/composer-normalize` ^2.48
 **Purpose**: Normalize composer.json format
 
-=== 7.2. Security Advisories
+### 7.2 Security Advisories
 
 **Package**: `roave/security-advisories` dev-latest
 **Purpose**: Prevent installation of insecure packages
 
-=== 7.3. Faker
+### 7.3 Faker
 
 **Package**: `fakerphp/faker` ^1.24
 **Purpose**: Fake data generation for tests
 
-== 8. Next Steps
+## 8 Next Steps
 
-xref:130-frontend-build.adoc[Next: Frontend Build →]
+[Frontend Build →](130-frontend-build.md)
 
-== 9. Navigation
+## 9 Navigation
 
-xref:110-search-analytics.adoc[← Search & Analytics] | xref:130-frontend-build.adoc[Next: Frontend Build →]
+[← Scout, Typesense, and Analytics Setup](110-search-analytics.md) | [↑ Top](#development-dependencies-setup) | [Bun, Vite, and Tailwind CSS 4 →](130-frontend-build.md)
