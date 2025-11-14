@@ -27,3 +27,8 @@ The antenna icon is the primary control for dump interception—there's no separ
 - **Use Herd's PHP**: `herd php artisan filament:make-user` may work if Herd bundles PHP 8.4 ([Herd Docs – macOS](https://herd.laravel.com/docs/macos/))
 
 ---
+
+create `resources/views/pages/tailwindcss.catppuccin.blade.php` by converting @tailwindcss.catppuccin.html
+the result should be a folio-routed, livewire- and flux-enabled component, fitting within the existing layout
+
+---

@@ -1,6 +1,15 @@
 @import 'tailwindcss';
 @import '../../vendor/livewire/flux/dist/flux.css';
 
+/*
+ Choose between `mocha`, `frappe` or `macchiato` for dark mode, latte is included as the light mode flavour.
+ We recommend using `mocha` for dark mode.
+*/
+@import "@catppuccin/tailwindcss/frappe.css";
+@import "@catppuccin/tailwindcss/latte.css";
+@import "@catppuccin/tailwindcss/macchiato.css";
+@import "@catppuccin/tailwindcss/mocha.css";
+
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
@@ -53,7 +62,7 @@
 }
 
 [data-flux-label] {
-  @apply !mb-0 !leading-tight;
+  @apply mb-0! leading-tight!;
 }
 
 input:focus[data-flux-control],
