@@ -8,6 +8,12 @@ Livewire is a powerful way of building dynamic, reactive, frontend UIs using jus
 
 This Livewire starter kit utilizes Livewire 3, Laravel Volt (optionally), TypeScript, Tailwind, and the [Flux UI](https://fluxui.dev) component library.
 
+## Spec-Driven Development
+
+This project uses **Specification-Driven Development (SDD)** with [Spec-Kit](https://spec-kit.org) to ensure features are well-specified, planned, and tracked before implementation. Specifications are written first, then transformed into technical plans and actionable tasks using AI-powered tools. All specification artifacts are committed to the repository, providing clear documentation and traceability from requirements to implementation.
+
+For detailed workflow documentation, see [Spec-Driven Development Workflow](docs/010-setup/125-spec-driven-development.md).
+
 If you are looking for the alternate configurations of this starter kit, they can be found in the following branches:
 
 - [components](https://github.com/laravel/livewire-starter-kit/tree/components) - if Volt is not selected

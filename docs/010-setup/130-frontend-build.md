@@ -395,4 +395,4 @@ After configuring the frontend build system:
 
 ## 11 Navigation
 
-[← Development Dependencies Setup](120-development-tools.md) | [↑ Top](#bun-vite-and-tailwind-css-4) | [Outstanding Questions, Decisions, and Inconsistencies →](140-outstanding-questions.md)
+[← Spec-Driven Development](125-spec-driven-development.md) | [↑ Top](#bun-vite-and-tailwind-css-4) | [Outstanding Questions, Decisions, and Inconsistencies →](140-outstanding-questions.md)
