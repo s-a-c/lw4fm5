@@ -172,6 +172,7 @@ The documentation is organized into the following sections:
 - [spatie-packages.md](100-spatie-packages.md) - All Spatie Laravel packages configuration
 - [search-analytics.md](110-search-analytics.md) - Scout, Typesense, Analytics setup
 - [development-tools.md](120-development-tools.md) - Dev dependencies (Debugbar, IDE Helper, Rector, Pest, etc.)
+- [spec-driven-development.md](125-spec-driven-development.md) - Spec-Kit workflow and specification-driven development
 - [frontend-build.md](130-frontend-build.md) - Bun, Vite, Tailwind CSS 4, and frontend tooling
 - [outstanding-questions.md](140-outstanding-questions.md) - Outstanding questions, decisions, and inconsistencies
 - [troubleshooting.md](150-troubleshooting.md) - Centralized troubleshooting index
