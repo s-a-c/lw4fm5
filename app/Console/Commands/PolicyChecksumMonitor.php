@@ -18,13 +18,19 @@ final class PolicyChecksumMonitor extends Command
 
     public function handle(): int
     {
-        $expected = (string) Config::get('base-platform.policy.acknowledgement_checksum');
-        $files = Collection::make(Config::get('base-platform.policy.files', []));
+        $expectedChecksum = Config::get('base-platform.policy.acknowledgement_checksum');
+        $expected = is_string($expectedChecksum) ? $expectedChecksum : '';
+
+        $filesConfig = Config::get('base-platform.policy.files', []);
+        $files = Collection::make(is_array($filesConfig) ? $filesConfig : []);
 
         $missing = collect();
         $mismatched = collect();
 
-        $files->each(function (string $relative) use ($expected, $missing, $mismatched): void {
+        $files->each(function (mixed $relative) use ($expected, $missing, $mismatched): void {
+            if (! is_string($relative)) {
+                return;
+            }
             $path = base_path($relative);
 
             if (! File::exists($path)) {
@@ -35,7 +41,8 @@ final class PolicyChecksumMonitor extends Command
 
             $contents = File::get($path);
 
-            if (! preg_match('/Compliant with \[\.ai\/AI-GUIDELINES.md\]\(.+?\) v([a-f0-9]+)/i', $contents, $matches)) {
+            $matches = [];
+            if (preg_match('/Compliant with \[\.ai\/AI-GUIDELINES.md\]\(.+?\) v([a-f0-9]+)/i', $contents, $matches) !== 1) {
                 $missing->push($relative);
 
                 return;
@@ -57,16 +64,31 @@ final class PolicyChecksumMonitor extends Command
 
         if ($missing->isNotEmpty()) {
             $this->components->error('Missing or malformed acknowledgement headers detected:');
-            $missing->each(fn (string $file) => $this->line(" • {$file}"));
+            $missing->each(function (mixed $file): void {
+                if (is_string($file)) {
+                    $this->line(" • {$file}");
+                }
+            });
         }
 
         if ($mismatched->isNotEmpty()) {
             $this->components->warn('Checksum drift detected:');
-            $mismatched->each(fn (array $entry) => $this->line(sprintf(
-                ' • %s has checksum %s',
-                $entry['file'],
-                $entry['checksum']
-            )));
+            $mismatched->each(function (mixed $entry): void {
+                // Guard against non-array values to satisfy static analysis and runtime safety
+                if (! is_array($entry)) {
+                    return;
+                }
+
+                if (isset($entry['file'], $entry['checksum'])) {
+                    $file = is_string($entry['file']) ? $entry['file'] : '';
+                    $checksum = is_string($entry['checksum']) ? $entry['checksum'] : '';
+                    $this->line(sprintf(
+                        ' • %s has checksum %s',
+                        $file,
+                        $checksum
+                    ));
+                }
+            });
         }
 
         $status = $missing->isEmpty() && $mismatched->isEmpty() ? 'pass' : 'fail';

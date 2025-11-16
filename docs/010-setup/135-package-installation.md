@@ -213,7 +213,7 @@ The project uses custom Composer repositories for private and special packages. 
 
 | Repository Name | URL | Purpose | Authentication Required |
 |----------------|-----|---------|------------------------|
-| `flux-pro` | `https://composer.fluxui.dev` | Flux Pro premium components | ✅ Yes |
+| `fluxui-pro` | `https://composer.fluxui.dev` | Flux Pro premium components | ✅ Yes |
 | `laravel-comments` | `https://satis.spatie.be` | Spatie private packages | ❌ No |
 | `laravel-labs-starter-kit-browser-tests` | GitHub VCS | Browser test utilities | ❌ No |
 
@@ -343,13 +343,21 @@ composer install --no-interaction --prefer-dist --optimize-autoloader
 
 ```log
 Loading composer repositories with package information
+Gathering patches for root package.
+Gathering patches for dependencies. This might take a minute.
 Installing dependencies from lock file (if composer.lock exists)
 or
 Updating dependencies (if no composer.lock exists)
 ...
+  - Applying patches for filament/filament
+    patches/filament-filament/livewire-v4-compatibility.patch (Fix Livewire v4 ComponentRegistry compatibility)
+...
 Writing lock file
 Generating optimized autoload files
 ```
+
+> [!NOTE]
+> **About Patches**: This project uses composer patches to fix compatibility issues between bleeding-edge versions. You'll see patches being applied during installation - this is normal and expected. The patches are managed via the `cweagans/composer-patches` plugin.
 
 **Step 3: Monitor Installation Progress**
 

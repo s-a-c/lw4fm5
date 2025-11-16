@@ -45,9 +45,14 @@ final class RunParityCheck extends Command
                 default => $this->components->error($message),
             };
 
-            collect($result->issues ?? [])->each(function (string $issue): void {
-                $this->line(" - {$issue}");
-            });
+            $issues = $result->issues ?? [];
+            if (is_array($issues)) {
+                collect($issues)->each(function (mixed $issue): void {
+                    if (is_string($issue)) {
+                        $this->line(" - {$issue}");
+                    }
+                });
+            }
         });
 
         return self::SUCCESS;
@@ -61,19 +66,26 @@ final class RunParityCheck extends Command
         $requested = $this->option('profile');
 
         if (is_string($requested) && $requested !== '') {
-            return EnvironmentProfile::query()
-                ->supported()
+            /** @phpstan-ignore-next-line */
+            $query = EnvironmentProfile::query()->supported();
+            /** @var array<int, string> $result */
+            $result = $query
                 ->where('name', $requested)
                 ->pluck('name')
                 ->all();
+
+            return $result;
         }
 
-        return Config::get('base-platform.profiles.supported', []);
+        $supported = Config::get('base-platform.profiles.supported', []);
+
+        return is_array($supported) ? array_values(array_filter($supported, is_string(...))) : [];
     }
 
     private function renderStatusMessage(ParityResult $result): string
     {
-        $profile = $result->environmentProfile->name;
+        $environmentProfile = $result->environmentProfile;
+        $profile = $environmentProfile->name ?? 'unknown';
 
         return match ($result->status) {
             ParityReport::STATUS_PASS => "Parity check passed for {$profile}",

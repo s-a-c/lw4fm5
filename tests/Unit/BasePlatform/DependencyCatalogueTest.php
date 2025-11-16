@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use App\Services\BasePlatform\DependencyCatalogue;
+use App\Services\BasePlatform\DependencyRecord;
+use Carbon\CarbonImmutable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
@@ -74,4 +77,200 @@ it('rejects catalogue entries with unsupported metadata', function (): void {
     $catalogue = new DependencyCatalogue(Storage::disk('local'));
 
     expect(fn (): Collection => $catalogue->entries())->toThrow(InvalidArgumentException::class);
+});
+
+it('throws when catalogue file is missing', function (): void {
+    $catalogue = new DependencyCatalogue(Storage::disk('local'));
+
+    expect(fn (): Collection => $catalogue->entries())->toThrow(RuntimeException::class);
+});
+
+it('throws when catalogue contains invalid JSON', function (): void {
+    Storage::disk('local')->put('base-platform/dependencies.json', '{invalid json}');
+
+    $catalogue = new DependencyCatalogue(Storage::disk('local'));
+
+    expect(fn (): Collection => $catalogue->entries())->toThrow(JsonException::class);
+});
+
+it('throws when catalogue root is not an array', function (): void {
+    Storage::disk('local')->put('base-platform/dependencies.json', json_encode('not-an-array', JSON_THROW_ON_ERROR));
+
+    $catalogue = new DependencyCatalogue(Storage::disk('local'));
+
+    expect(fn (): Collection => $catalogue->entries())->toThrow(InvalidArgumentException::class);
+});
+
+it('throws when catalogue entry is not an array', function (): void {
+    Storage::disk('local')->put('base-platform/dependencies.json', json_encode(['not-an-array-entry'], JSON_THROW_ON_ERROR));
+
+    $catalogue = new DependencyCatalogue(Storage::disk('local'));
+
+    expect(fn (): Collection => $catalogue->entries())->toThrow(InvalidArgumentException::class);
+});
+
+it('throws when catalogue entry is missing required keys', function (): void {
+    Storage::disk('local')->put('base-platform/dependencies.json', json_encode([
+        [
+            'name' => 'test/package',
+            // Missing other required keys
+        ],
+    ], JSON_THROW_ON_ERROR));
+
+    $catalogue = new DependencyCatalogue(Storage::disk('local'));
+
+    expect(fn (): Collection => $catalogue->entries())->toThrow(InvalidArgumentException::class);
+});
+
+it('throws when catalogue entry has invalid review cadence', function (): void {
+    Storage::disk('local')->put('base-platform/dependencies.json', json_encode([
+        [
+            'name' => 'test/package',
+            'version' => '1.0.0',
+            'classification' => 'core',
+            'owner' => 'Platform Engineering',
+            'justification' => 'Test',
+            'lastReviewedAt' => '2025-10-10',
+            'reviewCadence' => 'invalid-cadence',
+            'riskLevel' => 'medium',
+            'notes' => 'Test',
+        ],
+    ], JSON_THROW_ON_ERROR));
+
+    $catalogue = new DependencyCatalogue(Storage::disk('local'));
+
+    expect(fn (): Collection => $catalogue->entries())->toThrow(InvalidArgumentException::class);
+});
+
+it('throws when catalogue entry has invalid risk level', function (): void {
+    Storage::disk('local')->put('base-platform/dependencies.json', json_encode([
+        [
+            'name' => 'test/package',
+            'version' => '1.0.0',
+            'classification' => 'core',
+            'owner' => 'Platform Engineering',
+            'justification' => 'Test',
+            'lastReviewedAt' => '2025-10-10',
+            'reviewCadence' => 'monthly',
+            'riskLevel' => 'invalid-risk',
+            'notes' => 'Test',
+        ],
+    ], JSON_THROW_ON_ERROR));
+
+    $catalogue = new DependencyCatalogue(Storage::disk('local'));
+
+    expect(fn (): Collection => $catalogue->entries())->toThrow(InvalidArgumentException::class);
+});
+
+it('handles non-string values in catalogue entries gracefully', function (): void {
+    Storage::disk('local')->put('base-platform/dependencies.json', json_encode([
+        [
+            'name' => 123, // Non-string
+            'version' => '1.0.0',
+            'classification' => 'core',
+            'owner' => 'Platform Engineering',
+            'justification' => 'Test',
+            'lastReviewedAt' => '2025-10-10',
+            'reviewCadence' => 'monthly',
+            'riskLevel' => 'medium',
+            'notes' => 'Test',
+        ],
+    ], JSON_THROW_ON_ERROR));
+
+    $catalogue = new DependencyCatalogue(Storage::disk('local'));
+    $entries = $catalogue->entries();
+
+    expect($entries->first()->name)->toBe(''); // Should default to empty string
+});
+
+it('allows overdue check with custom reference date', function (): void {
+    Storage::disk('local')->put('base-platform/dependencies.json', json_encode([
+        [
+            'name' => 'test/package',
+            'version' => '1.0.0',
+            'classification' => 'core',
+            'owner' => 'Platform Engineering',
+            'justification' => 'Test',
+            'lastReviewedAt' => '2025-08-01',
+            'reviewCadence' => 'monthly',
+            'riskLevel' => 'high',
+            'notes' => 'Test',
+        ],
+    ], JSON_THROW_ON_ERROR));
+
+    $catalogue = new DependencyCatalogue(Storage::disk('local'));
+    // Use Carbon::parse() directly to get mutable Carbon (required by overdue() method)
+    $customReference = Carbon::parse('2025-12-01');
+    $overdue = $catalogue->overdue($customReference);
+
+    expect($overdue)->toHaveCount(1);
+});
+
+it('handles isOverdue with CarbonImmutable reference', function (): void {
+    Storage::disk('local')->put('base-platform/dependencies.json', json_encode([
+        [
+            'name' => 'test/package',
+            'version' => '1.0.0',
+            'classification' => 'core',
+            'owner' => 'Platform Engineering',
+            'justification' => 'Test',
+            'lastReviewedAt' => '2025-08-01',
+            'reviewCadence' => 'monthly',
+            'riskLevel' => 'high',
+            'notes' => 'Test',
+        ],
+    ], JSON_THROW_ON_ERROR));
+
+    $catalogue = new DependencyCatalogue(Storage::disk('local'));
+    $entries = $catalogue->entries();
+    $record = $entries->first();
+
+    $carbonImmutableRef = CarbonImmutable::parse('2025-12-01');
+    $isOverdue = $record->isOverdue($carbonImmutableRef);
+
+    expect($isOverdue)->toBeTrue();
+});
+
+it('converts dependency record to array', function (): void {
+    Storage::disk('local')->put('base-platform/dependencies.json', json_encode([
+        [
+            'name' => 'test/package',
+            'version' => '1.0.0',
+            'classification' => 'core',
+            'owner' => 'Platform Engineering',
+            'justification' => 'Test',
+            'lastReviewedAt' => '2025-10-10',
+            'reviewCadence' => 'monthly',
+            'riskLevel' => 'medium',
+            'notes' => 'Test notes',
+        ],
+    ], JSON_THROW_ON_ERROR));
+
+    $catalogue = new DependencyCatalogue(Storage::disk('local'));
+    $entries = $catalogue->entries();
+    $record = $entries->first();
+    $array = $record->toArray();
+
+    expect($array)->toBeArray();
+    expect($array['name'])->toBe('test/package');
+    expect($array['version'])->toBe('1.0.0');
+    expect($array)->toHaveKey('reviewDeadline');
+});
+
+it('throws when reviewDeadline encounters unsupported cadence', function (): void {
+    // Create a DependencyRecord directly with invalid cadence to test the default case
+    // Use Carbon::parse() directly to get mutable Carbon (required by DependencyRecord constructor)
+    $record = new DependencyRecord(
+        name: 'test/package',
+        version: '1.0.0',
+        classification: 'core',
+        owner: 'Platform Engineering',
+        justification: 'Test',
+        lastReviewedAt: Carbon::parse('2025-10-10'),
+        reviewCadence: 'unsupported-cadence',
+        riskLevel: 'medium',
+        notes: 'Test',
+    );
+
+    expect(fn (): Carbon => $record->reviewDeadline())->toThrow(InvalidArgumentException::class);
 });

@@ -11,7 +11,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 final class WorkflowSuiteChannel extends Model
 {
+    /** @use HasFactory<never> */
     use HasFactory;
+
     use HasUuids;
 
     public $incrementing = false;
@@ -25,7 +27,7 @@ final class WorkflowSuiteChannel extends Model
     protected $keyType = 'string';
 
     /**
-     * @return BelongsTo<WorkflowSuite, self>
+     * @return BelongsTo<WorkflowSuite, $this>
      */
     public function workflowSuite(): BelongsTo
     {

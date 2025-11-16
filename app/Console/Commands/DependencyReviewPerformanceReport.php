@@ -85,10 +85,13 @@ final class DependencyReviewPerformanceReport extends Command
             $reportPath
         ));
 
+        $runtimeSeconds = $entry['runtime_seconds'] ?? 0.0;
+        $runtimeFloat = is_numeric($runtimeSeconds) ? (float) $runtimeSeconds : 0.0;
+
         BasePlatformMetrics::record('dependency_review_performance', [
             'status' => $entry['status'],
             'overdue_count' => $entry['overdue_count'],
-        ], (float) ($entry['runtime_seconds'] ?? 0.0));
+        ], $runtimeFloat);
 
         return self::SUCCESS;
     }
@@ -98,12 +101,15 @@ final class DependencyReviewPerformanceReport extends Command
         $disk = Storage::disk('local');
 
         $files = collect($disk->files(self::REPORT_DIRECTORY))
-            ->filter(fn (string $path) => Str::endsWith($path, '.json'))
+            ->filter(fn (mixed $path): bool => is_string($path) && Str::endsWith($path, '.json'))
             ->sortDesc()
             ->values();
 
         throw_if($files->isEmpty(), RuntimeException::class, 'No dependency review reports are present in storage.');
 
-        return $files->first();
+        /** @var string $firstFile */
+        $firstFile = $files->first();
+
+        return $firstFile;
     }
 }

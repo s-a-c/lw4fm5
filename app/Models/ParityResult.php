@@ -15,7 +15,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 final class ParityResult extends Model
 {
+    /** @use HasFactory<never> */
     use HasFactory;
+
     use HasUuids;
 
     public $incrementing = false;
@@ -30,7 +32,7 @@ final class ParityResult extends Model
     protected $keyType = 'string';
 
     /**
-     * @return BelongsTo<EnvironmentProfile, self>
+     * @return BelongsTo<EnvironmentProfile, $this>
      */
     public function environmentProfile(): BelongsTo
     {

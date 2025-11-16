@@ -54,7 +54,7 @@ final class AppServiceProvider extends ServiceProvider
     {
 
         DB::prohibitDestructiveCommands(
-            $this->app->isProduction()
+            $this->app->environment('production')
             && ! $this->app->runningInConsole()
             && ! $this->app->runningUnitTests()
             && ! $this->app->isDownForMaintenance(),
@@ -67,8 +67,9 @@ final class AppServiceProvider extends ServiceProvider
     private function configureModels(): void
     {
 
-        Model::shouldBeStrict(! $this->app->isProduction());
-        Model::unguard(! $this->app->isProduction());
+        $isProduction = $this->app->environment('production');
+        Model::shouldBeStrict(! $isProduction);
+        Model::unguard(! $isProduction);
     }
 
     /**
@@ -77,7 +78,8 @@ final class AppServiceProvider extends ServiceProvider
     private function configurePasswordRules(): void
     {
 
-        if (! $this->app->isLocal()) {
+        $isLocal = $this->app->environment('local');
+        if (! $isLocal) {
             Password::defaults(fn () => Password::min(12)
                 ->letters()
                 ->numbers()
@@ -101,7 +103,7 @@ final class AppServiceProvider extends ServiceProvider
     private function configureUrl(): void
     {
 
-        if (! $this->app->isLocal()) {
+        if (! $this->app->environment('local')) {
             URL::forceScheme('https');
         }
     }

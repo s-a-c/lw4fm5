@@ -102,8 +102,7 @@ Create the prompt(s) and save to the prompts folder.
 
 ### Always Include
 
-- XML tag structure with clear, semantic tags like `
-<objective>`, `<context>`, `<requirements>`, `<constraints>`, `<output>`
+- XML tag structure with clear, semantic tags like `<objective>`, `<context>`, `<requirements>`, `<constraints>`, `<output>`
 - **Contextual information**: Why this task matters, what it's for, who will use it, end goal
 - **Explicit, specific instructions**: Tell Claude exactly what to do with clear, unambiguous language
 - **Sequential steps**: Use numbered lists for clarity

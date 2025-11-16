@@ -8,7 +8,6 @@ use FilesystemIterator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Livewire\LivewireManager;
-use Livewire\Mechanisms\ComponentRegistry;
 use Livewire\Volt\Component;
 use Livewire\Volt\ComponentResolver;
 use Livewire\Volt\MountedDirectories;
@@ -54,8 +53,6 @@ final class VoltServiceProvider extends ServiceProvider
             return;
         }
 
-        $componentRegistry = app(ComponentRegistry::class);
-        $componentRegistry->register();
         $livewireManager = app(LivewireManager::class);
         $componentResolver = app(ComponentResolver::class);
 
@@ -77,7 +74,6 @@ final class VoltServiceProvider extends ServiceProvider
                     continue;
                 }
 
-                $componentRegistry->component($alias, $class);
                 $livewireManager->component($alias, $class);
             }
         }
@@ -105,9 +101,6 @@ final class VoltServiceProvider extends ServiceProvider
             }
 
             $filename = $file->getFilename();
-            if ($filename === false) {
-                continue;
-            }
             if (! Str::endsWith($filename, '.blade.php')) {
                 continue;
             }

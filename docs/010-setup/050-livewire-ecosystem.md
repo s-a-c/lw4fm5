@@ -477,7 +477,30 @@ No specific environment variables required for Livewire ecosystem packages.
 
 ## 8 Troubleshooting
 
-### 8.1 Components Not Updating
+### 8.1 Livewire v4 Compatibility with Filament
+
+**Symptom**: `BindingResolutionException: Target class [Livewire\Mechanisms\ComponentRegistry] does not exist`
+
+**Cause**: Livewire v4.0.0-beta.3 removed the `ComponentRegistry` class, but Filament v5 beta still references it.
+
+**Solution**: This project includes an automatic composer patch that fixes this compatibility issue. The patch modifies Filament's `HasComponents` trait to use Livewire v4's new API.
+
+**Verification**:
+
+``` bash
+# Verify the patch is applied
+composer update -Wo
+
+# Check that the application boots correctly
+php artisan --version
+```
+
+**Details**: See [patches/filament-filament/README.md](../../patches/filament-filament/README.md) or [troubleshooting.md](150-troubleshooting.md#611-livewire-componentregistry-error) for full details.
+
+> [!NOTE]
+> This is a temporary fix until Filament officially supports Livewire v4.0.0-beta.3. The patch is automatically applied during `composer install` or `composer update`.
+
+### 8.2 Components Not Updating
 
 **Symptom**: Changes to components not reflected in browser
 
@@ -491,7 +514,7 @@ php artisan livewire:discover
 php artisan cache:clear
 ```
 
-### 8.2 Volt Components Not Routing
+### 8.3 Volt Components Not Routing
 
 **Symptom**: Volt routes return 404
 

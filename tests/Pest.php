@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
+use Pest\Mutate\Plugins\Mutate;
 use Tests\TestCase;
 
 $pestPluginRegistry = dirname(__DIR__).DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'pest-plugins.json';
@@ -22,13 +23,11 @@ if (is_file($pestPluginRegistry)) {
         }
 
         if (is_array($plugins)) {
-            $mutatePlugin = 'Pest\\Mutate\\Plugins\\Mutate';
+            $mutatePlugin = Mutate::class;
 
             $filteredPlugins = array_values(array_filter(
                 $plugins,
-                static function (string $plugin) use ($mutatePlugin): bool {
-                    return $plugin !== $mutatePlugin;
-                },
+                static fn (string $plugin): bool => $plugin !== $mutatePlugin,
             ));
 
             if ($filteredPlugins !== $plugins) {

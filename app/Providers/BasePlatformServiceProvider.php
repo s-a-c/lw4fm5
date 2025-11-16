@@ -9,9 +9,11 @@ namespace App\Providers;
  */
 
 use App\Contracts\BasePlatform\BootstrapRunnerContract;
+use App\Contracts\BasePlatform\ComposerAuditRunnerContract;
 use App\Contracts\BasePlatform\EnvironmentProfileValidatorContract;
 use App\Contracts\BasePlatform\ParityCheckerContract;
 use App\Services\BasePlatform\BootstrapRunner;
+use App\Services\BasePlatform\ComposerAuditRunner;
 use App\Services\BasePlatform\EnvironmentProfileValidator;
 use App\Services\BasePlatform\ParityChecker;
 use Illuminate\Support\ServiceProvider;
@@ -21,6 +23,7 @@ final class BasePlatformServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(BootstrapRunnerContract::class, BootstrapRunner::class);
+        $this->app->bind(ComposerAuditRunnerContract::class, ComposerAuditRunner::class);
         $this->app->bind(ParityCheckerContract::class, ParityChecker::class);
         $this->app->bind(EnvironmentProfileValidatorContract::class, EnvironmentProfileValidator::class);
     }

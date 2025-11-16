@@ -16,7 +16,8 @@ Compliant with [AI-GUIDELINES.md](../../.ai/AI-GUIDELINES.md) v0921d4cfab198af14
     - [2.2 Missing "Default Panel" for Filament](#22-missing-default-panel-for-filament)
     - [2.3 Configuration of spatie/laravel-blade-comments](#23-configuration-of-spatielaravel-blade-comments)
     - [2.4 Livewire Morph-Aware Compilation Timeout on `/dashboard`](#24-livewire-morph-aware-compilation-timeout-on-dashboard)
-    - [2.5 Volt Settings Pages Crash With “View `[app]` not found”](#25-volt-settings-pages-crash-with-view-app-not-found)
+    - [2.5 Volt Settings Pages Crash With "View `[app]` not found"](#25-volt-settings-pages-crash-with-view-app-not-found)
+    - [2.6 Filament ComponentRegistry Compatibility with Livewire v4](#26-filament-componentregistry-compatibility-with-livewire-v4)
   - [3 Additional Notes](#3-additional-notes)
     - [3.1 Document Maintenance](#31-document-maintenance)
     - [3.2 Related Documentation](#32-related-documentation)
@@ -246,11 +247,11 @@ After the fix, Filament admin panel loads correctly without errors.
 - Removing the package simplifies the stack and avoids future regressions if Blade comments were accidentally re-enabled.
 - If comment injection is reintroduced later, limit it to first-party templates or ensure compatibility with Livewire v4’s compiler before deployment.
 
-### 2.5 Volt Settings Pages Crash With “View `[app]` not found”
+### 2.5 Volt Settings Pages Crash With "View `[app]` not found"
 
 **Date**: Current setup session
 
-**Issue**: Navigating to Volt-backed settings pages (for example, `/settings/profile`) produced an `InvalidArgumentException` with the message “View `[app]` not found”.
+**Issue**: Navigating to Volt-backed settings pages (for example, `/settings/profile`) produced an `InvalidArgumentException` with the message "View `[app]` not found".
 
 **Symptoms**:
 
@@ -264,7 +265,7 @@ The project did not include a Blade view at `resources/views/layouts/app.blade.p
 **Solution**:
 
 1. Generated the missing layout stub via `php artisan livewire:layout`, creating `resources/views/layouts/app.blade.php`.
-2. Replaced the stub’s body with `<x-layouts.app>` so the new layout delegates to the existing sidebar wrapper.
+2. Replaced the stub's body with `<x-layouts.app>` so the new layout delegates to the existing sidebar wrapper.
 3. Ensured Livewire assets load globally by moving `@livewireStyles` into `resources/views/partials/head.blade.php` and `@livewireScripts` into `resources/views/components/layouts/app/sidebar.blade.php`.
 
 **Files Changed**:
@@ -283,11 +284,104 @@ The project did not include a Blade view at `resources/views/layouts/app.blade.p
 
 **References**:
 
-- [Livewire v4 Quickstart – “Create a layout”](https://livewire.laravel.com/docs/4.x/#create-a-layout)
+- [Livewire v4 Quickstart – "Create a layout"](https://livewire.laravel.com/docs/4.x/#create-a-layout)
 
 **Notes**:
 
 - If `component_layout` is changed again, ensure the referenced view exists or adjust the config accordingly.
+
+### 2.6 Filament ComponentRegistry Compatibility with Livewire v4
+
+**Date**: 2025-11-16
+
+**Issue**: Composer operations failed with `BindingResolutionException` when Filament tried to resolve Livewire component names.
+
+**Symptoms**:
+
+``` log
+Illuminate\Contracts\Container\BindingResolutionException
+
+Target class [Livewire\Mechanisms\ComponentRegistry] does not exist.
+
+at vendor/laravel/framework/src/Illuminate/Container/Container.php:1163
+```
+
+- Error occurred during `composer update` and `php artisan package:discover`
+- Stack trace showed error originated from `vendor/filament/filament/src/Panel/Concerns/HasComponents.php:596`
+- Application failed to boot due to service provider registration failure
+
+**Root Cause**:
+
+Livewire v4.0.0-beta.3 removed the `Livewire\Mechanisms\ComponentRegistry` class as part of architectural changes. The class was replaced with a new factory-based API for component name resolution. However, Filament v5.x-dev still referenced the old `ComponentRegistry` class in its `HasComponents` trait.
+
+The incompatibility occurred because:
+
+1. Filament's `queueLivewireComponentForRegistration()` method attempted to resolve `ComponentRegistry` from the service container
+2. Livewire v4 no longer registers this class, having moved to `app('livewire.factory')->resolveComponentName()`
+3. Laravel's container threw a `BindingResolutionException` when it couldn't find the class
+4. This happened during service provider boot, preventing the application from starting
+
+**Solution**:
+
+Created a composer patch that modifies Filament's component registration to use Livewire v4's new factory API:
+
+1. **Created patch file**: `patches/filament-filament/livewire-v4-compatibility.patch`
+2. **Modified code**:
+   - **Before**: `$componentName = app(ComponentRegistry::class)->getName($component);`
+   - **After**: `$componentName = app('livewire.factory')->resolveComponentName($component);`
+3. **Removed import**: Deleted `use Livewire\Mechanisms\ComponentRegistry;` from the file
+
+**Files Changed**:
+
+- `patches/filament-filament/livewire-v4-compatibility.patch` (created)
+- `patches/filament-filament/README.md` (created with documentation)
+- `composer.json` (lines 204-206): Added patch configuration
+- `vendor/filament/filament/src/Panel/Concerns/HasComponents.php` (patched via composer)
+
+**Patch Configuration in `composer.json`**:
+
+``` json
+"patches": {
+  "filament/filament": {
+    "Fix Livewire v4 ComponentRegistry compatibility": "patches/filament-filament/livewire-v4-compatibility.patch"
+  }
+}
+```
+
+**Additional Steps**:
+
+- Documented the patch system in `docs/010-setup/145-patches.md`
+- Added troubleshooting section in `docs/010-setup/150-troubleshooting.md` (section 6.1.1)
+- Added compatibility note in `docs/010-setup/050-livewire-ecosystem.md` (section 8.1)
+- Updated installation guide in `docs/010-setup/135-package-installation.md`
+
+**Verification**:
+
+``` bash
+# Verify patch applies correctly
+composer update -Wo
+
+# Confirm application boots
+php artisan --version  # Output: Laravel Framework 12.38.1
+
+# Run tests to ensure no regressions
+php artisan test
+```
+
+**References**:
+
+- [Composer Patches Documentation](145-patches.md)
+- [Troubleshooting - ComponentRegistry Error](150-troubleshooting.md#611-livewire-componentregistry-error)
+- [Livewire Ecosystem - v4 Compatibility](050-livewire-ecosystem.md#81-livewire-v4-compatibility-with-filament)
+- [Patch README](../../patches/filament-filament/README.md)
+
+**Notes**:
+
+- This is a **temporary fix** until Filament officially supports Livewire v4.0.0-beta.3
+- The patch is automatically applied during `composer install` and `composer update` via the `cweagans/composer-patches` plugin
+- Monitor Filament releases for official Livewire v4 support, then remove this patch
+- The patch uses Livewire's public factory API, ensuring forward compatibility
+- If Filament is updated and the patch fails to apply, regenerate it using the same approach
 
 ---
 

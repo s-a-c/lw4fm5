@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Contracts\BasePlatform\ComposerAuditRunnerContract;
 use App\Services\BasePlatform\DependencyCatalogue;
 use App\Services\BasePlatform\DependencyRecord;
 use App\Support\BasePlatformMetrics;
@@ -13,7 +14,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -23,18 +23,24 @@ final class DependencyReviewReport extends Command
 {
     private const string DEFAULT_REPORT_DIRECTORY = 'base-platform/dependency-reports';
 
-    private const string COMPOSER_AUDIT_COMMAND = 'composer audit --format=json';
-
     protected $signature = 'platform:dependency-review
         {--output= : Relative storage path for the generated report}
         {--issue-template=.github/ISSUE_TEMPLATE/dependency-review.md : GitHub issue template used by automation}';
 
     protected $description = 'Generate the monthly dependency review report and emit governance metrics.';
 
+    public function __construct(
+        private readonly ComposerAuditRunnerContract $auditRunner,
+    ) {
+        parent::__construct();
+    }
+
     public function handle(): int
     {
         $startedAt = microtime(true);
-        $now = Date::now();
+        $nowImmutable = Date::now();
+        // Note: Using Carbon::parse() instead of Date::parse() because DependencyCatalogue::overdue() requires Carbon (mutable), not CarbonImmutable
+        $now = Carbon::parse($nowImmutable->toDateTimeString());
 
         $disk = Storage::disk('local');
         $catalogue = new DependencyCatalogue($disk);
@@ -51,7 +57,7 @@ final class DependencyReviewReport extends Command
         $auditStatus = 'pass';
         $auditError = null;
 
-        $result = Process::run(self::COMPOSER_AUDIT_COMMAND);
+        $result = $this->auditRunner->run();
 
         if (! $result->successful()) {
             $auditStatus = 'fail';
@@ -63,7 +69,11 @@ final class DependencyReviewReport extends Command
                 $auditStatus = 'fail';
                 $auditError = 'Composer audit returned malformed JSON output.';
             } else {
-                $severityCounts = $this->tallySeverities(Arr::get($decoded, 'advisories', []));
+                $advisoriesRaw = Arr::get($decoded, 'advisories', []);
+                $advisories = is_array($advisoriesRaw) ? $advisoriesRaw : [];
+                /** @var array<int, array<string, mixed>> $advisoriesTyped */
+                $advisoriesTyped = array_filter($advisories, is_array(...));
+                $severityCounts = $this->tallySeverities($advisoriesTyped);
 
                 if ($severityCounts['critical'] > 0 || $severityCounts['high'] > 0) {
                     $auditStatus = 'fail';
@@ -85,7 +95,7 @@ final class DependencyReviewReport extends Command
             'overdue_reviews' => $overdue->map->toArray()->values()->all(),
             'dependencies' => $dependencies->map->toArray()->values()->all(),
             'issue_template' => $this->option('issue-template'),
-            'composer_command' => self::COMPOSER_AUDIT_COMMAND,
+            'composer_command' => 'composer audit --format=json',
             'error' => $auditError,
         ];
 
@@ -150,7 +160,8 @@ final class DependencyReviewReport extends Command
 
         Collection::make($advisories)
             ->each(function (array $advisory) use (&$counts): void {
-                $severity = mb_strtolower((string) ($advisory['severity'] ?? 'low'));
+                $severityValue = $advisory['severity'] ?? 'low';
+                $severity = mb_strtolower(is_string($severityValue) ? $severityValue : 'low');
 
                 if (! array_key_exists($severity, $counts)) {
                     $severity = 'low';

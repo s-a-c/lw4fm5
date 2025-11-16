@@ -28,8 +28,12 @@ final class RunPlatformBootstrap extends Command
 
     public function handle(): int
     {
-        $profile = (string) ($this->option('profile') ?? Config::get('base-platform.profiles.supported.0', 'native'));
-        $forceClean = (bool) $this->option('force-clean');
+        $profileOption = $this->option('profile');
+        $profileDefault = Config::get('base-platform.profiles.supported.0', 'native');
+        $profile = is_string($profileOption) ? $profileOption : (is_string($profileDefault) ? $profileDefault : 'native');
+
+        $forceCleanOption = $this->option('force-clean');
+        $forceClean = $forceCleanOption === true;
 
         try {
             $run = $this->runner->run($profile, $forceClean);

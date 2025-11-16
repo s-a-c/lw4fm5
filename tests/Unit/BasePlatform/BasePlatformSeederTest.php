@@ -7,10 +7,9 @@ declare(strict_types=1);
  */
 
 use Database\Seeders\BasePlatformSeeder;
-use Tests\TestCase;
 use Tests\Unit\BasePlatform\Concerns\InteractsWithBasePlatformSeeder;
 
-uses(TestCase::class, InteractsWithBasePlatformSeeder::class);
+uses(InteractsWithBasePlatformSeeder::class);
 
 it('appends timestamp keys without dropping existing attributes', function (): void {
     $seeder = new BasePlatformSeeder();

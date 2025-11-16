@@ -45,7 +45,7 @@
     "livewire/flux-pro": "^2.6",
     "livewire/livewire": "^4.0",
     "livewire/volt": "dev-main",
-    "monolog/monolog": "dev-main",
+    "monolog/monolog": "^3.0",
     "runtime/frankenphp-symfony": "^0.2.0",
     "spatie/laravel-activitylog": "^4.10",
     "spatie/laravel-analytics": "^5.6",
@@ -171,6 +171,7 @@
     "workflow:policy": [
       "php artisan policy:checksum-monitor"
     ],
+    "ci:local": "bash scripts/run-ci-checks.sh",
     "test:type-coverage": "php -d error_reporting=\"E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED\" -d memory_limit=1G vendor/bin/pest --type-coverage --min=100",
     "test:lint": [
       "pint --parallel --test",
@@ -199,6 +200,9 @@
     "patches": {
       "laravel/framework": {
         "Use PDO\\\\Mysql::ATTR_SSL_CA when available under PHP 8.5": "patches/laravel-framework/pdo-mysql-ssl-attr.patch"
+      },
+      "filament/filament": {
+        "Fix Livewire v4 ComponentRegistry compatibility": "patches/filament-filament/livewire-v4-compatibility.patch"
       }
     }
   },
@@ -213,7 +217,8 @@
       "php-http/discovery": true,
       "phpstan/extension-installer": true,
       "symfony/runtime": true
-    }
+    },
+    "process-timeout": 1200
   },
   "minimum-stability": "dev",
   "prefer-stable": true

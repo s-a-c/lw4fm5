@@ -174,7 +174,9 @@ The documentation is organized into the following sections:
 - [development-tools.md](120-development-tools.md) - Dev dependencies (Debugbar, IDE Helper, Rector, Pest, etc.)
 - [spec-driven-development.md](125-spec-driven-development.md) - Spec-Kit workflow and specification-driven development
 - [frontend-build.md](130-frontend-build.md) - Bun, Vite, Tailwind CSS 4, and frontend tooling
+- [package-installation.md](135-package-installation.md) - Comprehensive Composer and JavaScript package installation guide
 - [outstanding-questions.md](140-outstanding-questions.md) - Outstanding questions, decisions, and inconsistencies
+- [patches.md](145-patches.md) - Composer patch system for package compatibility
 - [troubleshooting.md](150-troubleshooting.md) - Centralized troubleshooting index
 
 ---

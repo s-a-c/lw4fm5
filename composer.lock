@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7b3dad41bd53d625f5d63c452f8f2b95",
+    "content-hash": "7fb2a6a108e17a6835f0c68078f4502b",
     "packages": [
         {
             "name": "ably/ably-php",
@@ -5321,16 +5321,16 @@
         },
         {
             "name": "livewire/livewire",
-            "version": "v4.0.0-beta.2",
+            "version": "v4.0.0-beta.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/livewire/livewire.git",
-                "reference": "1a6b9c954c8dfff30428b7f54199bae854d9fe34"
+                "reference": "640182b29e63f75150c6e11b4468e74bcd2fab00"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/livewire/livewire/zipball/1a6b9c954c8dfff30428b7f54199bae854d9fe34",
-                "reference": "1a6b9c954c8dfff30428b7f54199bae854d9fe34",
+                "url": "https://api.github.com/repos/livewire/livewire/zipball/640182b29e63f75150c6e11b4468e74bcd2fab00",
+                "reference": "640182b29e63f75150c6e11b4468e74bcd2fab00",
                 "shasum": ""
             },
             "require": {
@@ -5385,7 +5385,7 @@
             "description": "A front-end framework for Laravel.",
             "support": {
                 "issues": "https://github.com/livewire/livewire/issues",
-                "source": "https://github.com/livewire/livewire/tree/v4.0.0-beta.2"
+                "source": "https://github.com/livewire/livewire/tree/v4.0.0-beta.3"
             },
             "funding": [
                 {
@@ -5393,7 +5393,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-10-31T12:33:14+00:00"
+            "time": "2025-11-12T21:09:04+00:00"
         },
         {
             "name": "livewire/volt",
@@ -5401,12 +5401,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/livewire/volt.git",
-                "reference": "6c25f507b1cffa2724c30a6865511293e50271d9"
+                "reference": "79a5e2367944aad6f4af9edef31a3d688cc8875c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/livewire/volt/zipball/6c25f507b1cffa2724c30a6865511293e50271d9",
-                "reference": "6c25f507b1cffa2724c30a6865511293e50271d9",
+                "url": "https://api.github.com/repos/livewire/volt/zipball/79a5e2367944aad6f4af9edef31a3d688cc8875c",
+                "reference": "79a5e2367944aad6f4af9edef31a3d688cc8875c",
                 "shasum": ""
             },
             "require": {
@@ -5466,7 +5466,7 @@
                 "issues": "https://github.com/livewire/volt/issues",
                 "source": "https://github.com/livewire/volt"
             },
-            "time": "2025-11-04T15:49:35+00:00"
+            "time": "2025-11-14T15:10:57+00:00"
         },
         {
             "name": "lorisleiva/cron-translator",
@@ -5671,16 +5671,16 @@
         },
         {
             "name": "monolog/monolog",
-            "version": "dev-main",
+            "version": "3.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "0d529a75d32af31ec6c70b75e13369aa48ae3c3f"
+                "reference": "10d85740180ecba7896c87e06a166e0c95a0e3b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/0d529a75d32af31ec6c70b75e13369aa48ae3c3f",
-                "reference": "0d529a75d32af31ec6c70b75e13369aa48ae3c3f",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/10d85740180ecba7896c87e06a166e0c95a0e3b6",
+                "reference": "10d85740180ecba7896c87e06a166e0c95a0e3b6",
                 "shasum": ""
             },
             "require": {
@@ -5698,7 +5698,7 @@
                 "graylog2/gelf-php": "^1.4.2 || ^2.0",
                 "guzzlehttp/guzzle": "^7.4.5",
                 "guzzlehttp/psr7": "^2.2",
-                "mongodb/mongodb": "^1.8 || ^2.0",
+                "mongodb/mongodb": "^1.8",
                 "php-amqplib/php-amqplib": "~2.4 || ^3",
                 "php-console/php-console": "^3.1.8",
                 "phpstan/phpstan": "^2",
@@ -5727,7 +5727,6 @@
                 "rollbar/rollbar": "Allow sending log messages to Rollbar",
                 "ruflin/elastica": "Allow sending log messages to an Elastic Search server"
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -5759,7 +5758,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Seldaek/monolog/issues",
-                "source": "https://github.com/Seldaek/monolog/tree/main"
+                "source": "https://github.com/Seldaek/monolog/tree/3.9.0"
             },
             "funding": [
                 {
@@ -5771,7 +5770,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-10-27T13:40:53+00:00"
+            "time": "2025-03-24T10:02:05+00:00"
         },
         {
             "name": "nesbot/carbon",
@@ -20537,12 +20536,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "ccc4996aff4ff810b514472932f677753ee5d8a4"
+                "reference": "6c7e6e7ebf679f9228c82ec3f7a432b4e8df538e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/ccc4996aff4ff810b514472932f677753ee5d8a4",
-                "reference": "ccc4996aff4ff810b514472932f677753ee5d8a4",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/6c7e6e7ebf679f9228c82ec3f7a432b4e8df538e",
+                "reference": "6c7e6e7ebf679f9228c82ec3f7a432b4e8df538e",
                 "shasum": ""
             },
             "conflict": {
@@ -20658,6 +20657,7 @@
                 "codeigniter4/shield": "<1.0.0.0-beta8",
                 "codiad/codiad": "<=2.8.4",
                 "codingms/additional-tca": ">=1.7,<1.15.17|>=1.16,<1.16.9",
+                "codingms/modules": "<4.3.11|>=5,<5.7.4|>=6,<6.4.2|>=7,<7.5.5",
                 "commerceteam/commerce": ">=0.9.6,<0.9.9",
                 "components/jquery": ">=1.0.3,<3.5",
                 "composer/composer": "<1.10.27|>=2,<2.2.24|>=2.3,<2.7.7",
@@ -21146,7 +21146,7 @@
                 "prestashop/ps_emailsubscription": "<2.6.1",
                 "prestashop/ps_facetedsearch": "<3.4.1",
                 "prestashop/ps_linklist": "<3.1",
-                "privatebin/privatebin": "<1.4|>=1.5,<1.7.4|>=1.7.7,<2.0.2",
+                "privatebin/privatebin": "<1.4|>=1.5,<1.7.4|>=1.7.7,<2.0.3",
                 "processwire/processwire": "<=3.0.246",
                 "propel/propel": ">=2.0.0.0-alpha1,<=2.0.0.0-alpha7",
                 "propel/propel1": ">=1,<=1.7.1",
@@ -21190,7 +21190,7 @@
                 "setasign/fpdi": "<2.6.4",
                 "sfroemken/url_redirect": "<=1.2.1",
                 "sheng/yiicms": "<1.2.1",
-                "shopware/core": "<6.6.10.7-dev|>=6.7,<6.7.3.1-dev",
+                "shopware/core": "<6.6.10.9-dev|>=6.7,<6.7.4.1-dev",
                 "shopware/platform": "<6.6.10.7-dev|>=6.7,<6.7.3.1-dev",
                 "shopware/production": "<=6.3.5.2",
                 "shopware/shopware": "<=5.7.17|>=6.7,<6.7.2.1-dev",
@@ -21520,7 +21520,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-11-12T14:06:11+00:00"
+            "time": "2025-11-14T21:05:13+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -23297,16 +23297,16 @@
         },
         {
             "name": "spatie/phpunit-snapshot-assertions",
-            "version": "5.2.2",
+            "version": "5.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/phpunit-snapshot-assertions.git",
-                "reference": "7497fcb81a4dac00aeedabf284ba34f1393f9b21"
+                "reference": "d2ea8f533db147b771f13345b3598bf6bc0196db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/phpunit-snapshot-assertions/zipball/7497fcb81a4dac00aeedabf284ba34f1393f9b21",
-                "reference": "7497fcb81a4dac00aeedabf284ba34f1393f9b21",
+                "url": "https://api.github.com/repos/spatie/phpunit-snapshot-assertions/zipball/d2ea8f533db147b771f13345b3598bf6bc0196db",
+                "reference": "d2ea8f533db147b771f13345b3598bf6bc0196db",
                 "shasum": ""
             },
             "require": {
@@ -23316,9 +23316,9 @@
                 "ext-libxml": "*",
                 "php": "^8.1",
                 "phpunit/phpunit": "^10.0|^11.0|^12.0",
-                "symfony/property-access": "^5.2|^6.2|^7.0",
-                "symfony/serializer": "^5.2|^6.2|^7.0",
-                "symfony/yaml": "^5.2|^6.2|^7.0"
+                "symfony/property-access": "^5.2|^6.2|^7.0|^8.0",
+                "symfony/serializer": "^5.2|^6.2|^7.0|^8.0",
+                "symfony/yaml": "^5.2|^6.2|^7.0|^8.0"
             },
             "require-dev": {
                 "spatie/pixelmatch-php": "dev-main",
@@ -23362,7 +23362,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/phpunit-snapshot-assertions/issues",
-                "source": "https://github.com/spatie/phpunit-snapshot-assertions/tree/5.2.2"
+                "source": "https://github.com/spatie/phpunit-snapshot-assertions/tree/5.2.3"
             },
             "funding": [
                 {
@@ -23370,7 +23370,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2025-08-19T06:43:29+00:00"
+            "time": "2025-11-14T08:08:38+00:00"
         },
         {
             "name": "spatie/ray",
@@ -23854,16 +23854,16 @@
         },
         {
             "name": "theseer/tokenizer",
-            "version": "1.2.3",
+            "version": "1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/theseer/tokenizer.git",
-                "reference": "737eda637ed5e28c3413cb1ebe8bb52cbf1ca7a2"
+                "reference": "d74205c497bfbca49f34d4bc4c19c17e22db4ebb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/theseer/tokenizer/zipball/737eda637ed5e28c3413cb1ebe8bb52cbf1ca7a2",
-                "reference": "737eda637ed5e28c3413cb1ebe8bb52cbf1ca7a2",
+                "url": "https://api.github.com/repos/theseer/tokenizer/zipball/d74205c497bfbca49f34d4bc4c19c17e22db4ebb",
+                "reference": "d74205c497bfbca49f34d4bc4c19c17e22db4ebb",
                 "shasum": ""
             },
             "require": {
@@ -23892,7 +23892,7 @@
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",
             "support": {
                 "issues": "https://github.com/theseer/tokenizer/issues",
-                "source": "https://github.com/theseer/tokenizer/tree/1.2.3"
+                "source": "https://github.com/theseer/tokenizer/tree/1.3.0"
             },
             "funding": [
                 {
@@ -23900,7 +23900,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-03-03T12:36:25+00:00"
+            "time": "2025-11-13T13:44:09+00:00"
         },
         {
             "name": "tomasvotruba/type-coverage",
@@ -24175,7 +24175,6 @@
         "laravel-labs/starter-kit-browser-tests": 20,
         "laravel/folio": 20,
         "livewire/volt": 20,
-        "monolog/monolog": 20,
         "roave/security-advisories": 20
     },
     "prefer-stable": true,

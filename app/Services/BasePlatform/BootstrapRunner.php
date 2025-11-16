@@ -6,7 +6,6 @@ namespace App\Services\BasePlatform;
 
 use App\Contracts\BasePlatform\BootstrapRunnerContract;
 use App\Support\BasePlatformMetrics;
-use Illuminate\Process\Result;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Process;
 
@@ -18,7 +17,8 @@ final readonly class BootstrapRunner implements BootstrapRunnerContract
 
     public function run(string $profile, bool $forceClean): BootstrapRun
     {
-        $supported = Config::get('base-platform.profiles.supported', []);
+        $supportedRaw = Config::get('base-platform.profiles.supported', []);
+        $supported = is_array($supportedRaw) ? $supportedRaw : [];
 
         throw_unless(in_array($profile, $supported, true), UnsupportedProfileException::class, $profile);
 
@@ -26,7 +26,6 @@ final readonly class BootstrapRunner implements BootstrapRunnerContract
 
         $command = base_path('scripts/platform/bootstrap.sh');
 
-        /** @var Result $result */
         $result = Process::path(base_path())
             ->timeout(2700)
             ->env([
@@ -37,10 +36,11 @@ final readonly class BootstrapRunner implements BootstrapRunnerContract
 
         if ($result->failed()) {
             $guidance = $this->recovery->missingSecret('Flux credentials');
+            $errorOutputStr = $result->errorOutput();
 
             throw new BootstrapRunnerException(
                 message: sprintf('Bootstrap failed for %s', $profile),
-                output: $result->errorOutput(),
+                output: $errorOutputStr,
                 guidance: $guidance,
             );
         }
@@ -48,12 +48,14 @@ final readonly class BootstrapRunner implements BootstrapRunnerContract
         $durationMinutes = (microtime(true) - $startedAt) / 60;
         BasePlatformMetrics::recordBootstrapDuration($profile, round($durationMinutes, 2));
 
+        $outputStr = $result->output();
+
         return new BootstrapRun(
             profile: $profile,
             status: BootstrapRun::STATUS_SUCCESS,
             durationMinutes: round($durationMinutes, 2),
             notes: [
-                'output' => mb_trim($result->output()),
+                'output' => mb_trim($outputStr),
             ],
         );
     }

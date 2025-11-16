@@ -32,3 +32,26 @@ create `resources/views/pages/tailwindcss.catppuccin.blade.php` by converting @t
 the result should be a folio-routed, livewire- and flux-enabled component, fitting within the existing layout
 
 ---
+
+Context: I’m working on a Laravel 12 app with Filament v5, Livewire v4, Pest v4, Tailwind v4. PHP 8.4. CI script is `composer ci:local` which runs: Pint + Rector + Prettier, Pest tests with coverage (gate set to exactly 100%), PHPStan, security audit, and a policy checksum monitor.
+
+What’s already done:
+- Rector config adjusted to skip Carbon→Date conversion where mutable Carbon is required.
+- PHPStan error fixed in `PolicyChecksumMonitor` by guarding non-array entries.
+- Added many targeted tests; lint and PHPStan are green. Overall coverage is currently ~88% (last run showed ~87.9%).
+- We also discussed Composer process timeout and how to set `process-timeout` permanently in `composer.json` or globally.
+
+Goal:
+- Reach exactly 100% code coverage so `composer ci:local` passes end-to-end.
+
+What I want next:
+- Please review the current coverage report and propose the smallest set of additional tests to reach 100%.
+- Prioritize files still below 100% (e.g., any remaining command/service branches, `DependencyCatalogue` edge lines, providers with partial lines). Suggest 1–3 concrete tests with short outlines, then implement them.
+- If needed, temporarily increase Composer’s process timeout during local runs (e.g., `COMPOSER_PROCESS_TIMEOUT=1200 composer ci:local`) to prevent timeouts while iterating.
+
+Constraints & preferences:
+- Follow the project’s coding standards (Pint), Rector rules, and Boost/Laravel testing guidelines.
+- Use Pest tests; keep them focused and fast.
+- Don’t relax the coverage gate — we must truly hit 100%.
+
+---
