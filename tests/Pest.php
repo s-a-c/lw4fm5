@@ -27,7 +27,7 @@ if (is_file($pestPluginRegistry)) {
 
             $filteredPlugins = array_values(array_filter(
                 $plugins,
-                static fn (string $plugin): bool => $plugin !== $mutatePlugin,
+                static fn (mixed $plugin): bool => is_string($plugin) && $plugin !== $mutatePlugin,
             ));
 
             if ($filteredPlugins !== $plugins) {

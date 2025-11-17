@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Console\Commands\DependencyReviewReport;
 use App\Contracts\BasePlatform\ComposerAuditRunnerContract;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
@@ -92,7 +93,7 @@ it('generates a dependency review report with severity counts and overdue entrie
     // Bind mock before command is instantiated
     $this->app->instance(ComposerAuditRunnerContract::class, $mock);
 
-    $command = app(App\Console\Commands\DependencyReviewReport::class);
+    $command = app(DependencyReviewReport::class);
     $command->setLaravel($this->app);
 
     $tester = new CommandTester($command);
@@ -153,7 +154,7 @@ it('handles composer audit failure with error output', function (): void {
 
     app()->instance(ComposerAuditRunnerContract::class, $mock);
 
-    $command = app(App\Console\Commands\DependencyReviewReport::class);
+    $command = app(DependencyReviewReport::class);
     $command->setLaravel($this->app);
 
     $tester = new CommandTester($command);
@@ -176,7 +177,7 @@ it('handles composer audit returning malformed JSON', function (): void {
 
     app()->instance(ComposerAuditRunnerContract::class, $mock);
 
-    $command = app(App\Console\Commands\DependencyReviewReport::class);
+    $command = app(DependencyReviewReport::class);
     $command->setLaravel($this->app);
 
     $tester = new CommandTester($command);
@@ -206,7 +207,7 @@ it('handles warning status when medium advisories exist', function (): void {
 
     app()->instance(ComposerAuditRunnerContract::class, $mock);
 
-    $command = app(App\Console\Commands\DependencyReviewReport::class);
+    $command = app(DependencyReviewReport::class);
     $command->setLaravel($this->app);
 
     $tester = new CommandTester($command);
@@ -218,8 +219,8 @@ it('handles warning status when medium advisories exist', function (): void {
     $reportPath = 'base-platform/dependency-reports/2025-11-dependency-review.json';
     $disk = Storage::disk('local');
     $contents = $disk->exists($reportPath) ? $disk->get($reportPath) : null;
-    if ($contents) {
-        $report = json_decode((string) $contents, true);
+    if ($contents !== null) {
+        $report = json_decode($contents, true);
         expect($report['status'])->toBe('warn');
     }
 });
@@ -243,7 +244,7 @@ it('handles unknown severity in advisories', function (): void {
 
     app()->instance(ComposerAuditRunnerContract::class, $mock);
 
-    $command = app(App\Console\Commands\DependencyReviewReport::class);
+    $command = app(DependencyReviewReport::class);
     $command->setLaravel($this->app);
 
     $tester = new CommandTester($command);
@@ -265,7 +266,7 @@ it('uses custom output path when provided', function (): void {
 
     app()->instance(ComposerAuditRunnerContract::class, $mock);
 
-    $command = app(App\Console\Commands\DependencyReviewReport::class);
+    $command = app(DependencyReviewReport::class);
     $command->setLaravel($this->app);
 
     $tester = new CommandTester($command);

@@ -5,6 +5,9 @@ declare(strict_types=1);
 use App\Models\User;
 use Laravel\Fortify\Features;
 
+use function Pest\Laravel\assertAuthenticated;
+use function Pest\Laravel\assertGuest;
+
 test('login screen can be rendered', function (): void {
     $response = $this->get(route('login'));
 
@@ -23,7 +26,7 @@ test('users can authenticate using the login screen', function (): void {
         ->assertSessionHasNoErrors()
         ->assertRedirect(route('dashboard', absolute: false));
 
-    $this->assertAuthenticated();
+    assertAuthenticated();
 });
 
 test('users can not authenticate with invalid password', function (): void {
@@ -36,12 +39,12 @@ test('users can not authenticate with invalid password', function (): void {
 
     $response->assertSessionHasErrorsIn('email');
 
-    $this->assertGuest();
+    assertGuest();
 });
 
 test('users with two factor enabled are redirected to two factor challenge', function (): void {
     if (! Features::canManageTwoFactorAuthentication()) {
-        $this->markTestSkipped('Two-factor authentication is not enabled.');
+        skip('Two-factor authentication is not enabled.');
     }
 
     Features::twoFactorAuthentication([
@@ -57,7 +60,7 @@ test('users with two factor enabled are redirected to two factor challenge', fun
     ]);
 
     $response->assertRedirect(route('two-factor.login'));
-    $this->assertGuest();
+    assertGuest();
 });
 
 test('users can logout', function (): void {
@@ -67,5 +70,5 @@ test('users can logout', function (): void {
 
     $response->assertRedirect(route('home'));
 
-    $this->assertGuest();
+    assertGuest();
 });

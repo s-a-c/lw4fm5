@@ -200,7 +200,7 @@ it('allows overdue check with custom reference date', function (): void {
 
     $catalogue = new DependencyCatalogue(Storage::disk('local'));
     // Use Carbon::parse() directly to get mutable Carbon (required by overdue() method)
-    $customReference = Carbon::parse('2025-12-01');
+    $customReference = Date::parse('2025-12-01');
     $overdue = $catalogue->overdue($customReference);
 
     expect($overdue)->toHaveCount(1);
@@ -266,11 +266,54 @@ it('throws when reviewDeadline encounters unsupported cadence', function (): voi
         classification: 'core',
         owner: 'Platform Engineering',
         justification: 'Test',
-        lastReviewedAt: Carbon::parse('2025-10-10'),
+        lastReviewedAt: Date::parse('2025-10-10'),
         reviewCadence: 'unsupported-cadence',
         riskLevel: 'medium',
         notes: 'Test',
     );
 
     expect(fn (): Carbon => $record->reviewDeadline())->toThrow(InvalidArgumentException::class);
+});
+
+it('handles reviewDeadline with CarbonImmutable lastReviewedAt', function (): void {
+    // Test line 182: when lastReviewedAt is CarbonImmutable (not Carbon instance)
+    $carbonImmutable = CarbonImmutable::parse('2025-10-10');
+    $record = new DependencyRecord(
+        name: 'test/package',
+        version: '1.0.0',
+        classification: 'core',
+        owner: 'Platform Engineering',
+        justification: 'Test',
+        lastReviewedAt: $carbonImmutable,
+        reviewCadence: 'monthly',
+        riskLevel: 'medium',
+        notes: 'Test',
+    );
+
+    $deadline = $record->reviewDeadline();
+
+    expect($deadline)->toBeInstanceOf(Carbon::class)
+        ->and($deadline->toDateString())->toBe('2025-11-10');
+});
+
+it('handles reviewDeadline with Carbon lastReviewedAt', function (): void {
+    // Test line 181: when lastReviewedAt is Carbon instance (if branch)
+    $carbon = Carbon::parse('2025-10-10');
+    $record = new DependencyRecord(
+        name: 'test/package',
+        version: '1.0.0',
+        classification: 'core',
+        owner: 'Platform Engineering',
+        justification: 'Test',
+        lastReviewedAt: $carbon,
+        reviewCadence: 'monthly',
+        riskLevel: 'medium',
+        notes: 'Test',
+    );
+
+    $deadline = $record->reviewDeadline();
+
+    // Line 181: when lastReviewedAt is Carbon, it uses it directly (before match adds cadence)
+    expect($deadline)->toBeInstanceOf(Carbon::class)
+        ->and($deadline->toDateString())->toBe('2025-11-10');
 });

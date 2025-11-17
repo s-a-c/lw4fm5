@@ -6,9 +6,11 @@ use App\Models\User;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 
+use function Pest\Laravel\assertDatabaseHas;
+
 beforeEach(function (): void {
     if (! Features::canManageTwoFactorAuthentication()) {
-        $this->markTestSkipped('Two-factor authentication is not enabled.');
+        skip('Two-factor authentication is not enabled.');
     }
 
     Features::twoFactorAuthentication([
@@ -64,7 +66,7 @@ test('two factor authentication disabled when confirmation abandoned between req
 
     $component->assertSet('twoFactorEnabled', false);
 
-    $this->assertDatabaseHas('users', [
+    assertDatabaseHas('users', [
         'id' => $user->id,
         'two_factor_secret' => null,
         'two_factor_recovery_codes' => null,

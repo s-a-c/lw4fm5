@@ -41,7 +41,7 @@ final class BasePlatformMetrics
             $channelName = is_string($channel) ? $channel : null;
             Log::channel($channelName)
                 ->info('base-platform-metric', $payload);
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             // Silently fail if logging is unavailable (e.g., Monolog autoload issues)
             // This prevents CI failures when logging infrastructure has issues
         }

@@ -22,6 +22,7 @@
     </source>
     <php>
         <ini name="error_reporting" value="E_ALL &amp; ~E_DEPRECATED &amp; ~E_USER_DEPRECATED"/>
+        <ini name="pcov.enabled" value="1"/>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>

@@ -33,8 +33,7 @@ it('throws UnsupportedProfileException for an unsupported profile', function ():
 
     $runner = new BootstrapRunner(new BootstrapRecovery());
 
-    $this->expectException(UnsupportedProfileException::class);
-    $runner->run('native', false);
+    expect(fn () => $runner->run('native', false))->toThrow(UnsupportedProfileException::class);
 });
 
 it('throws BootstrapRunnerException when the process fails', function (): void {
@@ -48,6 +47,5 @@ it('throws BootstrapRunnerException when the process fails', function (): void {
 
     $runner = new BootstrapRunner(new BootstrapRecovery());
 
-    $this->expectException(BootstrapRunnerException::class);
-    $runner->run('native', true);
+    expect(fn () => $runner->run('native', true))->toThrow(BootstrapRunnerException::class);
 });

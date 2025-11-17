@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use function Pest\Laravel\assertAuthenticated;
+
 test('registration screen can be rendered', function (): void {
     $response = $this->get(route('register'));
 
@@ -19,5 +21,5 @@ test('new users can register', function (): void {
     $response->assertSessionHasNoErrors()
         ->assertRedirect(route('dashboard', absolute: false));
 
-    $this->assertAuthenticated();
+    assertAuthenticated();
 });

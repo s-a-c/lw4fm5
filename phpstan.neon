@@ -10,6 +10,7 @@ parameters:
         - database
         - public
         - routes
+        - tests
 
     excludePaths:
         - database/migrations/*.php
@@ -17,3 +18,152 @@ parameters:
     level: max
 
     tmpDir: /tmp/phpstan
+
+    ignoreErrors:
+        # Pest internal class access - these are expected patterns
+        - '#Call to method .+ of internal class Pest\\Mixins\\Expectation.* from outside its root namespace Pest#'
+        - '#Call to method .+ of internal class Pest\\PendingCalls\\.+ from outside its root namespace Pest#'
+        - '#Call to method .+ of internal class Pest\\Configuration from outside its root namespace Pest#'
+        - '#Access to constant on internal class Pest\\Mutate\\Plugins\\Mutate#'
+        # Pest expect() syntax with $not property
+        -
+            message: '#Access to an undefined property Pest\\Mixins\\Expectation.*::\$not\.?#'
+            paths:
+                - tests/**/*.php
+        -
+            message: '#Cannot access property \$not on mixed\.?#'
+            paths:
+                - tests/**/*.php
+        -
+            message: '#Cannot call method (toContain|toBeEmpty|toBeUsed)\(\) on mixed\.#'
+            paths:
+                - tests/**/*.php
+        # Mockery expectations - fluent interface pattern
+        - '#Call to an undefined method Mockery\\ExpectationInterface.*#'
+        -
+            message: '#Cannot call method (andReturn|andThrow|with|once)\(\) on mixed\.#'
+            paths:
+                - tests/**/*.php
+        # Laravel test helpers from TestCase trait
+        -
+            message: '#Call to an undefined method PHPUnit\\Framework\\TestCase::(get|post|actingAs|assertDatabaseHas|assertAuthenticated|assertGuest|expectsOutputToContain)\(\)\.#'
+            paths:
+                - tests/**/*.php
+        -
+            message: '#Cannot call method (get|post)\(\) on mixed\.#'
+            paths:
+                - tests/**/*.php
+        -
+            message: '#Cannot call method (assertRedirect|assertStatus|assertOk|assertSee|assertDontSee|assertForbidden|assertSessionHasNoErrors|assertSessionHasErrorsIn|withSession)\(\) on mixed\.#'
+            paths:
+                - tests/**/*.php
+        # Laravel command testing
+        -
+            message: '#Cannot call method (expectsOutputToContain|assertExitCode)\(\) on#'
+            paths:
+                - tests/**/*.php
+        # Dynamic method calls that are valid in tests
+        -
+            message: '#Dynamic call to static method .+::(count|insert)\(\)#'
+            paths:
+                - tests/**/*.php
+        -
+            message: '#Dynamic call to static method Illuminate\\Contracts\\Auth\\Guard::check\(\)#'
+            paths:
+                - tests/**/*.php
+        # Internal class access for testing (BootstrapRecoveryGuidance is intentionally internal for testing)
+        -
+            message: '#Call to method __construct\(\) of internal class App\\Services\\BasePlatform\\BootstrapRecoveryGuidance#'
+            paths:
+                - tests/**/*.php
+        -
+            message: '#Instantiation of internal class App\\Services\\BasePlatform\\BootstrapRecoveryGuidance#'
+            paths:
+                - tests/**/*.php
+        -
+            message: '#Access to property .+ of internal class App\\Services\\BasePlatform\\BootstrapRecoveryGuidance#'
+            paths:
+                - tests/**/*.php
+        # Pest helper function issues
+        -
+            message: '#Cannot call method (freezeTime|toBe)\(\) on mixed\.#'
+            paths:
+                - tests/Pest.php
+        -
+            message: '#Undefined variable: \$this#'
+            paths:
+                - tests/Pest.php
+        # Pest Laravel helper functions (globally available)
+        -
+            message: '#Function (assertAuthenticated|assertGuest|assertDatabaseHas|skip) not found\.#'
+            paths:
+                - tests/**/*.php
+        # Pest plugin arch (preset and expect methods)
+        -
+            message: '#Call to an undefined method Pest\\PendingCalls\\TestCall::(preset|expect)\(\)#'
+            paths:
+                - tests/**/*.php
+        -
+            message: '#Cannot call method (security|expect)\(\) on mixed\.#'
+            paths:
+                - tests/**/*.php
+        # Trait unused warnings (test traits are used via Pest configuration)
+        -
+            message: '#Trait .+ is used zero times and is not analysed#'
+            paths:
+                - tests/**/*.php
+        # Type issues in test data (test-specific arrays)
+        -
+            message: '#Parameter \$issues of class App\\Services\\BasePlatform\\ParityReport constructor expects list<string>#'
+            paths:
+                - tests/**/*.php
+        # Nullable access in tests (tests verify null handling)
+        -
+            message: '#Cannot access property \$(name|classification|id) on#'
+            paths:
+                - tests/**/*.php
+        -
+            message: '#Cannot call method (hasVerifiedEmail|isOverdue|toArray)\(\) on#'
+            paths:
+                - tests/**/*.php
+        # Array offset access in tests (test data arrays)
+        -
+            message: '#Cannot access offset .+ on mixed#'
+            paths:
+                - tests/**/*.php
+        # Test helper methods and properties
+        -
+            message: '#Call to an undefined method PHPUnit\\Framework\\TestCase::appendTimestamps\(\)#'
+            paths:
+                - tests/**/*.php
+        -
+            message: '#Access to an undefined property PHPUnit\\Framework\\TestCase::\$app#'
+            paths:
+                - tests/**/*.php
+        -
+            message: '#Cannot call method instance\(\) on mixed#'
+            paths:
+                - tests/**/*.php
+        -
+            message: '#Parameter .+ expects .+, mixed given#'
+            paths:
+                - tests/**/*.php
+        # Collection template type issues in tests
+        -
+            message: '#Unable to resolve the template type .+ in call to static method Illuminate\\Support\\Collection.*::make\(\)#'
+            paths:
+                - tests/**/*.php
+        # Cast and condition issues in tests
+        -
+            message: "#Casting to string something that's already string#"
+            paths:
+                - tests/**/*.php
+        # Generic test issues
+        -
+            message: '#Trying to invoke mixed but.*not a callable#'
+            paths:
+                - tests/**/*.php
+        -
+            message: '#Cannot access property \$token on mixed#'
+            paths:
+                - tests/**/*.php

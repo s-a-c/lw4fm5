@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Contracts\BasePlatform\EnvironmentProfileValidatorContract;
 use App\Models\EnvironmentProfile;
+use App\Services\BasePlatform\ProfileValidationResult;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 
@@ -72,18 +74,18 @@ it('handles fail status in validation results', function (): void {
     ]);
 
     // Mock the validator to return a fail result
-    $validator = mock(App\Contracts\BasePlatform\EnvironmentProfileValidatorContract::class);
+    $validator = mock(EnvironmentProfileValidatorContract::class);
     $validator->shouldReceive('validate')
         ->once()
         ->andReturn([
-            new App\Services\BasePlatform\ProfileValidationResult(
+            new ProfileValidationResult(
                 profile: 'native',
                 status: 'fail',
                 issues: ['Validation failed'],
             ),
         ]);
 
-    app()->instance(App\Contracts\BasePlatform\EnvironmentProfileValidatorContract::class, $validator);
+    app()->instance(EnvironmentProfileValidatorContract::class, $validator);
 
     artisan('platform:validate-profiles', ['--profile' => 'native'])
         ->expectsOutputToContain('Validation complete for native')

@@ -77,8 +77,7 @@ final readonly class DependencyCatalogue
                 classification: is_string($classification) ? $classification : '',
                 owner: is_string($owner) ? $owner : '',
                 justification: is_string($justification) ? $justification : '',
-                // Note: Using Carbon::parse() instead of Date::parse() because DependencyRecord requires Carbon (mutable), not CarbonImmutable
-                lastReviewedAt: Carbon::parse(Date::parse(is_string($lastReviewedAtRaw) ? $lastReviewedAtRaw : 'now')->toDateTimeString())->startOfDay(),
+                lastReviewedAt: Date::parse(is_string($lastReviewedAtRaw) ? $lastReviewedAtRaw : 'now')->startOfDay(),
                 reviewCadence: is_string($reviewCadence) ? $reviewCadence : '',
                 riskLevel: is_string($riskLevel) ? $riskLevel : '',
                 notes: is_string($notes) ? $notes : '',
@@ -89,10 +88,9 @@ final readonly class DependencyCatalogue
     /**
      * @return Collection<int, DependencyRecord>
      */
-    public function overdue(?Carbon $reference = null): Collection
+    public function overdue(Carbon|CarbonImmutable|null $reference = null): Collection
     {
-        // Note: Using Carbon::parse() instead of Date::parse() because this method requires Carbon (mutable), not CarbonImmutable
-        $reference ??= Carbon::parse(Date::now()->toDateTimeString());
+        $reference ??= Date::now();
 
         return $this->entries()->filter(fn (DependencyRecord $record): bool => $record->isOverdue($reference));
     }
@@ -171,7 +169,7 @@ final readonly class DependencyRecord
         public string $classification,
         public string $owner,
         public string $justification,
-        public Carbon $lastReviewedAt,
+        public Carbon|CarbonImmutable $lastReviewedAt,
         public string $reviewCadence,
         public string $riskLevel,
         public string $notes,
@@ -179,9 +177,13 @@ final readonly class DependencyRecord
 
     public function reviewDeadline(): Carbon
     {
+        $date = $this->lastReviewedAt instanceof Carbon
+            ? $this->lastReviewedAt
+            : Carbon::parse($this->lastReviewedAt->toDateTimeString());
+
         return match ($this->reviewCadence) {
-            'monthly' => $this->lastReviewedAt->copy()->addMonthNoOverflow()->endOfDay(),
-            'quarterly' => $this->lastReviewedAt->copy()->addMonthsNoOverflow(3)->endOfDay(),
+            'monthly' => $date->copy()->addMonthNoOverflow()->endOfDay(),
+            'quarterly' => $date->copy()->addMonthsNoOverflow(3)->endOfDay(),
             default => throw new InvalidArgumentException(sprintf(
                 'Unsupported review cadence [%s]',
                 $this->reviewCadence
