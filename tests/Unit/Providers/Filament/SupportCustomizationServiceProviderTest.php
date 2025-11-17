@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Providers\Filament\SupportCustomizationServiceProvider;
+use Filament\Facades\Filament;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Support\Facades\App;
@@ -242,3 +243,4 @@ it('disables Alpine components when load_alpine is false', function (): void {
 
     expect(true)->toBeTrue();
 });
+
