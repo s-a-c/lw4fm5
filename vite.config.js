@@ -1,6 +1,6 @@
-import {
-    defineConfig
-} from 'vite';
+/// <reference types="vitest" />
+
+import { defineConfig } from 'vitest/config'; // <-- Change this import
 import laravel from 'laravel-vite-plugin';
 import tailwindcss from "@tailwindcss/vite";
 
@@ -14,5 +14,19 @@ export default defineConfig({
     ],
     server: {
         cors: true,
+    },
+
+    // --- Add this block for Vitest ---
+    test: {
+        globals: true,
+        environment: 'jsdom', // Use jsdom for Alpine.js testing
+    },
+    // ------------------------------------
+
+    // Optional: Add this if you want '@' to work in tests
+    resolve: {
+        alias: {
+            '@': '/resources/js',
+        },
     },
 });
