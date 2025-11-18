@@ -220,17 +220,19 @@ it('applies extra attributes to scripts', function (): void {
     ]);
 
     // Mock script to test extra attributes (lines 84-90)
-    // stringifyAttributes converts to strings like "data-test=\"value\""
+    // stringifyAttributes converts to associative array like ['data-test' => 'value']
     // Then merged with existing attributes array
     $script = m::mock(Js::class);
     $script->shouldReceive('getPackage')->andReturn('filament');
     $script->shouldReceive('getId')->andReturn('app');
     $script->shouldReceive('getExtraAttributes')->andReturn(['existing' => 'attr']);
     $script->shouldReceive('extraAttributes')->once()->with(m::on(fn (array $attributes): bool =>
-        // Should contain existing attribute and stringified attributes
+        // Should contain existing attribute and new attributes as associative array
         isset($attributes['existing'])
-        && in_array('data-test="value"', $attributes, true)
-        && in_array('data-qa="true"', $attributes, true)));
+        && isset($attributes['data-test'])
+        && $attributes['data-test'] === 'value'
+        && isset($attributes['data-qa'])
+        && $attributes['data-qa'] === 'true'));
 
     FilamentAsset::shouldReceive('getScripts')->andReturn([$script]);
     FilamentAsset::shouldReceive('getAlpineComponents')->andReturn([]);
