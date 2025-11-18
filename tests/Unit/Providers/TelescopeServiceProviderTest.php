@@ -3,9 +3,13 @@
 declare(strict_types=1);
 
 use App\Providers\TelescopeServiceProvider;
+use Illuminate\Contracts\Config\Repository;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
+use Laravel\Telescope\IncomingEntry;
+use Laravel\Telescope\Telescope;
 use Mockery as m;
 use ReflectionClass;
 
@@ -55,7 +59,7 @@ it('hides sensitive request details in non-local environment', function (): void
 it('skips hiding sensitive request details in local environment', function (): void {
     // Test line 63: early return when environment is local
     Config::set('app.env', 'local');
-    App::getInstance()->make(Illuminate\Contracts\Config\Repository::class)->set('app.env', 'local');
+    App::getInstance()->make(Repository::class)->set('app.env', 'local');
 
     $provider = new TelescopeServiceProvider(App::getInstance());
     $provider->register();
@@ -66,7 +70,7 @@ it('skips hiding sensitive request details in local environment', function (): v
 
 it('filters entries in non-local environment based on entry type', function (): void {
     Config::set('app.env', 'production');
-    App::getInstance()->make(Illuminate\Contracts\Config\Repository::class)->set('app.env', 'production');
+    App::getInstance()->make(Repository::class)->set('app.env', 'production');
 
     $provider = new TelescopeServiceProvider(App::getInstance());
     $provider->register();
@@ -79,35 +83,105 @@ it('filters entries in non-local environment based on entry type', function (): 
 
 it('executes filter logic with IncomingEntry objects', function (): void {
     Config::set('app.env', 'production');
-    App::getInstance()->make(Illuminate\Contracts\Config\Repository::class)->set('app.env', 'production');
+    App::getInstance()->make(Repository::class)->set('app.env', 'production');
 
     $provider = new TelescopeServiceProvider(App::getInstance());
     $provider->register();
 
-    // Test filter with various entry types to cover lines 27-43
-    $entry = m::mock(Laravel\Telescope\IncomingEntry::class);
-    
-    // Test line 30: isReportableException
-    $entry->shouldReceive('isReportableException')->andReturn(true);
-    $entry->shouldReceive('hasMonitoredTag')->andReturn(false);
-    
-    // The filter should return true for reportable exceptions
-    expect(true)->toBeTrue();
+    // Access Telescope::$filterUsing via reflection to get the registered filter callback
+    // This will execute line 27 (return $this->shouldRecordEntry($entry, $isLocal))
+    $telescopeReflection = new ReflectionClass(Telescope::class);
+    $filterUsingProperty = $telescopeReflection->getProperty('filterUsing');
+    $filters = $filterUsingProperty->getValue();
+
+    // Execute the filter callback (line 27) with mock entries
+    expect($filters)->not->toBeEmpty();
+    $filterCallback = end($filters);
+
+    // Test line 27: Execute the filter callback which calls shouldRecordEntry
+    $entry1 = m::mock(IncomingEntry::class);
+    $entry1->shouldReceive('isReportableException')->andReturn(true);
+    $result1 = $filterCallback($entry1);
+    expect($result1)->toBeTrue();
+
+    // Use reflection to call shouldRecordEntry directly for other test cases
+    // This executes lines 68-84 in TelescopeServiceProvider
+    $reflection = new ReflectionClass($provider);
+    $method = $reflection->getMethod('shouldRecordEntry');
+
+    // Test line 68: local environment returns true
+    $result2 = $method->invoke($provider, m::mock(IncomingEntry::class), true);
+    expect($result2)->toBeTrue();
+
+    // Test line 71: isReportableException returns true
+    $entry2 = m::mock(IncomingEntry::class);
+    $entry2->shouldReceive('isReportableException')->andReturn(true);
+    $result3 = $method->invoke($provider, $entry2, false);
+    expect($result3)->toBeTrue();
+
+    // Test line 74: isFailedRequest returns true
+    $entry3 = m::mock(IncomingEntry::class);
+    $entry3->shouldReceive('isReportableException')->andReturn(false);
+    $entry3->shouldReceive('isFailedRequest')->andReturn(true);
+    $result4 = $method->invoke($provider, $entry3, false);
+    expect($result4)->toBeTrue();
+
+    // Test line 77: isFailedJob returns true
+    $entry4 = m::mock(IncomingEntry::class);
+    $entry4->shouldReceive('isReportableException')->andReturn(false);
+    $entry4->shouldReceive('isFailedRequest')->andReturn(false);
+    $entry4->shouldReceive('isFailedJob')->andReturn(true);
+    $result5 = $method->invoke($provider, $entry4, false);
+    expect($result5)->toBeTrue();
+
+    // Test line 80: isScheduledTask returns true
+    $entry5 = m::mock(IncomingEntry::class);
+    $entry5->shouldReceive('isReportableException')->andReturn(false);
+    $entry5->shouldReceive('isFailedRequest')->andReturn(false);
+    $entry5->shouldReceive('isFailedJob')->andReturn(false);
+    $entry5->shouldReceive('isScheduledTask')->andReturn(true);
+    $result6 = $method->invoke($provider, $entry5, false);
+    expect($result6)->toBeTrue();
+
+    // Test line 84: hasMonitoredTag returns true
+    $entry6 = m::mock(IncomingEntry::class);
+    $entry6->shouldReceive('isReportableException')->andReturn(false);
+    $entry6->shouldReceive('isFailedRequest')->andReturn(false);
+    $entry6->shouldReceive('isFailedJob')->andReturn(false);
+    $entry6->shouldReceive('isScheduledTask')->andReturn(false);
+    $entry6->shouldReceive('hasMonitoredTag')->andReturn(true);
+    $result7 = $method->invoke($provider, $entry6, false);
+    expect($result7)->toBeTrue();
+
+    // Test line 84: hasMonitoredTag returns false
+    $entry7 = m::mock(IncomingEntry::class);
+    $entry7->shouldReceive('isReportableException')->andReturn(false);
+    $entry7->shouldReceive('isFailedRequest')->andReturn(false);
+    $entry7->shouldReceive('isFailedJob')->andReturn(false);
+    $entry7->shouldReceive('isScheduledTask')->andReturn(false);
+    $entry7->shouldReceive('hasMonitoredTag')->andReturn(false);
+    $result8 = $method->invoke($provider, $entry7, false);
+    expect($result8)->toBeFalse();
 });
 
 it('executes hideSensitiveRequestDetails early return in local environment', function (): void {
-    Config::set('app.env', 'local');
-    App::getInstance()->make(Illuminate\Contracts\Config\Repository::class)->set('app.env', 'local');
+    // Test line 71: early return when environment is local
+    // Create a mock app that returns true for environment('local')
+    $app = m::mock(Application::class)->makePartial();
+    $app->shouldReceive('environment')->with('local')->andReturn(true);
+    $app->shouldReceive('make')->andReturnUsing(fn (string $abstract) => App::getInstance()->make($abstract));
 
-    $provider = new TelescopeServiceProvider(App::getInstance());
-    
-    // Use reflection to call hideSensitiveRequestDetails directly
+    // Create provider with mocked app
+    $provider = new TelescopeServiceProvider($app);
+
+    // Call register() - this will call hideSensitiveRequestDetails() at line 22
+    // which will execute line 71 (return) when environment('local') returns true
+    $provider->register();
+
+    // Also call directly via reflection to ensure line 71 is executed
     $reflection = new ReflectionClass($provider);
     $method = $reflection->getMethod('hideSensitiveRequestDetails');
-    $method->setAccessible(true);
-    
-    // In local environment, should return early at line 63
-    $method->invoke($provider);
-    
+    $method->invoke($provider); // Executes line 71
+
     expect(true)->toBeTrue();
 });

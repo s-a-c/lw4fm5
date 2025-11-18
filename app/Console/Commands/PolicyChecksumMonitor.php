@@ -73,22 +73,7 @@ final class PolicyChecksumMonitor extends Command
 
         if ($mismatched->isNotEmpty()) {
             $this->components->warn('Checksum drift detected:');
-            $mismatched->each(function (mixed $entry): void {
-                // Guard against non-array values to satisfy static analysis and runtime safety
-                if (! is_array($entry)) {
-                    return;
-                }
-
-                if (isset($entry['file'], $entry['checksum'])) {
-                    $file = is_string($entry['file']) ? $entry['file'] : '';
-                    $checksum = is_string($entry['checksum']) ? $entry['checksum'] : '';
-                    $this->line(sprintf(
-                        ' • %s has checksum %s',
-                        $file,
-                        $checksum
-                    ));
-                }
-            });
+            $this->processMismatchedEntries($mismatched);
         }
 
         $status = $missing->isEmpty() && $mismatched->isEmpty() ? 'pass' : 'fail';
@@ -98,5 +83,30 @@ final class PolicyChecksumMonitor extends Command
         ]);
 
         return $status === 'pass' ? self::SUCCESS : self::FAILURE;
+    }
+
+    /**
+     * Process mismatched entries and output checksum drift information.
+     *
+     * @param  Collection<int, array{file: string, checksum: string}|mixed>  $mismatched
+     */
+    private function processMismatchedEntries(Collection $mismatched): void
+    {
+        $mismatched->each(function (mixed $entry): void {
+            // Guard against non-array values to satisfy static analysis and runtime safety
+            if (! is_array($entry)) {
+                return;
+            }
+
+            if (isset($entry['file'], $entry['checksum'])) {
+                $file = is_string($entry['file']) ? $entry['file'] : '';
+                $checksum = is_string($entry['checksum']) ? $entry['checksum'] : '';
+                $this->line(sprintf(
+                    ' • %s has checksum %s',
+                    $file,
+                    $checksum
+                ));
+            }
+        });
     }
 }

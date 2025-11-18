@@ -163,6 +163,8 @@ pest --type-coverage
 
 **Source**: [Pest Documentation](https://pestphp.com/docs) \| [Pest Browser Testing](https://pestphp.com/docs/browser-testing)
 
+**Code Coverage**: The project requires 100% code coverage. If coverage tools report lines as uncovered despite passing tests, see [Setup Notes - Coverage Issues](800-notes-and-queries.md#27-voltserviceprovider-code-coverage-issue---line-71-not-covered) for debugging techniques.
+
 ### 4.2 Pest Plugins
 
 - `pestphp/pest-plugin-arch` ^4.0 - Architecture testing

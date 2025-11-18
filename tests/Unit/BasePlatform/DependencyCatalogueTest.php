@@ -183,6 +183,28 @@ it('handles non-string values in catalogue entries gracefully', function (): voi
     expect($entries->first()->name)->toBe(''); // Should default to empty string
 });
 
+it('defaults lastReviewedAt to now when value is not a string', function (): void {
+    Storage::disk('local')->put('base-platform/dependencies.json', json_encode([
+        [
+            'name' => 'test/package',
+            'version' => '1.0.0',
+            'classification' => 'core',
+            'owner' => 'Platform Engineering',
+            'justification' => 'Test',
+            'lastReviewedAt' => ['invalid-date'], // Non-string value
+            'reviewCadence' => 'monthly',
+            'riskLevel' => 'medium',
+            'notes' => 'Test',
+        ],
+    ], JSON_THROW_ON_ERROR));
+
+    $catalogue = new DependencyCatalogue(Storage::disk('local'));
+    $record = $catalogue->entries()->first();
+
+    assert($record !== null);
+    expect($record->lastReviewedAt->toDateTimeString())->toBe('2025-11-09 00:00:00');
+});
+
 it('allows overdue check with custom reference date', function (): void {
     Storage::disk('local')->put('base-platform/dependencies.json', json_encode([
         [
@@ -200,7 +222,7 @@ it('allows overdue check with custom reference date', function (): void {
 
     $catalogue = new DependencyCatalogue(Storage::disk('local'));
     // Use Carbon::parse() directly to get mutable Carbon (required by overdue() method)
-    $customReference = Date::parse('2025-12-01');
+    $customReference = Carbon::parse('2025-12-01');
     $overdue = $catalogue->overdue($customReference);
 
     expect($overdue)->toHaveCount(1);

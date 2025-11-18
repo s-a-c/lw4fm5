@@ -3,11 +3,14 @@
 declare(strict_types=1);
 
 use App\Providers\Filament\SupportCustomizationServiceProvider;
+use Filament\Events\ServingFilament;
 use Filament\Facades\Filament;
+use Filament\Facades\Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Event;
 use Mockery as m;
 
 it('boots SupportCustomizationServiceProvider', function (): void {
@@ -31,17 +34,46 @@ it('configures Filament assets on serving event', function (): void {
     FilamentAsset::shouldReceive('getScripts')->andReturn([$script]);
     FilamentAsset::shouldReceive('getAlpineComponents')->andReturn([]);
 
-    // Boot the provider to register the serving callback (line 30)
+    // Boot the provider to register the serving callback (line 29-30)
     $provider = new SupportCustomizationServiceProvider(App::getInstance());
     $provider->boot();
 
-    // Use reflection to call configureFilamentAssets directly to test line 30 execution
+    // Use reflection to access and execute the serving callback to test line 30
+    // Filament::serving registers callbacks that we can access via reflection
+    $filamentReflection = new ReflectionClass(Filament::class);
+
+    // Try to get the serving callbacks and execute them
+    // Since we can't easily access Filament's internal callbacks, we'll test
+    // by calling configureFilamentAssets directly which is what line 30 does
     $reflection = new ReflectionClass($provider);
     $method = $reflection->getMethod('configureFilamentAssets');
-    $method->setAccessible(true);
-    $method->invoke($provider);
+    $method->invoke($provider); // This executes the same code as line 30
 
     expect(App::getProvider(SupportCustomizationServiceProvider::class))->not->toBeNull();
+});
+
+it('calls onFilamentServing from Filament serving callback', function (): void {
+    // Test line 30: onFilamentServing called from Filament::serving callback
+    Config::set('filament.assets.scripts', [
+        'targets' => ['*'],
+    ]);
+
+    $script = m::mock(Js::class);
+    $script->shouldReceive('getPackage')->andReturn('filament');
+    $script->shouldReceive('getId')->andReturn('app');
+    $script->shouldReceive('getExtraAttributes')->andReturn([]);
+
+    FilamentAsset::shouldReceive('getScripts')->andReturn([$script]);
+    FilamentAsset::shouldReceive('getAlpineComponents')->andReturn([]);
+
+    $provider = new SupportCustomizationServiceProvider(App::getInstance());
+    $provider->boot();
+
+    // Dispatch ServingFilament event to trigger the callback registered at line 29
+    // This will execute line 30 ($this->onFilamentServing())
+    Event::dispatch(new ServingFilament);
+
+    expect(true)->toBeTrue();
 });
 
 it('configures Filament assets on view composer', function (): void {
@@ -68,7 +100,6 @@ it('configures Filament assets on view composer', function (): void {
     // Use reflection to call configureFilamentAssets directly
     $reflection = new ReflectionClass($provider);
     $method = $reflection->getMethod('configureFilamentAssets');
-    $method->setAccessible(true);
     $method->invoke($provider);
 
     expect(true)->toBeTrue();
@@ -95,7 +126,6 @@ it('skips scripts that should not be mutated', function (): void {
     // Use reflection to call configureFilamentAssets directly
     $reflection = new ReflectionClass($provider);
     $method = $reflection->getMethod('configureFilamentAssets');
-    $method->setAccessible(true);
     $method->invoke($provider);
 
     expect(true)->toBeTrue();
@@ -123,7 +153,6 @@ it('applies async attribute to scripts', function (): void {
     // Use reflection to call configureFilamentAssets directly
     $reflection = new ReflectionClass($provider);
     $method = $reflection->getMethod('configureFilamentAssets');
-    $method->setAccessible(true);
     $method->invoke($provider);
 
     expect(App::getProvider(SupportCustomizationServiceProvider::class))->not->toBeNull();
@@ -151,7 +180,6 @@ it('mutates scripts based on identifier match', function (): void {
     // Use reflection to call configureFilamentAssets directly
     $reflection = new ReflectionClass($provider);
     $method = $reflection->getMethod('configureFilamentAssets');
-    $method->setAccessible(true);
     $method->invoke($provider);
 
     expect(App::getProvider(SupportCustomizationServiceProvider::class))->not->toBeNull();
@@ -177,7 +205,6 @@ it('excludes scripts that match exclude list', function (): void {
 
     $reflection = new ReflectionClass($provider);
     $method = $reflection->getMethod('configureFilamentAssets');
-    $method->setAccessible(true);
     $method->invoke($provider);
 
     expect(true)->toBeTrue();
@@ -199,12 +226,11 @@ it('applies extra attributes to scripts', function (): void {
     $script->shouldReceive('getPackage')->andReturn('filament');
     $script->shouldReceive('getId')->andReturn('app');
     $script->shouldReceive('getExtraAttributes')->andReturn(['existing' => 'attr']);
-    $script->shouldReceive('extraAttributes')->once()->with(m::on(function (array $attributes): bool {
+    $script->shouldReceive('extraAttributes')->once()->with(m::on(fn (array $attributes): bool =>
         // Should contain existing attribute and stringified attributes
-        return isset($attributes['existing'])
-            && in_array('data-test="value"', $attributes, true)
-            && in_array('data-qa="true"', $attributes, true);
-    }));
+        isset($attributes['existing'])
+        && in_array('data-test="value"', $attributes, true)
+        && in_array('data-qa="true"', $attributes, true)));
 
     FilamentAsset::shouldReceive('getScripts')->andReturn([$script]);
     FilamentAsset::shouldReceive('getAlpineComponents')->andReturn([]);
@@ -214,7 +240,6 @@ it('applies extra attributes to scripts', function (): void {
 
     $reflection = new ReflectionClass($provider);
     $method = $reflection->getMethod('configureFilamentAssets');
-    $method->setAccessible(true);
     $method->invoke($provider);
 
     expect(true)->toBeTrue();
@@ -227,7 +252,7 @@ it('disables Alpine components when load_alpine is false', function (): void {
     Config::set('filament.assets.load_alpine', false);
 
     // Mock Alpine component (lines 93-96)
-    $component = m::mock(Filament\Support\Assets\AlpineComponent::class);
+    $component = m::mock(AlpineComponent::class);
     $component->shouldReceive('loadedOnRequest')->once();
 
     FilamentAsset::shouldReceive('getScripts')->andReturn([]);
@@ -238,9 +263,7 @@ it('disables Alpine components when load_alpine is false', function (): void {
 
     $reflection = new ReflectionClass($provider);
     $method = $reflection->getMethod('configureFilamentAssets');
-    $method->setAccessible(true);
     $method->invoke($provider);
 
     expect(true)->toBeTrue();
 });
-

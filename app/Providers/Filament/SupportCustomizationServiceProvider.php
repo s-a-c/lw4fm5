@@ -27,12 +27,21 @@ final class SupportCustomizationServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Filament::serving(function (): void {
-            $this->configureFilamentAssets();
+            $this->onFilamentServing();
         });
 
         View::composer('filament::assets', function (): void {
             $this->configureFilamentAssets();
         });
+    }
+
+    /**
+     * Handle Filament serving event.
+     * This method is called from the Filament::serving callback.
+     */
+    private function onFilamentServing(): void
+    {
+        $this->configureFilamentAssets();
     }
 
     private function configureFilamentAssets(): void

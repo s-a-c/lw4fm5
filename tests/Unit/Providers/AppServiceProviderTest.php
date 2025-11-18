@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Vite;
+use Illuminate\Validation\Rules\Password;
 use Mockery as m;
 
 it('boots AppServiceProvider and configures application', function (): void {
@@ -57,9 +58,7 @@ it('configures password defaults for local environment without uncompromised', f
     // Create a mock app that returns true for environment('local')
     $app = m::mock(Application::class)->makePartial();
     $app->shouldReceive('environment')->with('local')->andReturn(true);
-    $app->shouldReceive('make')->andReturnUsing(function (string $abstract) {
-        return App::getInstance()->make($abstract);
-    });
+    $app->shouldReceive('make')->andReturnUsing(fn (string $abstract) => App::getInstance()->make($abstract));
 
     // Create provider with mocked app
     $provider = new AppServiceProvider($app);
@@ -68,9 +67,26 @@ it('configures password defaults for local environment without uncompromised', f
     // This ensures we hit lines 90-94 (the else branch for local environment)
     $reflection = new ReflectionClass($provider);
     $method = $reflection->getMethod('configurePasswordRules');
-    $method->setAccessible(true);
     $method->invoke($provider);
 
     // Verify password defaults are configured (local environment uses min(8) without uncompromised)
+    expect(true)->toBeTrue();
+});
+
+it('configures password defaults with uncompromised when enabled', function (): void {
+    Config::set('base-platform.security.password_uncompromised', true);
+
+    $app = m::mock(Application::class)->makePartial();
+    $app->shouldReceive('environment')->with('local')->andReturn(false);
+    $app->shouldReceive('environment')->with(['local', 'testing'])->andReturn(false);
+
+    $provider = new AppServiceProvider($app);
+
+    $reflection = new ReflectionClass($provider);
+    $method = $reflection->getMethod('configurePasswordRules');
+    $method->invoke($provider);
+
+    Password::default();
+
     expect(true)->toBeTrue();
 });

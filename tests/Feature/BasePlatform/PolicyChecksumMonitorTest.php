@@ -2,8 +2,13 @@
 
 declare(strict_types=1);
 
+use App\Console\Commands\PolicyChecksumMonitor;
+use Illuminate\Console\OutputStyle;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
+use ReflectionClass;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 use function Pest\Laravel\artisan;
 
@@ -87,7 +92,7 @@ it('handles non-array mismatched entry gracefully', function (): void {
     MD);
 
     // Create command instance and use reflection to inject non-array values
-    $command = new App\Console\Commands\PolicyChecksumMonitor;
+    $command = new PolicyChecksumMonitor;
     $reflection = new ReflectionClass($command);
     $handleMethod = $reflection->getMethod('handle');
 
@@ -124,33 +129,36 @@ it('handles non-array mismatched entry gracefully', function (): void {
         ->and($processed[1]['file'])->toBe('test2.md');
 });
 
-it('executes line 79 guard when mismatched entry is not an array', function (): void {
-    // Test the exact guard logic from lines 76-91 with non-array values
-    // This replicates the code path that executes line 79 in PolicyChecksumMonitor
+it('executes line 98 guard when mismatched entry is not an array', function (): void {
+    // Test line 98 (formerly 79): guard against non-array entries in mismatched collection
+    // We'll test the processMismatchedEntries method directly with non-array values
+
+    $command = new PolicyChecksumMonitor;
+
+    // Create proper OutputStyle instance for Laravel commands
+    $bufferedOutput = new BufferedOutput();
+    $outputStyle = new OutputStyle(
+        new ArrayInput([]),
+        $bufferedOutput
+    );
+    $command->setOutput($outputStyle);
+
+    // Create mismatched collection with non-array values to test line 98
     $mismatched = collect([
         ['file' => 'test.md', 'checksum' => 'abc123'],
-        'non-array-value', // This will trigger line 79 return statement
-        null, // This will also trigger line 79
+        'not-an-array-value', // This triggers line 98
+        null, // This also triggers line 98
         ['file' => 'test2.md', 'checksum' => 'def456'],
     ]);
-    
-    $lines = [];
-    $mismatched->each(function (mixed $entry) use (&$lines): void {
-        // Guard from line 78-79 - this is the exact code from PolicyChecksumMonitor
-        if (! is_array($entry)) {
-            return; // Line 79 executes here - this is what we're testing
-        }
-        
-        // Lines 82-89 from PolicyChecksumMonitor
-        if (isset($entry['file'], $entry['checksum'])) {
-            $file = is_string($entry['file']) ? $entry['file'] : '';
-            $checksum = is_string($entry['checksum']) ? $entry['checksum'] : '';
-            $lines[] = sprintf(' • %s has checksum %s', $file, $checksum);
-        }
-    });
-    
-    // Verify line 79 executed (non-array entries were skipped via return statement)
-    expect($lines)->toHaveCount(2)
-        ->and($lines[0])->toContain('test.md')
-        ->and($lines[1])->toContain('test2.md');
+
+    // Use reflection to call processMismatchedEntries directly
+    $reflection = new ReflectionClass($command);
+    $method = $reflection->getMethod('processMismatchedEntries');
+    $method->invoke($command, $mismatched);
+
+    $output = $bufferedOutput->fetch();
+
+    expect($output)->toContain('test.md')
+        ->and($output)->toContain('test2.md')
+        ->and($output)->not->toContain('not-an-array-value');
 });

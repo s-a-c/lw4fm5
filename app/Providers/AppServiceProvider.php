@@ -79,22 +79,22 @@ final class AppServiceProvider extends ServiceProvider
     {
 
         $isLocal = $this->app->environment('local');
-        if (! $isLocal) {
-            Password::defaults(fn () => Password::min(12)
-                ->letters()
-                ->numbers()
-                ->symbols()
-                ->mixedCase()
-                ->uncompromised());
-        } else {
-            Password::defaults(fn () => Password::min(8)
-                ->letters()
-                ->numbers()
-                ->symbols()
-                ->mixedCase());
-        }
+        $shouldRequireUncompromised = ! $this->app->environment(['local', 'testing'])
+            && (bool) config('base-platform.security.password_uncompromised', true);
 
-        // config(['auth.password_timeout' => 60])
+        Password::defaults(function () use ($isLocal, $shouldRequireUncompromised): Password {
+            $rule = Password::min($isLocal ? 8 : 12)
+                ->letters()
+                ->numbers()
+                ->symbols()
+                ->mixedCase();
+
+            if ($shouldRequireUncompromised) {
+                $rule->uncompromised();
+            }
+
+            return $rule;
+        });
     }
 
     /**

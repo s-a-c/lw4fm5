@@ -203,9 +203,19 @@ See [11-development-tools.md - Browser Testing](120-development-tools.md#browser
 
 ### 7.3 Database in Tests
 
-**Symptom**: Tests affecting each other’s data
+**Symptom**: Tests affecting each other's data
 
 **Solution**: Use `RefreshDatabase` trait or database transactions in tests
+
+### 7.4 Code Coverage Issues
+
+**Symptom**: Coverage tool reports lines as uncovered even though tests pass
+
+**Solutions**:
+\* See [Setup Notes - VoltServiceProvider Coverage Issue](800-notes-and-queries.md#27-voltserviceprovider-code-coverage-issue---line-71-not-covered) for detailed solution
+\* Add explicit assertions within mock callbacks to verify return values
+\* Use `andReturnUsing()` with debugging assertions when coverage tool has difficulty detecting statement execution
+\* Check HTML coverage reports to identify which specific lines are not covered
 
 ## 8 Authentication Issues
 

@@ -57,6 +57,9 @@ pest()->extend(TestCase::class)
         Str::createRandomStringsNormally();
         Str::createUuidsNormally();
         Http::preventStrayRequests();
+        Http::fake([
+            'https://api.pwnedpasswords.com/range/*' => Http::response('', 200),
+        ]);
         Process::preventStrayProcesses();
         Sleep::fake();
 

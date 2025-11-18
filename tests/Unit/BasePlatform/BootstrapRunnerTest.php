@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Services\BasePlatform\BootstrapRecovery;
+use App\Services\BasePlatform\BootstrapRun;
 use App\Services\BasePlatform\BootstrapRunner;
 use App\Services\BasePlatform\BootstrapRunnerException;
 use App\Services\BasePlatform\UnsupportedProfileException;
@@ -33,7 +34,7 @@ it('throws UnsupportedProfileException for an unsupported profile', function ():
 
     $runner = new BootstrapRunner(new BootstrapRecovery());
 
-    expect(fn () => $runner->run('native', false))->toThrow(UnsupportedProfileException::class);
+    expect(fn (): BootstrapRun => $runner->run('native', false))->toThrow(UnsupportedProfileException::class);
 });
 
 it('throws BootstrapRunnerException when the process fails', function (): void {
@@ -47,5 +48,5 @@ it('throws BootstrapRunnerException when the process fails', function (): void {
 
     $runner = new BootstrapRunner(new BootstrapRecovery());
 
-    expect(fn () => $runner->run('native', true))->toThrow(BootstrapRunnerException::class);
+    expect(fn (): BootstrapRun => $runner->run('native', true))->toThrow(BootstrapRunnerException::class);
 });
