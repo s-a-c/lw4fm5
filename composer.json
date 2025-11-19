@@ -65,6 +65,7 @@
         "driftingly/rector-laravel": "^2.1",
         "ergebnis/composer-normalize": "^2.48",
         "fakerphp/faker": "^1.24",
+        "infection/infection": "^0.31.9",
         "jasonmccreary/laravel-test-assertions": "^2.8",
         "larastan/larastan": "^3.8",
         "laravel-labs/starter-kit-browser-tests": "dev-main",
@@ -206,6 +207,7 @@
         "allow-plugins": {
             "cweagans/composer-patches": true,
             "ergebnis/composer-normalize": true,
+            "infection/extension-installer": true,
             "pestphp/pest-plugin": true,
             "php-http/discovery": true,
             "phpstan/extension-installer": true,

@@ -7,7 +7,7 @@
         "bun-git-hooks": "^0.3.1",
         "bun-plugin-tailwind": "^0.1.2",
         "prettier-plugin-packagejson": "^2.5.19",
-        "rolldown-vite": "^7.2.5"
+        "rolldown-vite": "^7.2.6"
     },
     "devDependencies": {
         "@catppuccin/tailwindcss": "^1.0.0",
@@ -34,9 +34,9 @@
         "node": ">=24"
     },
     "optionalDependencies": {
-        "@rollup/rollup-darwin-arm64": "4.53.2",
-        "@rollup/rollup-darwin-x64": "4.53.2",
-        "@rollup/rollup-linux-x64-gnu": "4.53.2",
+        "@rollup/rollup-darwin-arm64": "4.53.3",
+        "@rollup/rollup-darwin-x64": "4.53.3",
+        "@rollup/rollup-linux-x64-gnu": "4.53.3",
         "@tailwindcss/oxide-darwin-arm64": "^4.1.17",
         "@tailwindcss/oxide-darwin-x64": "^4.1.17",
         "@tailwindcss/oxide-linux-x64-gnu": "^4.1.17",

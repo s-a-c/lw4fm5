@@ -1,0 +1,18 @@
+{
+    "$schema": "https://raw.githubusercontent.com/infection/infection/0.29.8/resources/schema.json",
+    "source": {
+        "directories": [
+            "app"
+        ]
+    },
+    "logs": {
+        "text": "php://stderr",
+        "html": "infection.html",
+        "summary": "infection-summary.log"
+    },
+    "mutators": {
+        "@default": true
+    },
+    "minMsi": 90,
+    "minCoveredMsi": 90
+}

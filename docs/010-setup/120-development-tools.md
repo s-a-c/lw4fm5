@@ -25,6 +25,11 @@ Compliant with [AI-GUIDELINES.md](../../.ai/AI-GUIDELINES.md) v0921d4cfab198af14
     - [4.4 Mockery](#44-mockery)
     - [4.5 Laravel Test Assertions](#45-laravel-test-assertions)
     - [4.6 Browser Testing (Playwright)](#46-browser-testing-playwright)
+    - [4.7 Mutation Testing (Infection)](#47-mutation-testing-infection)
+      - [4.7.1 Overview](#471-overview)
+      - [4.7.2 Configuration](#472-configuration)
+      - [4.7.3 Running Mutation Tests](#473-running-mutation-tests)
+      - [4.7.4 Interpreting Results](#474-interpreting-results)
       - [4.6.1 Installation](#461-installation)
       - [4.6.2 Browser Installation](#462-browser-installation)
       - [4.6.3 Configuration](#463-configuration)
@@ -197,6 +202,56 @@ pest --type-coverage
 **Package**: `playwright` ^1.56.1 (frontend dependency)
 **Purpose**: End-to-end browser testing framework
 **Architectural Role**: Provides real browser testing capabilities for Pest 4
+
+### 4.7 Mutation Testing (Infection)
+
+**Package**: `infection/infection` ^0.31.9
+**Purpose**: Mutation testing framework for PHP
+**Architectural Role**: Verifies the quality of your tests by modifying your code and checking if tests fail.
+
+#### 4.7.1 Overview
+
+Mutation testing evaluates the quality of your test suite by introducing small changes (mutations) to your code and running your tests against them. If your tests fail (kill the mutant), your tests are good. If your tests pass (mutant escapes), you might have missing test cases.
+
+#### 4.7.2 Configuration
+
+The project includes a default configuration in `infection.json.dist`:
+
+```json
+{
+    "source": {
+        "directories": [
+            "app"
+        ]
+    },
+    "mutators": {
+        "@default": true
+    },
+    "minMsi": 90
+}
+```
+
+#### 4.7.3 Running Mutation Tests
+
+```bash
+# Run mutation tests
+composer test:mutation
+
+# Or run directly
+vendor/bin/infection
+```
+
+#### 4.7.4 Interpreting Results
+
+Infection reports the **Mutation Score Indicator (MSI)**. A high MSI means your tests are effective at catching bugs. The project enforces a minimum MSI of 90%.
+
+**Key Metrics**:
+
+- **Killed**: Tests failed as expected (Good)
+- **Escaped**: Tests passed despite mutation (Bad - improve tests)
+- **Uncovered**: No tests cover this code (Bad - write tests)
+
+**Source**: [Infection Documentation](https://infection.github.io/guide/)
 
 #### 4.6.1 Installation
 
