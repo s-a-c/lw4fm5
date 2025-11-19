@@ -22,6 +22,8 @@ return new class extends Migration
             $table->string('owner');
             $table->text('notes')->nullable();
             $table->timestamps();
+
+            $table->unique(['context', 'storage_mechanism']);
         });
     }
 

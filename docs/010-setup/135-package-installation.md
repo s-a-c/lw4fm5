@@ -313,6 +313,27 @@ composer show livewire/flux-pro 2>&1 | head -5
 > [!NOTE]
 > If you encounter authentication errors, see [Section 6.2](#62-authentication-issues) for troubleshooting.
 
+### 3.2.1 CI/CD Authentication (GitHub Actions)
+
+The project's CI/CD pipeline (GitHub Actions) also requires authentication to install Flux Pro. You must add your Flux Pro credentials as secrets in your GitHub repository.
+
+**Required Secrets:**
+
+- `FLUXUI_PRO_USERNAME`: Your Flux Pro account email
+- `FLUXUI_PRO_KEY`: Your Flux Pro license key
+
+**How to Add Secrets:**
+
+1. Go to your GitHub repository.
+2. Click on **Settings** > **Secrets and variables** > **Actions**.
+3. Click **New repository secret**.
+4. Add `FLUXUI_PRO_USERNAME` with your email.
+5. Click **New repository secret** again.
+6. Add `FLUXUI_PRO_KEY` with your license key.
+
+> [!IMPORTANT]
+> Without these secrets, the CI workflow will fail during the "Configure Composer Auth" step.
+
 ### 3.3 Production Dependencies Installation
 
 **Step 1: Navigate to Project Root**

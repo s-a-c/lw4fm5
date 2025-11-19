@@ -1,0 +1,27 @@
+
+   INFO  Seeding database.  
+
+
+   Illuminate\Database\QueryException 
+
+  SQLSTATE[HY000]: General error: 1 ON CONFLICT clause does not match any PRIMARY KEY or UNIQUE constraint (Connection: sqlite, SQL: insert into "toolchain_definitions" ("created_at", "documentation_url", "enforcement_scope", "id", "language", "updated_at", "verification_command", "version") values (2025-11-19 19:20:18, docs/base-platform/toolchain-baseline.md, both, 4709d0f0-2155-44ca-9370-5077dbad6a6b, php, 2025-11-19 19:20:18, php -v, ^8.5), (2025-11-19 19:20:18, docs/base-platform/toolchain-baseline.md, both, 9a4d780d-03f4-452f-b0ac-cc2967bef723, javascript, 2025-11-19 19:20:18, bun --version, ^1.1) on conflict ("language", "enforcement_scope") do update set "version" = "excluded"."version", "verification_command" = "excluded"."verification_command", "documentation_url" = "excluded"."documentation_url", "updated_at" = "excluded"."updated_at")
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+    820▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+    821▕                 );
+    822▕             }
+    823▕ 
+  ➜ 824▕             throw new QueryException(
+    825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+    826▕             );
+    827▕         }
+    828▕     }
+
+      [2m+7 vendor frames [22m
+
+  8   database/seeders/BasePlatformSeeder.php:91
+      Illuminate\Database\Eloquent\Builder::upsert()
+
+  9   database/seeders/BasePlatformSeeder.php:21
+      Database\Seeders\BasePlatformSeeder::seedToolchainDefinitions()
+

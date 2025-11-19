@@ -30,31 +30,31 @@ final class BasePlatformSeeder extends Seeder
             [
                 'id' => (string) Str::uuid(),
                 'name' => 'native',
-                'runtime_versions' => [
+                'runtime_versions' => json_encode([
                     'php' => '8.5',
                     'bun' => '1.1',
                     'redis' => '7',
                     'postgres' => '15',
-                ],
-                'prerequisites' => [
+                ]),
+                'prerequisites' => json_encode([
                     'herd' => true,
                     'docker' => false,
-                ],
+                ]),
                 'smoke_check_script' => 'scripts/platform/bootstrap.sh',
                 'status' => 'supported',
             ],
             [
                 'id' => (string) Str::uuid(),
                 'name' => 'container',
-                'runtime_versions' => [
+                'runtime_versions' => json_encode([
                     'php' => '8.5',
                     'bun' => '1.1',
                     'redis' => '7',
                     'postgres' => '15',
-                ],
-                'prerequisites' => [
+                ]),
+                'prerequisites' => json_encode([
                     'docker' => true,
-                ],
+                ]),
                 'smoke_check_script' => 'scripts/platform/bootstrap.sh',
                 'status' => 'supported',
             ],
@@ -129,22 +129,22 @@ final class BasePlatformSeeder extends Seeder
             [
                 'id' => (string) Str::uuid(),
                 'name' => 'core-quality',
-                'triggers' => ['push', 'pull_request'],
-                'required_checks' => ['lint', 'test', 'type'],
+                'triggers' => json_encode(['push', 'pull_request']),
+                'required_checks' => json_encode(['lint', 'test', 'type']),
                 'sla_minutes' => 25,
             ],
             [
                 'id' => (string) Str::uuid(),
                 'name' => 'heavy-quality',
-                'triggers' => ['nightly', 'release'],
-                'required_checks' => ['mutation', 'browser'],
+                'triggers' => json_encode(['nightly', 'release']),
+                'required_checks' => json_encode(['mutation', 'browser']),
                 'sla_minutes' => 120,
             ],
             [
                 'id' => (string) Str::uuid(),
                 'name' => 'dependency-governance',
-                'triggers' => ['monthly'],
-                'required_checks' => ['dependency-review', 'dependency-review-performance'],
+                'triggers' => json_encode(['monthly']),
+                'required_checks' => json_encode(['dependency-review', 'dependency-review-performance']),
                 'sla_minutes' => 30,
             ],
         ];
