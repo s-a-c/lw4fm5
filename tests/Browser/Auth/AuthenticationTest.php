@@ -1,13 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
-use Illuminate\Support\Facades\RateLimiter;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertAuthenticated;
 use function Pest\Laravel\assertGuest;
 
-test('login screen can be rendered', function () {
+test('login screen can be rendered', function (): void {
     visit(route('login'))
         ->assertSee('Log in to your account')
         ->assertSee('Enter your email and password below to log in')
@@ -15,7 +16,7 @@ test('login screen can be rendered', function () {
         ->assertNoJavaScriptErrors();
 });
 
-test('users can authenticate using the login screen', function () {
+test('users can authenticate using the login screen', function (): void {
     $user = User::factory()->withoutTwoFactor()->create();
 
     visit(route('login'))
@@ -29,7 +30,7 @@ test('users can authenticate using the login screen', function () {
     assertAuthenticated();
 });
 
-test('users can not authenticate with invalid password', function () {
+test('users can not authenticate with invalid password', function (): void {
     $user = User::factory()->create();
 
     visit(route('login'))
@@ -44,7 +45,7 @@ test('users can not authenticate with invalid password', function () {
     assertGuest();
 });
 
-test('users can logout', function () {
+test('users can logout', function (): void {
     $user = User::factory()->create();
 
     actingAs($user);

@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
 use function Pest\Laravel\actingAs;
 
-test('password update page is displayed', function () {
+test('password update page is displayed', function (): void {
     actingAs(User::factory()->create());
 
     visit(route('user-password.edit'))
@@ -15,7 +17,7 @@ test('password update page is displayed', function () {
         ->assertNoJavaScriptErrors();
 });
 
-test('password can be updated', function () {
+test('password can be updated', function (): void {
     actingAs($user = User::factory()->create());
 
     visit(route('user-password.edit'))
@@ -31,7 +33,7 @@ test('password can be updated', function () {
     expect(Hash::check('new-password', $user->refresh()->password))->toBeTrue();
 });
 
-test('correct password must be provided to update password', function () {
+test('correct password must be provided to update password', function (): void {
     actingAs($user = User::factory()->create());
 
     visit(route('user-password.edit'))

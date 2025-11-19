@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Providers\VoltServiceProvider;
 use Illuminate\Support\Facades\App;
 use Livewire\LivewireManager;
+use Livewire\Volt\Component;
 use Livewire\Volt\ComponentResolver;
 use Livewire\Volt\MountedDirectories;
 use Livewire\Volt\MountedDirectory;
@@ -380,10 +381,10 @@ it('successfully registers valid Volt component alias', function (): void {
     // Create a valid blade file with @volt
     $bladeFile = $tempDir.'/test-component.blade.php';
     file_put_contents($bladeFile, '@volt');
-    
+
     // Also test Component::class string in file to cover line 171
     $bladeFile2 = $tempDir.'/test-component-class.blade.php';
-    file_put_contents($bladeFile2, '<?php use '.\Livewire\Volt\Component::class.';');
+    file_put_contents($bladeFile2, '<?php use '.Component::class.';');
 
     /** @phpstan-var MockInterface&MountedDirectories $mountedDirectories */
     $mountedDirectories = m::mock(MountedDirectories::class);
@@ -393,7 +394,7 @@ it('successfully registers valid Volt component alias', function (): void {
     $mountedDirectories->shouldReceive('paths')->andReturn([$directory]);
 
     // Mock ComponentResolver to return a valid class name
-    $validClassName = 'Livewire\\Volt\\Component';
+    $validClassName = Component::class;
     /** @phpstan-var MockInterface&ComponentResolver $componentResolver */
     $componentResolver = m::mock(ComponentResolver::class);
     $componentResolver->shouldReceive('resolve')

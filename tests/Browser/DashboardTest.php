@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
 
 use function Pest\Laravel\actingAs;
 
-test('guests are redirected to the login page', function () {
+test('guests are redirected to the login page', function (): void {
     visit(route('dashboard'))
         ->assertUrlIs(route('login'))
         ->assertNoConsoleLogs()
@@ -13,7 +15,7 @@ test('guests are redirected to the login page', function () {
         ->assertSee('Enter your email and password below to log in');
 });
 
-test('authenticated users can visit the dashboard', function () {
+test('authenticated users can visit the dashboard', function (): void {
     actingAs(User::factory()->create());
 
     visit(route('dashboard'))

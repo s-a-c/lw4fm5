@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertAuthenticated;
 use function Pest\Laravel\assertGuest;
 
-test('profile page is displayed', function () {
+test('profile page is displayed', function (): void {
     actingAs($user = User::factory()->create());
 
     visit(route('profile.edit'))
@@ -17,7 +19,7 @@ test('profile page is displayed', function () {
         ->assertNoJavaScriptErrors();
 });
 
-test('profile information can be updated', function () {
+test('profile information can be updated', function (): void {
     actingAs($user = User::factory()->create());
 
     visit(route('profile.edit'))
@@ -37,7 +39,7 @@ test('profile information can be updated', function () {
     expect($user->email_verified_at)->toBeNull();
 });
 
-test('email verification status is unchanged when the email address is unchanged', function () {
+test('email verification status is unchanged when the email address is unchanged', function (): void {
     actingAs($user = User::factory()->create());
 
     visit(route('profile.edit'))
@@ -53,7 +55,7 @@ test('email verification status is unchanged when the email address is unchanged
     expect($user->refresh()->email_verified_at)->not->toBeNull();
 });
 
-test('user can delete their account', function () {
+test('user can delete their account', function (): void {
     actingAs($user = User::factory()->create());
 
     visit(route('profile.edit'))
@@ -69,7 +71,7 @@ test('user can delete their account', function () {
     expect($user->fresh())->toBeNull();
 });
 
-test('correct password must be provided to delete account', function () {
+test('correct password must be provided to delete account', function (): void {
     actingAs($user = User::factory()->create());
 
     visit(route('profile.edit'))

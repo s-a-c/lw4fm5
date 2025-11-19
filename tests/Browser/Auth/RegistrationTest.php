@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
 
 use function Pest\Laravel\assertAuthenticated;
 use function Pest\Laravel\assertGuest;
 
-test('registration screen can be rendered', function () {
+test('registration screen can be rendered', function (): void {
     visit(route('register'))
         ->assertSee('Create an account')
         ->assertSee('Enter your details below to create your account')
@@ -13,7 +15,7 @@ test('registration screen can be rendered', function () {
         ->assertNoJavaScriptErrors();
 });
 
-test('new user can be registered', function () {
+test('new user can be registered', function (): void {
     visit(route('register'))
         ->fill('name', 'Taylor Otwell')
         ->fill('email', 'taylor@laravel.com')
@@ -27,7 +29,7 @@ test('new user can be registered', function () {
     assertAuthenticated();
 });
 
-test('new user cannot be registered when email has already been taken', function () {
+test('new user cannot be registered when email has already been taken', function (): void {
     User::factory()->create([
         'name' => 'Taylor',
         'email' => 'taylor@laravel.com',
@@ -46,7 +48,7 @@ test('new user cannot be registered when email has already been taken', function
     assertGuest();
 });
 
-test('new user cannot be registered when password does not match', function () {
+test('new user cannot be registered when password does not match', function (): void {
     visit(route('register'))
         ->fill('name', 'Taylor Otwell')
         ->fill('email', 'taylor@laravel.com')

@@ -24,7 +24,6 @@ parameters:
         - '#Call to method .+ of internal class Pest\\Mixins\\Expectation.* from outside its root namespace Pest#'
         - '#Call to method .+ of internal class Pest\\PendingCalls\\.+ from outside its root namespace Pest#'
         - '#Call to method .+ of internal class Pest\\Configuration from outside its root namespace Pest#'
-        - '#Access to constant on internal class Pest\\Mutate\\Plugins\\Mutate#'
         # Pest expect() syntax with $not property - Fixed with assert() type narrowing
         # Removed: expect()->not-> patterns now use assert() for type narrowing
         # Mockery expectations - fluent interface pattern

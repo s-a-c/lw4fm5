@@ -424,10 +424,7 @@ describe('echo.js', () => {
         VITE_PUSHER_APP_KEY: 'test-key',
       });
 
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        'Echo initialization failed:',
-        expect.any(Error),
-      );
+      expect(consoleWarnSpy).toHaveBeenCalledWith('Echo initialization failed:', expect.any(Error));
 
       consoleWarnSpy.mockRestore();
     });
