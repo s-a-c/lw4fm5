@@ -16,7 +16,7 @@ permissions:
 jobs:
   core-quality:
     runs-on: ubuntu-latest
-    environment: Testing
+
 
     steps:
       - name: Checkout

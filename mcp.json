@@ -1,5 +1,11 @@
 {
     "mcpServers": {
+        "byterover-mcp": {
+            "httpUrl": "https://mcp.byterover.dev/v2/mcp",
+            "headers": {
+              "Authorization": "${BYTEROVER_BEARER_TOKEN}"
+            }
+          },
         "laravel-boost": {
             "command": "php",
             "args": [
