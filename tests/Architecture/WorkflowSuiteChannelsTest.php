@@ -16,5 +16,7 @@ it('persists workflow suite notification channels via dedicated table', function
 it('defines policy acknowledgement targets in configuration', function (): void {
     $files = Config::get('base-platform.policy.files', []);
 
-    expect($files)->toBeArray()->not->toBeEmpty();
+    expect($files)->toBeArray();
+    /** @phpstan-var array<int, string> $files */
+    expect($files)->not->toBeEmpty();
 });

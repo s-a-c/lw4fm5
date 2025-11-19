@@ -15,7 +15,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 final class WorkflowSuite extends Model
 {
+    /** @use HasFactory<never> */
     use HasFactory;
+
     use HasUuids;
 
     public $incrementing = false;
@@ -30,7 +32,7 @@ final class WorkflowSuite extends Model
     protected $keyType = 'string';
 
     /**
-     * @return HasMany<WorkflowSuiteChannel>
+     * @return HasMany<WorkflowSuiteChannel, $this>
      */
     public function channels(): HasMany
     {

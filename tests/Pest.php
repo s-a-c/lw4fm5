@@ -3,82 +3,57 @@
 declare(strict_types=1);
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Process;
-use Illuminate\Support\Sleep;
-use Illuminate\Support\Str;
 use Tests\TestCase;
 
-$pestPluginRegistry = dirname(__DIR__).DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'pest-plugins.json';
-
-if (is_file($pestPluginRegistry)) {
-    $contents = file_get_contents($pestPluginRegistry);
-
-    if ($contents !== false) {
-        try {
-            $plugins = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException) {
-            $plugins = null;
-        }
-
-        if (is_array($plugins)) {
-            $mutatePlugin = 'Pest\\Mutate\\Plugins\\Mutate';
-
-            $filteredPlugins = array_values(array_filter(
-                $plugins,
-                static function (string $plugin) use ($mutatePlugin): bool {
-                    return $plugin !== $mutatePlugin;
-                },
-            ));
-
-            if ($filteredPlugins !== $plugins) {
-                try {
-                    $encoded = json_encode($filteredPlugins, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
-                } catch (JsonException) {
-                    $encoded = null;
-                }
-
-                if ($encoded !== null) {
-                    file_put_contents($pestPluginRegistry, $encoded);
-                }
-            }
-        }
-    }
-}
-
-/*
+/**
 |--------------------------------------------------------------------------
-| Test Case & Defaults
+| Test Case
 |--------------------------------------------------------------------------
-*/
+|
+| The closure you provide to your test functions is always bound to a specific PHPUnit test
+| case class. By default, that class is "PHPUnit\Framework\TestCase". Of course, you may
+| need to change it using the "pest()" function to bind a different classes or traits.
+|
+ */
+pest()->extend(TestCase::class)
+    ->use(RefreshDatabase::class)
+    ->in('Browser');
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
-    ->beforeEach(function (): void {
-        Str::createRandomStringsNormally();
-        Str::createUuidsNormally();
-        Http::preventStrayRequests();
-        Process::preventStrayProcesses();
-        Sleep::fake();
+    ->in('Feature');
 
-        $this->freezeTime();
-    })
-    ->in('Architecture', 'Browser', 'Feature', 'Unit');
+pest()->extend(TestCase::class)
+    ->use(RefreshDatabase::class)
+    ->in('Unit');
 
-/*
+pest()->extend(TestCase::class)
+    ->in('Architecture');
+
+/**
 |--------------------------------------------------------------------------
 | Expectations
 |--------------------------------------------------------------------------
-*/
+|
+| When you're writing tests, you often need to check that values meet certain conditions. The
+| "expect()" function gives you access to a set of "expectations" methods that you can use
+| to assert different things. Of course, you may extend the Expectation API at any time.
+|
+ */
+expect()->extend('toBeOne', fn () =>
+    /** @phpstan-ignore-next-line */
+    $this->toBe(1));
 
-expect()->extend('toBeOne', fn () => $this->toBe(1));
-
-/*
+/**
 |--------------------------------------------------------------------------
 | Functions
 |--------------------------------------------------------------------------
-*/
-
+|
+| While Pest is very powerful out-of-the-box, you may have some testing code specific to your
+| project that you don't want to repeat in every file. Here you can also expose helpers as
+| global functions to help you to reduce the number of lines of code in your test files.
+|
+ */
 function something(): void
 {
     // ..

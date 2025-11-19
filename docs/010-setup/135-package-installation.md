@@ -213,7 +213,7 @@ The project uses custom Composer repositories for private and special packages. 
 
 | Repository Name | URL | Purpose | Authentication Required |
 |----------------|-----|---------|------------------------|
-| `flux-pro` | `https://composer.fluxui.dev` | Flux Pro premium components | ✅ Yes |
+| `fluxui-pro` | `https://composer.fluxui.dev` | Flux Pro premium components | ✅ Yes |
 | `laravel-comments` | `https://satis.spatie.be` | Spatie private packages | ❌ No |
 | `laravel-labs-starter-kit-browser-tests` | GitHub VCS | Browser test utilities | ❌ No |
 
@@ -313,6 +313,27 @@ composer show livewire/flux-pro 2>&1 | head -5
 > [!NOTE]
 > If you encounter authentication errors, see [Section 6.2](#62-authentication-issues) for troubleshooting.
 
+### 3.2.1 CI/CD Authentication (GitHub Actions)
+
+The project's CI/CD pipeline (GitHub Actions) also requires authentication to install Flux Pro. You must add your Flux Pro credentials as secrets in your GitHub repository.
+
+**Required Secrets:**
+
+- `FLUXUI_PRO_USERNAME`: Your Flux Pro account email
+- `FLUXUI_PRO_KEY`: Your Flux Pro license key
+
+**How to Add Secrets:**
+
+1. Go to your GitHub repository.
+2. Click on **Settings** > **Secrets and variables** > **Actions**.
+3. Click **New repository secret**.
+4. Add `FLUXUI_PRO_USERNAME` with your email.
+5. Click **New repository secret** again.
+6. Add `FLUXUI_PRO_KEY` with your license key.
+
+> [!IMPORTANT]
+> Without these secrets, the CI workflow will fail during the "Configure Composer Auth" step.
+
 ### 3.3 Production Dependencies Installation
 
 **Step 1: Navigate to Project Root**
@@ -343,13 +364,21 @@ composer install --no-interaction --prefer-dist --optimize-autoloader
 
 ```log
 Loading composer repositories with package information
+Gathering patches for root package.
+Gathering patches for dependencies. This might take a minute.
 Installing dependencies from lock file (if composer.lock exists)
 or
 Updating dependencies (if no composer.lock exists)
 ...
+  - Applying patches for filament/filament
+    patches/filament-filament/livewire-v4-compatibility.patch (Fix Livewire v4 ComponentRegistry compatibility)
+...
 Writing lock file
 Generating optimized autoload files
 ```
+
+> [!NOTE]
+> **About Patches**: This project uses composer patches to fix compatibility issues between bleeding-edge versions. You'll see patches being applied during installation - this is normal and expected. The patches are managed via the `cweagans/composer-patches` plugin.
 
 **Step 3: Monitor Installation Progress**
 

@@ -25,6 +25,8 @@ final class TieredWorkflowPolicy
      */
     public static function workflowsFor(string $tier): array
     {
-        return Arr::get(self::tiers(), "{$tier}.workflows", []);
+        $workflows = Arr::get(self::tiers(), "{$tier}.workflows", []);
+
+        return is_array($workflows) ? array_values(array_filter($workflows, is_string(...))) : [];
     }
 }

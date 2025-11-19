@@ -16,7 +16,7 @@ permissions:
 jobs:
   core-quality:
     runs-on: ubuntu-latest
-    environment: Testing
+
 
     steps:
       - name: Checkout
@@ -51,6 +51,9 @@ jobs:
 
       - name: Install Bun Dependencies
         run: bun install --frozen-lockfile
+
+      - name: Build Assets
+        run: bun run build
 
       - name: Prepare Environment
         run: |

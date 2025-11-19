@@ -7,6 +7,10 @@ declare(strict_types=1);
  */
 
 return [
+    'security' => [
+        'password_uncompromised' => env('BASE_PLATFORM_PASSWORD_UNCOMPROMISED', true),
+    ],
+
     'schedules' => [
         'nightly' => env('BASE_PLATFORM_ENABLE_NIGHTLY', true),
         'weekly' => env('BASE_PLATFORM_ENABLE_WEEKLY', true),

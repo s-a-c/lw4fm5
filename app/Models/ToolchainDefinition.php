@@ -14,7 +14,9 @@ use Illuminate\Database\Eloquent\Model;
 
 final class ToolchainDefinition extends Model
 {
+    /** @use HasFactory<never> */
     use HasFactory;
+
     use HasUuids;
 
     public $incrementing = false;

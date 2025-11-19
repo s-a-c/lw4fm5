@@ -1,55 +1,73 @@
 {
-  "$schema": "https://json.schemastore.org/package.json",
-  "private": true,
-  "type": "module",
-  "engines": {
-    "node": ">=25",
-    "bun": ">=1.1.0"
-  },
-  "packageManager": "bun@latest",
-  "scripts": {
-    "build": "vite build",
-    "dev": "vite",
-    "preview": "vite preview",
-    "lint": "bunx prettier --write resources/",
-    "test:lint": "bunx prettier --check resources/",
-    "playwright:install": "bunx playwright install --with-deps",
-    "test:browser": "bunx playwright test"
-  },
-  "dependencies": {
-    "ably": "^2.14.0",
-    "autoprefixer": "^10.4.22",
-    "axios": "^1.13.2",
-    "bun-git-hooks": "^0.3.1",
-    "bun-plugin-tailwind": "^0.1.2",
-    "prettier-plugin-packagejson": "^2.5.19",
-    "rolldown-vite": "^7.2.5"
-  },
-  "devDependencies": {
-    "@catppuccin/tailwindcss": "^1.0.0",
-    "@tailwindcss/vite": "^4.1.17",
-    "concurrently": "^9.2.1",
-    "laravel-echo": "^2.2.6",
-    "laravel-vite-plugin": "^2.0.1",
-    "npm-check-updates": "^19.1.2",
-    "playwright": "^1.56.1",
-    "prettier": "^3.6.2",
-    "prettier-plugin-organize-imports": "^4.3.0",
-    "prettier-plugin-tailwindcss": "^0.7.1",
-    "pusher-js": "^8.4.0",
-    "tailwindcss": "^4.1.17",
-    "vite": "^7.2.2",
-    "vitest": "^4.0.8"
-  },
-  "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "4.53.2",
-    "@rollup/rollup-darwin-arm64": "4.53.2",
-    "@rollup/rollup-darwin-x64": "4.53.2",
-    "@tailwindcss/oxide-linux-x64-gnu": "^4.1.17",
-    "@tailwindcss/oxide-darwin-arm64": "^4.1.17",
-    "@tailwindcss/oxide-darwin-x64": "^4.1.17",
-    "lightningcss-linux-x64-gnu": "^1.30.2",
-    "lightningcss-darwin-arm64": "^1.30.2",
-    "lightningcss-darwin-x64": "^1.30.2"
-  }
+    "$schema": "https://json.schemastore.org/package.json",
+    "dependencies": {
+        "ably": "^2.14.0",
+        "autoprefixer": "^10.4.22",
+        "axios": "^1.13.2",
+        "bun-git-hooks": "^0.3.1",
+        "bun-plugin-tailwind": "^0.1.2",
+        "prettier-plugin-packagejson": "^2.5.19",
+        "rolldown-vite": "^7.2.6"
+    },
+    "devDependencies": {
+        "@catppuccin/tailwindcss": "^1.0.0",
+        "@tailwindcss/vite": "^4.1.17",
+        "@vitest/browser-playwright": "^4.0.10",
+        "@vitest/coverage-v8": "^4.0.10",
+        "@vitest/ui": "^4.0.10",
+        "concurrently": "^9.2.1",
+        "jsdom": "^27.2.0",
+        "laravel-echo": "^2.2.6",
+        "laravel-vite-plugin": "^2.0.1",
+        "npm-check-updates": "^19.1.2",
+        "playwright": "^1.56.1",
+        "prettier": "^3.6.2",
+        "prettier-plugin-organize-imports": "^4.3.0",
+        "prettier-plugin-tailwindcss": "^0.7.1",
+        "pusher-js": "^8.4.0",
+        "tailwindcss": "^4.1.17",
+        "vite": "^7.2.2",
+        "vitest": "^4.0.10"
+    },
+    "engines": {
+        "bun": ">=1.1.0",
+        "node": ">=24"
+    },
+    "optionalDependencies": {
+        "@rollup/rollup-darwin-arm64": "4.53.3",
+        "@rollup/rollup-darwin-x64": "4.53.3",
+        "@rollup/rollup-linux-x64-gnu": "4.53.3",
+        "@tailwindcss/oxide-darwin-arm64": "^4.1.17",
+        "@tailwindcss/oxide-darwin-x64": "^4.1.17",
+        "@tailwindcss/oxide-linux-x64-gnu": "^4.1.17",
+        "lightningcss-darwin-arm64": "^1.30.2",
+        "lightningcss-darwin-x64": "^1.30.2",
+        "lightningcss-linux-x64-gnu": "^1.30.2"
+    },
+    "packageManager": "bun@latest",
+    "private": true,
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite",
+        "docs:build": "vitepress build docs",
+        "docs:deploy": "vitepress deploy docs",
+        "docs:dev": "vitepress dev docs",
+        "docs:preview": "vitepress preview docs",
+        "lint": "bunx prettier --write resources/",
+        "playwright:install": "bunx playwright install --with-deps",
+        "preview": "vite preview",
+        "test": "vitest run --reporter=verbose 2>&1 | tee test-output.log || (cat test-output.log 2>/dev/null; exit 1)",
+        "test:browser": "bunx playwright test",
+        "test:coverage": "vitest run --coverage",
+        "test:coverage:clover": "vitest run --coverage --clover",
+        "test:coverage:html": "vitest run --coverage --html",
+        "test:coverage:json": "vitest run --coverage --json",
+        "test:coverage:lcov": "vitest run --coverage --lcov",
+        "test:coverage:text": "vitest run --coverage --text",
+        "test:coverage:verbose": "vitest run --coverage --verbose",
+        "test:lint": "bunx prettier --check resources/",
+        "test:run": "vitest run",
+        "test:watch": "vitest"
+    },
+    "type": "module"
 }

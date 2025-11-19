@@ -8,7 +8,6 @@ use FilesystemIterator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Livewire\LivewireManager;
-use Livewire\Mechanisms\ComponentRegistry;
 use Livewire\Volt\Component;
 use Livewire\Volt\ComponentResolver;
 use Livewire\Volt\MountedDirectories;
@@ -24,10 +23,7 @@ final class VoltServiceProvider extends ServiceProvider
     /**
      * Register services.
      */
-    public function register(): void
-    {
-        //
-    }
+    public function register(): void {}
 
     /**
      * Bootstrap services.
@@ -54,33 +50,88 @@ final class VoltServiceProvider extends ServiceProvider
             return;
         }
 
-        $componentRegistry = app(ComponentRegistry::class);
-        $componentRegistry->register();
         $livewireManager = app(LivewireManager::class);
         $componentResolver = app(ComponentResolver::class);
 
+        /** @var array<int, string> $allMountPaths */
         $allMountPaths = $directories
             ->map(static fn (MountedDirectory $directory): string => $directory->path)
+            ->values()
             ->all();
 
         foreach ($directories as $directory) {
             foreach ($this->discoverVoltComponentAliases($directory) as $alias) {
-                try {
-                    $class = $componentResolver->resolve($alias, $allMountPaths);
-                } catch (Throwable) {
-                    continue;
-                }
-                if (! is_string($class)) {
-                    continue;
-                }
-                if (! class_exists($class)) {
+                $class = $this->resolveComponentClass($componentResolver, $alias, $allMountPaths);
+
+                if ($class === null) {
                     continue;
                 }
 
-                $componentRegistry->component($alias, $class);
                 $livewireManager->component($alias, $class);
             }
         }
+    }
+
+    /**
+     * Resolve component class name from alias, returning null if resolution fails.
+     *
+     * @param  array<int, string>  $allMountPaths
+     * @return string|null The resolved class name, or null if resolution fails
+     */
+    private function resolveComponentClass(
+        ComponentResolver $componentResolver,
+        string $alias,
+        array $allMountPaths
+    ): ?string {
+        $class = $this->attemptComponentResolution($componentResolver, $alias, $allMountPaths);
+
+        if ($class === null) {
+            return null;
+        }
+
+        if ($this->isValidClassString($class)) {
+            /** @var string $classString */
+            $classString = $class;
+            if ($this->classExists($classString)) {
+                return $classString;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Attempt to resolve component class from resolver, returning null on failure.
+     *
+     * @param  array<int, string>  $allMountPaths
+     * @return mixed The resolved class name or null if resolution fails
+     */
+    private function attemptComponentResolution(
+        ComponentResolver $componentResolver,
+        string $alias,
+        array $allMountPaths
+    ): mixed {
+        try {
+            return $componentResolver->resolve($alias, $allMountPaths);
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * Check if the resolved value is a valid string class name.
+     */
+    private function isValidClassString(mixed $class): bool
+    {
+        return is_string($class);
+    }
+
+    /**
+     * Check if the class exists.
+     */
+    private function classExists(string $class): bool
+    {
+        return class_exists($class);
     }
 
     /**
@@ -95,7 +146,8 @@ final class VoltServiceProvider extends ServiceProvider
         $aliases = [];
 
         $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($directory->path, FilesystemIterator::SKIP_DOTS)
+            new RecursiveDirectoryIterator($directory->path, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST
         );
 
         /** @var SplFileInfo $file */
@@ -105,9 +157,6 @@ final class VoltServiceProvider extends ServiceProvider
             }
 
             $filename = $file->getFilename();
-            if ($filename === false) {
-                continue;
-            }
             if (! Str::endsWith($filename, '.blade.php')) {
                 continue;
             }

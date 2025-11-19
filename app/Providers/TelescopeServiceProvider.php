@@ -23,25 +23,7 @@ final class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 
         $isLocal = $this->app->environment('local');
 
-        Telescope::filter(function (IncomingEntry $entry) use ($isLocal): bool {
-            if ($isLocal) {
-                return true;
-            }
-            if ($entry->isReportableException()) {
-                return true;
-            }
-            if ($entry->isFailedRequest()) {
-                return true;
-            }
-            if ($entry->isFailedJob()) {
-                return true;
-            }
-            if ($entry->isScheduledTask()) {
-                return true;
-            }
-
-            return $entry->hasMonitoredTag();
-        });
+        Telescope::filter(fn (IncomingEntry $entry): bool => $this->shouldRecordEntry($entry, $isLocal));
     }
 
     /**
@@ -51,9 +33,31 @@ final class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
      */
     protected function gate(): void
     {
-        Gate::define('viewTelescope', fn (?User $user): bool => in_array($user?->email, [
-            //
-        ]));
+        Gate::define('viewTelescope', fn (?User $user): bool => false);
+    }
+
+    /**
+     * Determine if an entry should be recorded by Telescope.
+     */
+    private function shouldRecordEntry(IncomingEntry $entry, bool $isLocal): bool
+    {
+        if ($isLocal) {
+            return true;
+        }
+        if ($entry->isReportableException()) {
+            return true;
+        }
+        if ($entry->isFailedRequest()) {
+            return true;
+        }
+        if ($entry->isFailedJob()) {
+            return true;
+        }
+        if ($entry->isScheduledTask()) {
+            return true;
+        }
+
+        return $entry->hasMonitoredTag();
     }
 
     /**

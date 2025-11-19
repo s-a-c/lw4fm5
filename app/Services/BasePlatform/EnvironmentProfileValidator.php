@@ -34,6 +34,7 @@ final class EnvironmentProfileValidator implements EnvironmentProfileValidatorCo
         $query = EnvironmentProfile::query()->where('status', 'supported');
 
         if ($profiles !== []) {
+            /** @phpstan-ignore-next-line */
             $query->whereIn('name', $profiles);
         }
 

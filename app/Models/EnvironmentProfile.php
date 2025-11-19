@@ -16,7 +16,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 final class EnvironmentProfile extends Model
 {
+    /** @use HasFactory<never> */
     use HasFactory;
+
     use HasUuids;
 
     public $incrementing = false;
@@ -32,7 +34,7 @@ final class EnvironmentProfile extends Model
     protected $keyType = 'string';
 
     /**
-     * @return HasMany<ParityResult>
+     * @return HasMany<ParityResult, $this>
      */
     public function parityResults(): HasMany
     {

@@ -31,11 +31,13 @@ final readonly class ParityReport
      */
     public static function persistMany(iterable $reports): Collection
     {
-        return collect($reports)->map(function (self $report): ParityResult {
+        $results = [];
+        foreach ($reports as $report) {
             $profile = EnvironmentProfile::query()->where('name', $report->profile)->firstOrFail();
+            $results[] = $report->toParityResult($profile);
+        }
 
-            return $report->toParityResult($profile);
-        });
+        return collect($results);
     }
 
     public function toParityResult(EnvironmentProfile $environmentProfile): ParityResult
@@ -47,6 +49,8 @@ final readonly class ParityReport
             'status' => $this->status,
             'issues' => $this->issues,
         ]);
+
+        $result->setRelation('environmentProfile', $environmentProfile);
 
         return $result;
     }

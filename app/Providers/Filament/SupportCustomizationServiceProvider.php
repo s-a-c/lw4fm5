@@ -27,7 +27,7 @@ final class SupportCustomizationServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Filament::serving(function (): void {
-            $this->configureFilamentAssets();
+            $this->onFilamentServing();
         });
 
         View::composer('filament::assets', function (): void {
@@ -35,20 +35,40 @@ final class SupportCustomizationServiceProvider extends ServiceProvider
         });
     }
 
+    /**
+     * Handle Filament serving event.
+     * This method is called from the Filament::serving callback.
+     */
+    private function onFilamentServing(): void
+    {
+        $this->configureFilamentAssets();
+    }
+
     private function configureFilamentAssets(): void
     {
-        $scriptConfig = config('filament.assets.scripts', []);
-        $defer = (bool) ($scriptConfig['defer'] ?? false);
-        $async = (bool) ($scriptConfig['async'] ?? false);
-        $extraAttributes = $this->stringifyAttributes(
-            (array) ($scriptConfig['attributes'] ?? []),
-        );
-        $targets = $this->normalizeIdentifiers(
-            (array) ($scriptConfig['targets'] ?? ['*']),
-        );
-        $excludes = $this->normalizeIdentifiers(
-            (array) ($scriptConfig['exclude'] ?? []),
-        );
+        $scriptConfigRaw = config('filament.assets.scripts', []);
+        $scriptConfig = is_array($scriptConfigRaw) ? $scriptConfigRaw : [];
+
+        $defer = isset($scriptConfig['defer']) && is_bool($scriptConfig['defer']) && $scriptConfig['defer'];
+        $async = isset($scriptConfig['async']) && is_bool($scriptConfig['async']) && $scriptConfig['async'];
+
+        $attributesRaw = $scriptConfig['attributes'] ?? [];
+        $attributesArray = is_array($attributesRaw) ? $attributesRaw : [];
+        /** @var array<string, bool|int|string> $attributesFiltered */
+        $attributesFiltered = array_filter($attributesArray, fn (mixed $v): bool => is_bool($v) || is_int($v) || is_string($v));
+        $extraAttributes = $this->stringifyAttributes($attributesFiltered);
+
+        $targetsRaw = $scriptConfig['targets'] ?? ['*'];
+        $targetsArray = is_array($targetsRaw) ? $targetsRaw : ['*'];
+        /** @var array<int, string> $targetsFiltered */
+        $targetsFiltered = array_values(array_filter($targetsArray, is_string(...)));
+        $targets = $this->normalizeIdentifiers($targetsFiltered);
+
+        $excludesRaw = $scriptConfig['exclude'] ?? [];
+        $excludesArray = is_array($excludesRaw) ? $excludesRaw : [];
+        /** @var array<int, string> $excludesFiltered */
+        $excludesFiltered = array_values(array_filter($excludesArray, is_string(...)));
+        $excludes = $this->normalizeIdentifiers($excludesFiltered);
         $loadAlpine = (bool) config('filament.assets.load_alpine', true);
 
         foreach (FilamentAsset::getScripts() as $script) {
@@ -71,10 +91,11 @@ final class SupportCustomizationServiceProvider extends ServiceProvider
             }
 
             if ($extraAttributes->isNotEmpty()) {
-                $script->extraAttributes([
-                    ...$script->getExtraAttributes(),
-                    ...$extraAttributes->all(),
-                ]);
+                $existingAttributes = $script->getExtraAttributes();
+                $extraArray = $extraAttributes->all();
+                /** @var array<string, string> $combined */
+                $combined = array_merge($existingAttributes, $extraArray);
+                $script->extraAttributes($combined);
             }
         }
 
@@ -86,13 +107,14 @@ final class SupportCustomizationServiceProvider extends ServiceProvider
     }
 
     /**
-     * @param  array<string, string|int|bool>  $attributes
+     * @param  array<string, bool|int|string>  $attributes
+     * @return Collection<string, non-empty-string>
      */
     private function stringifyAttributes(array $attributes): Collection
     {
         return collect($attributes)
             ->mapWithKeys(static fn (string|int|bool $value, string $key): array => [$key => (string) $value])
-            ->filter();
+            ->reject(static fn (string $value): bool => $value === '');
     }
 
     /**

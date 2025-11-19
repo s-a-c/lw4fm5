@@ -10,7 +10,6 @@ use App\Models\ToolchainDefinition;
 use App\Models\WorkflowSuite;
 use App\Models\WorkflowSuiteChannel;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 
@@ -31,31 +30,31 @@ final class BasePlatformSeeder extends Seeder
             [
                 'id' => (string) Str::uuid(),
                 'name' => 'native',
-                'runtime_versions' => [
+                'runtime_versions' => json_encode([
                     'php' => '8.5',
                     'bun' => '1.1',
                     'redis' => '7',
                     'postgres' => '15',
-                ],
-                'prerequisites' => [
+                ]),
+                'prerequisites' => json_encode([
                     'herd' => true,
                     'docker' => false,
-                ],
+                ]),
                 'smoke_check_script' => 'scripts/platform/bootstrap.sh',
                 'status' => 'supported',
             ],
             [
                 'id' => (string) Str::uuid(),
                 'name' => 'container',
-                'runtime_versions' => [
+                'runtime_versions' => json_encode([
                     'php' => '8.5',
                     'bun' => '1.1',
                     'redis' => '7',
                     'postgres' => '15',
-                ],
-                'prerequisites' => [
+                ]),
+                'prerequisites' => json_encode([
                     'docker' => true,
-                ],
+                ]),
                 'smoke_check_script' => 'scripts/platform/bootstrap.sh',
                 'status' => 'supported',
             ],
@@ -130,22 +129,22 @@ final class BasePlatformSeeder extends Seeder
             [
                 'id' => (string) Str::uuid(),
                 'name' => 'core-quality',
-                'triggers' => ['push', 'pull_request'],
-                'required_checks' => ['lint', 'test', 'type'],
+                'triggers' => json_encode(['push', 'pull_request']),
+                'required_checks' => json_encode(['lint', 'test', 'type']),
                 'sla_minutes' => 25,
             ],
             [
                 'id' => (string) Str::uuid(),
                 'name' => 'heavy-quality',
-                'triggers' => ['nightly', 'release'],
-                'required_checks' => ['mutation', 'browser'],
+                'triggers' => json_encode(['nightly', 'release']),
+                'required_checks' => json_encode(['mutation', 'browser']),
                 'sla_minutes' => 120,
             ],
             [
                 'id' => (string) Str::uuid(),
                 'name' => 'dependency-governance',
-                'triggers' => ['monthly'],
-                'required_checks' => ['dependency-review', 'dependency-review-performance'],
+                'triggers' => json_encode(['monthly']),
+                'required_checks' => json_encode(['dependency-review', 'dependency-review-performance']),
                 'sla_minutes' => 30,
             ],
         ];
@@ -159,11 +158,18 @@ final class BasePlatformSeeder extends Seeder
 
     private function seedWorkflowSuiteChannels(): void
     {
-        $desired = Config::get('base-platform.workflow_suite_channels', []);
+        $desiredRaw = Config::get('base-platform.workflow_suite_channels', []);
+        $desired = is_array($desiredRaw) ? $desiredRaw : [];
 
         $records = [];
 
         foreach ($desired as $suiteName => $channels) {
+            if (! is_string($suiteName)) {
+                continue;
+            }
+            if (! is_array($channels)) {
+                continue;
+            }
             $suite = WorkflowSuite::query()->where('name', $suiteName)->first();
 
             if ($suite === null) {
@@ -171,11 +177,17 @@ final class BasePlatformSeeder extends Seeder
             }
 
             foreach ($channels as $channel) {
+                if (! is_array($channel)) {
+                    continue;
+                }
+                if (! isset($channel['channel'], $channel['medium'])) {
+                    continue;
+                }
                 $records[] = [
                     'id' => (string) Str::uuid(),
                     'workflow_suite_id' => $suite->id,
-                    'channel' => $channel['channel'],
-                    'medium' => $channel['medium'],
+                    'channel' => is_string($channel['channel']) ? $channel['channel'] : '',
+                    'medium' => is_string($channel['medium']) ? $channel['medium'] : '',
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
@@ -199,9 +211,9 @@ final class BasePlatformSeeder extends Seeder
     {
         $now = now();
 
-        return array_map(static fn (array $attributes): array => Arr::only($attributes + [
+        return array_map(static fn (array $attributes): array => $attributes + [
             'created_at' => $now,
             'updated_at' => $now,
-        ], array_merge(array_keys($attributes), ['created_at', 'updated_at'])), $records);
+        ], $records);
     }
 }

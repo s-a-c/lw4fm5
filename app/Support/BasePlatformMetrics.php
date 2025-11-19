@@ -11,20 +11,40 @@ namespace App\Support;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Throwable;
 
 final class BasePlatformMetrics
 {
+    /**
+     * @param  array<string, mixed>  $labels
+     */
     public static function record(string $metric, array $labels = [], float|int $value = 1): void
     {
         $payload = [
             'metric' => self::formatMetric($metric),
-            'labels' => Arr::map($labels, static fn (mixed $label): string => (string) $label),
+            'labels' => Arr::map($labels, static function (mixed $label): string {
+                if (is_string($label)) {
+                    return $label;
+                }
+                if (is_scalar($label)) {
+                    return (string) $label;
+                }
+
+                return '';
+            }),
             'value' => $value,
             'timestamp' => now()->toIso8601String(),
         ];
 
-        Log::channel(config('base-platform.observability.log_channel'))
-            ->info('base-platform-metric', $payload);
+        try {
+            $channel = config('base-platform.observability.log_channel');
+            $channelName = is_string($channel) ? $channel : null;
+            Log::channel($channelName)
+                ->info('base-platform-metric', $payload);
+        } catch (Throwable) {
+            // Silently fail if logging is unavailable (e.g., Monolog autoload issues)
+            // This prevents CI failures when logging infrastructure has issues
+        }
     }
 
     public static function recordBootstrapDuration(string $profile, float $minutes): void
@@ -55,8 +75,9 @@ final class BasePlatformMetrics
 
     private static function formatMetric(string $metric): string
     {
-        $prefix = Str::of((string) config('base-platform.observability.metrics_prefix'))
-            ->trim('_');
+        $prefixRaw = config('base-platform.observability.metrics_prefix');
+        $prefixStr = is_string($prefixRaw) ? $prefixRaw : '';
+        $prefix = Str::of($prefixStr)->trim('_');
 
         $normalized = Str::of($metric)
             ->replace('-', '_')
@@ -66,6 +87,8 @@ final class BasePlatformMetrics
             return (string) $normalized;
         }
 
-        return (string) $prefix->append('_')->append($normalized);
+        $prefixWithUnderscore = (string) $prefix->append('_');
+
+        return $prefixWithUnderscore.$normalized;
     }
 }

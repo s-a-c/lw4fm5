@@ -3,17 +3,26 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use Illuminate\Http\Response;
+use Illuminate\Testing\TestResponse;
 use Laravel\Fortify\Features;
 
+use function Pest\Laravel\assertAuthenticated;
+use function Pest\Laravel\assertGuest;
+
 test('login screen can be rendered', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
+    /** @phpstan-var TestResponse<Response> $response */
     $response = $this->get(route('login'));
 
     $response->assertStatus(200);
 });
 
 test('users can authenticate using the login screen', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     $user = User::factory()->withoutTwoFactor()->create();
 
+    /** @phpstan-var TestResponse<Response> $response */
     $response = $this->post(route('login.store'), [
         'email' => $user->email,
         'password' => 'password',
@@ -23,12 +32,14 @@ test('users can authenticate using the login screen', function (): void {
         ->assertSessionHasNoErrors()
         ->assertRedirect(route('dashboard', absolute: false));
 
-    $this->assertAuthenticated();
+    assertAuthenticated();
 });
 
 test('users can not authenticate with invalid password', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     $user = User::factory()->create();
 
+    /** @phpstan-var TestResponse<Response> $response */
     $response = $this->post(route('login.store'), [
         'email' => $user->email,
         'password' => 'wrong-password',
@@ -36,12 +47,13 @@ test('users can not authenticate with invalid password', function (): void {
 
     $response->assertSessionHasErrorsIn('email');
 
-    $this->assertGuest();
+    assertGuest();
 });
 
 test('users with two factor enabled are redirected to two factor challenge', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     if (! Features::canManageTwoFactorAuthentication()) {
-        $this->markTestSkipped('Two-factor authentication is not enabled.');
+        skip('Two-factor authentication is not enabled.');
     }
 
     Features::twoFactorAuthentication([
@@ -51,21 +63,24 @@ test('users with two factor enabled are redirected to two factor challenge', fun
 
     $user = User::factory()->create();
 
+    /** @phpstan-var TestResponse<Response> $response */
     $response = $this->post(route('login.store'), [
         'email' => $user->email,
         'password' => 'password',
     ]);
 
     $response->assertRedirect(route('two-factor.login'));
-    $this->assertGuest();
+    assertGuest();
 });
 
 test('users can logout', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     $user = User::factory()->create();
 
+    /** @phpstan-var TestResponse<Response> $response */
     $response = $this->actingAs($user)->post(route('logout'));
 
     $response->assertRedirect(route('home'));
 
-    $this->assertGuest();
+    assertGuest();
 });

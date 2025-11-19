@@ -15,7 +15,9 @@ use Illuminate\Database\Eloquent\Model;
 
 final class CredentialPolicy extends Model
 {
+    /** @use HasFactory<never> */
     use HasFactory;
+
     use HasUuids;
 
     public $incrementing = false;

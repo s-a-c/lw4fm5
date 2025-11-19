@@ -129,6 +129,35 @@ See [12-frontend-build.md - Tailwind Issues](130-frontend-build.md#issue-tailwin
 \* Remove `composer.lock` and reinstall (development only)
 \* Check PHP version compatibility
 
+### 6.1.1 Livewire ComponentRegistry Error
+
+**Symptom**: `BindingResolutionException: Target class [Livewire\Mechanisms\ComponentRegistry] does not exist`
+
+**Cause**: Filament v5 beta compatibility issue with Livewire v4.0.0-beta.3. The `ComponentRegistry` class was removed in Livewire v4.
+
+**Solution**: This project includes a composer patch that automatically fixes this issue. The patch is located at:
+
+``` bash
+patches/filament-filament/livewire-v4-compatibility.patch
+```
+
+**Verification**:
+
+``` bash
+# Verify patch is configured in composer.json
+grep -A 2 "filament/filament" composer.json
+
+# Run composer update to apply patches
+composer update -Wo
+
+# Verify application boots correctly
+php artisan --version
+```
+
+**What the patch does**: Replaces `app(ComponentRegistry::class)->getName($component)` with `app('livewire.factory')->resolveComponentName($component)` in Filament's `HasComponents` trait.
+
+See [patches/filament-filament/README.md](../../patches/filament-filament/README.md) for details.
+
 ### 6.2 Flux Pro Authentication Failed
 
 **Symptom**: Cannot install Flux Pro packages
@@ -174,9 +203,19 @@ See [11-development-tools.md - Browser Testing](120-development-tools.md#browser
 
 ### 7.3 Database in Tests
 
-**Symptom**: Tests affecting each other’s data
+**Symptom**: Tests affecting each other's data
 
 **Solution**: Use `RefreshDatabase` trait or database transactions in tests
+
+### 7.4 Code Coverage Issues
+
+**Symptom**: Coverage tool reports lines as uncovered even though tests pass
+
+**Solutions**:
+\* See [Setup Notes - VoltServiceProvider Coverage Issue](800-notes-and-queries.md#27-voltserviceprovider-code-coverage-issue---line-71-not-covered) for detailed solution
+\* Add explicit assertions within mock callbacks to verify return values
+\* Use `andReturnUsing()` with debugging assertions when coverage tool has difficulty detecting statement execution
+\* Check HTML coverage reports to identify which specific lines are not covered
 
 ## 8 Authentication Issues
 

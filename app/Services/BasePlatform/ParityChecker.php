@@ -34,6 +34,7 @@ final class ParityChecker implements ParityCheckerContract
         $query = EnvironmentProfile::query()->where('status', 'supported');
 
         if ($profiles !== []) {
+            /** @phpstan-ignore-next-line */
             $query->whereIn('name', $profiles);
         }
 

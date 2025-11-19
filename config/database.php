@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Str;
-use PDO\MYSQL;
+use Pdo\Mysql;
 
-$mysqlSslAttribute = class_exists(MYSQL::class)
-    ? MYSQL::ATTR_SSL_CA
-    : (defined('PDO::MYSQL_ATTR_SSL_CA') ? MYSQL::ATTR_SSL_CA : null);
+$mysqlSslAttribute = class_exists(Mysql::class)
+    ? Mysql::ATTR_SSL_CA
+    : (defined('PDO::MYSQL_ATTR_SSL_CA') ? Mysql::ATTR_SSL_CA : null);
 
 return [
 
@@ -66,7 +66,8 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter(
-                $mysqlSslAttribute !== null ? [$mysqlSslAttribute => env('MYSQL_ATTR_SSL_CA')] : []
+                $mysqlSslAttribute !== null ? [$mysqlSslAttribute => env('MYSQL_ATTR_SSL_CA')] : [],
+                fn (mixed $value): bool => $value !== null
             ) : [],
         ],
 
@@ -86,7 +87,8 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter(
-                $mysqlSslAttribute !== null ? [$mysqlSslAttribute => env('MYSQL_ATTR_SSL_CA')] : []
+                $mysqlSslAttribute !== null ? [$mysqlSslAttribute => env('MYSQL_ATTR_SSL_CA')] : [],
+                fn (mixed $value): bool => $value !== null
             ) : [],
         ],
 

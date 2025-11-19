@@ -22,6 +22,8 @@ return new class extends Migration
             $table->string('verification_command');
             $table->string('documentation_url')->nullable();
             $table->timestamps();
+
+            $table->unique(['language', 'enforcement_scope']);
         });
     }
 

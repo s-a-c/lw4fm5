@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\Config\RectorConfig;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
+use RectorLaravel\Rector\StaticCall\CarbonToDateFacadeRector;
 use RectorLaravel\Set\LaravelSetList;
 use RectorLaravel\Set\LaravelSetProvider;
 
@@ -41,6 +42,12 @@ return RectorConfig::configure()
     ])
     ->withSkip([
         AddOverrideAttributeToOverriddenMethodsRector::class,
+        // Preserve intentional usage of mutable Carbon instances in these files
+        CarbonToDateFacadeRector::class => [
+            __DIR__.'/app/Services/BasePlatform/DependencyCatalogue.php',
+            __DIR__.'/app/Console/Commands/DependencyReviewReport.php',
+            __DIR__.'/tests/Unit/BasePlatform/DependencyCatalogueTest.php',
+        ],
     ])
     ->withPreparedSets(
         deadCode: true,

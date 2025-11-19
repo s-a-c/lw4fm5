@@ -61,12 +61,17 @@ final class ValidateEnvironmentProfiles extends Command
     private function determineProfiles(): array
     {
         if ($this->option('all')) {
-            return Config::get('base-platform.profiles.supported', []);
+            $supported = Config::get('base-platform.profiles.supported', []);
+
+            return is_array($supported) ? array_values(array_filter($supported, is_string(...))) : [];
         }
 
-        $profile = (string) ($this->option('profile') ?? '');
+        $profileOption = $this->option('profile');
+        $profile = is_string($profileOption) ? $profileOption : '';
 
         if ($profile !== '') {
+            /** @var array<int, string> */
+            /** @phpstan-ignore-next-line */
             return EnvironmentProfile::query()
                 ->supported()
                 ->where('name', $profile)
@@ -74,6 +79,8 @@ final class ValidateEnvironmentProfiles extends Command
                 ->all();
         }
 
-        return Config::get('base-platform.profiles.supported', []);
+        $supported = Config::get('base-platform.profiles.supported', []);
+
+        return is_array($supported) ? array_values(array_filter($supported, is_string(...))) : [];
     }
 }

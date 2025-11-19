@@ -18,6 +18,7 @@ it('normalizes metric names and forwards payload to configured channel', functio
     Log::shouldReceive('info')
         ->once()
         ->with('base-platform-metric', Mockery::on(function (array $payload): bool {
+            /** @phpstan-var array{metric: string, labels: array<string, mixed>, value: int|float, timestamp: string} $payload */
             expect($payload['metric'])->toBe('base_platform_bootstrap_duration');
             expect($payload['labels'])->toBe(['profile' => 'native']);
             expect($payload['value'])->toBe(42);
@@ -41,6 +42,7 @@ it('records bootstrap duration helper metric', function (): void {
     Log::shouldReceive('info')
         ->once()
         ->with('base-platform-metric', Mockery::on(function (array $payload): bool {
+            /** @phpstan-var array{metric: string, labels: array<string, mixed>, value: int|float} $payload */
             expect($payload['metric'])->toBe('base_platform_bootstrap_duration_minutes');
             expect($payload['labels'])->toBe(['profile' => 'container']);
             expect($payload['value'])->toBe(15.25);

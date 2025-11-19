@@ -3,21 +3,26 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use Illuminate\Http\Response;
+use Illuminate\Testing\TestResponse;
 use Laravel\Fortify\Features;
 
 test('two factor challenge redirects to login when not authenticated', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     if (! Features::canManageTwoFactorAuthentication()) {
-        $this->markTestSkipped('Two-factor authentication is not enabled.');
+        skip('Two-factor authentication is not enabled.');
     }
 
+    /** @phpstan-var TestResponse<Response> $response */
     $response = $this->get(route('two-factor.login'));
 
     $response->assertRedirect(route('login'));
 });
 
 test('two factor challenge can be rendered', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     if (! Features::canManageTwoFactorAuthentication()) {
-        $this->markTestSkipped('Two-factor authentication is not enabled.');
+        skip('Two-factor authentication is not enabled.');
     }
 
     Features::twoFactorAuthentication([
@@ -27,8 +32,10 @@ test('two factor challenge can be rendered', function (): void {
 
     $user = User::factory()->create();
 
-    $this->post(route('login.store'), [
+    /** @phpstan-var TestResponse<Response> $response */
+    $response = $this->post(route('login.store'), [
         'email' => $user->email,
         'password' => 'password',
-    ])->assertRedirect(route('two-factor.login'));
+    ]);
+    $response->assertRedirect(route('two-factor.login'));
 });

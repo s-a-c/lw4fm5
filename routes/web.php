@@ -21,14 +21,15 @@ Route::middleware(['auth'])->group(function (): void {
     Volt::route('settings/password', 'settings.password')->name('user-password.edit');
     Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
 
+    $twoFactorMiddleware = when(
+        Features::canManageTwoFactorAuthentication()
+            && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
+        ['password.confirm'],
+        [],
+    );
+    /** @var array<string> $middlewareArray */
+    $middlewareArray = is_array($twoFactorMiddleware) ? $twoFactorMiddleware : [];
     Volt::route('settings/two-factor', 'settings.two-factor')
-        ->middleware(
-            when(
-                Features::canManageTwoFactorAuthentication()
-                    && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
-                ['password.confirm'],
-                [],
-            ),
-        )
+        ->middleware($middlewareArray)
         ->name('two-factor.show');
 });

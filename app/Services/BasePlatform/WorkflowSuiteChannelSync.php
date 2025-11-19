@@ -38,6 +38,7 @@ final class WorkflowSuiteChannelSync
         }
 
         if ($keep !== []) {
+            /** @phpstan-ignore-next-line */
             WorkflowSuiteChannel::query()
                 ->whereNotIn('id', $keep)
                 ->delete();

@@ -54,7 +54,7 @@ final class AppServiceProvider extends ServiceProvider
     {
 
         DB::prohibitDestructiveCommands(
-            $this->app->isProduction()
+            $this->app->environment('production')
             && ! $this->app->runningInConsole()
             && ! $this->app->runningUnitTests()
             && ! $this->app->isDownForMaintenance(),
@@ -67,8 +67,9 @@ final class AppServiceProvider extends ServiceProvider
     private function configureModels(): void
     {
 
-        Model::shouldBeStrict(! $this->app->isProduction());
-        Model::unguard(! $this->app->isProduction());
+        $isProduction = $this->app->environment('production');
+        Model::shouldBeStrict(! $isProduction);
+        Model::unguard(! $isProduction);
     }
 
     /**
@@ -77,22 +78,30 @@ final class AppServiceProvider extends ServiceProvider
     private function configurePasswordRules(): void
     {
 
-        if (! $this->app->isLocal()) {
-            Password::defaults(fn () => Password::min(12)
-                ->letters()
-                ->numbers()
-                ->symbols()
-                ->mixedCase()
-                ->uncompromised());
-        } else {
-            Password::defaults(fn () => Password::min(8)
-                ->letters()
-                ->numbers()
-                ->symbols()
-                ->mixedCase());
-        }
+        $isLocalOrTesting = $this->app->environment(['local', 'testing']);
+        $shouldRequireUncompromised = ! $this->app->environment(['local', 'testing'])
+            && (bool) config('base-platform.security.password_uncompromised', true);
 
-        // config(['auth.password_timeout' => 60])
+        Password::defaults(function () use ($isLocalOrTesting, $shouldRequireUncompromised): Password {
+            $rule = Password::min($isLocalOrTesting ? 8 : 12);
+
+            if ($isLocalOrTesting) {
+                // In local/testing, only require letters and minimum length
+                $rule->letters();
+            } else {
+                // In production/staging, require all complexity rules
+                $rule->letters()
+                    ->numbers()
+                    ->symbols()
+                    ->mixedCase();
+            }
+
+            if ($shouldRequireUncompromised) {
+                $rule->uncompromised();
+            }
+
+            return $rule;
+        });
     }
 
     /**
@@ -101,7 +110,7 @@ final class AppServiceProvider extends ServiceProvider
     private function configureUrl(): void
     {
 
-        if (! $this->app->isLocal()) {
+        if (! $this->app->environment('local')) {
             URL::forceScheme('https');
         }
     }

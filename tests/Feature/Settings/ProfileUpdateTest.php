@@ -3,19 +3,27 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use Illuminate\Http\Response;
+use Illuminate\Testing\TestResponse;
+use Livewire\Features\SupportTesting\Testable;
 use Livewire\Volt\Volt;
 
 test('profile page is displayed', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     $this->actingAs($user = User::factory()->create());
 
-    $this->get(route('profile.edit'))->assertOk();
+    /** @phpstan-var TestResponse<Response> $response */
+    $response = $this->get(route('profile.edit'));
+    $response->assertOk();
 });
 
 test('profile information can be updated', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     $user = User::factory()->create();
 
     $this->actingAs($user);
 
+    /** @phpstan-var Testable $response */
     $response = Volt::test('settings.profile')
         ->set('name', 'Test User')
         ->set('email', 'test@example.com')
@@ -31,10 +39,12 @@ test('profile information can be updated', function (): void {
 });
 
 test('email verification status is unchanged when email address is unchanged', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     $user = User::factory()->create();
 
     $this->actingAs($user);
 
+    /** @phpstan-var Testable $response */
     $response = Volt::test('settings.profile')
         ->set('name', 'Test User')
         ->set('email', $user->email)
@@ -42,36 +52,43 @@ test('email verification status is unchanged when email address is unchanged', f
 
     $response->assertHasNoErrors();
 
-    expect($user->refresh()->email_verified_at)->not->toBeNull();
+    $verified = $user->refresh()->email_verified_at;
+    assert($verified !== null);
+    expect($verified)->not->toBeNull();
 });
 
 test('user can delete their account', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     $user = User::factory()->create();
 
     $this->actingAs($user);
 
+    /** @phpstan-var Testable $response */
     $response = Volt::test('settings.delete-user-form')
         ->set('password', 'password')
         ->call('deleteUser');
 
-    $response
-        ->assertHasNoErrors()
-        ->assertRedirect('/');
+    $response->assertHasNoErrors();
+    $response->assertRedirect('/');
 
     expect($user->fresh())->toBeNull();
     expect(auth()->check())->toBeFalse();
 });
 
 test('correct password must be provided to delete account', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     $user = User::factory()->create();
 
     $this->actingAs($user);
 
+    /** @phpstan-var Testable $response */
     $response = Volt::test('settings.delete-user-form')
         ->set('password', 'wrong-password')
         ->call('deleteUser');
 
     $response->assertHasErrors(['password']);
 
-    expect($user->fresh())->not->toBeNull();
+    $freshUser = $user->fresh();
+    assert($freshUser !== null);
+    expect($freshUser)->not->toBeNull();
 });

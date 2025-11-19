@@ -7,6 +7,7 @@ use App\Models\EnvironmentProfile;
 use App\Models\ParityResult;
 use App\Services\BasePlatform\ParityReport;
 use Illuminate\Support\Str;
+use Mockery\MockInterface;
 
 use function Pest\Laravel\artisan;
 use function Pest\Laravel\mock;
@@ -21,8 +22,9 @@ it('records a passing parity report for a specific profile', function (): void {
         'status' => 'supported',
     ]);
 
-    mock(ParityCheckerContract::class)
-        ->shouldReceive('run')
+    /** @phpstan-var MockInterface&ParityCheckerContract $mock */
+    $mock = mock(ParityCheckerContract::class);
+    $mock->shouldReceive('run')
         ->once()
         ->with(['native'])
         ->andReturn([
@@ -32,6 +34,8 @@ it('records a passing parity report for a specific profile', function (): void {
                 issues: []
             ),
         ]);
+
+    app()->instance(ParityCheckerContract::class, $mock);
 
     artisan('platform:parity-check', ['--profile' => 'native'])
         ->expectsOutputToContain('Parity check passed for native')

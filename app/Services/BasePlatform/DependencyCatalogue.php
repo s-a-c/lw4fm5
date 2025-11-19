@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\BasePlatform;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -54,19 +55,32 @@ final readonly class DependencyCatalogue
 
         throw_unless(is_array($raw), InvalidArgumentException::class, 'Dependency catalogue must decode to an array');
 
-        return collect($raw)->map(function (array $entry): DependencyRecord {
-            $this->assertValidEntry($entry);
+        return collect($raw)->map(function (mixed $entry): DependencyRecord {
+            throw_unless(is_array($entry), InvalidArgumentException::class, 'Dependency catalogue entry must be an array');
+            /** @var array<string, mixed> $entryTyped */
+            $entryTyped = $entry;
+            $this->assertValidEntry($entryTyped);
+
+            $name = $entryTyped['name'] ?? '';
+            $version = $entryTyped['version'] ?? '';
+            $classification = $entryTyped['classification'] ?? '';
+            $owner = $entryTyped['owner'] ?? '';
+            $justification = $entryTyped['justification'] ?? '';
+            $lastReviewedAtRaw = $entryTyped['lastReviewedAt'] ?? '';
+            $reviewCadence = $entryTyped['reviewCadence'] ?? '';
+            $riskLevel = $entryTyped['riskLevel'] ?? '';
+            $notes = $entryTyped['notes'] ?? '';
 
             return new DependencyRecord(
-                name: (string) $entry['name'],
-                version: (string) $entry['version'],
-                classification: (string) $entry['classification'],
-                owner: (string) $entry['owner'],
-                justification: (string) $entry['justification'],
-                lastReviewedAt: Date::parse($entry['lastReviewedAt'])->startOfDay(),
-                reviewCadence: (string) $entry['reviewCadence'],
-                riskLevel: (string) $entry['riskLevel'],
-                notes: (string) $entry['notes'],
+                name: is_string($name) ? $name : '',
+                version: is_string($version) ? $version : '',
+                classification: is_string($classification) ? $classification : '',
+                owner: is_string($owner) ? $owner : '',
+                justification: is_string($justification) ? $justification : '',
+                lastReviewedAt: Date::parse(is_string($lastReviewedAtRaw) ? $lastReviewedAtRaw : 'now')->startOfDay(),
+                reviewCadence: is_string($reviewCadence) ? $reviewCadence : '',
+                riskLevel: is_string($riskLevel) ? $riskLevel : '',
+                notes: is_string($notes) ? $notes : '',
             );
         });
     }
@@ -74,7 +88,7 @@ final readonly class DependencyCatalogue
     /**
      * @return Collection<int, DependencyRecord>
      */
-    public function overdue(?Carbon $reference = null): Collection
+    public function overdue(Carbon|CarbonImmutable|null $reference = null): Collection
     {
         $reference ??= Date::now();
 
@@ -104,24 +118,30 @@ final readonly class DependencyCatalogue
             }
         }
 
-        if (! in_array($entry['classification'], self::VALID_CLASSIFICATIONS, true)) {
+        $classification = $entry['classification'] ?? '';
+        $classificationStr = is_string($classification) ? $classification : '';
+        if (! in_array($classificationStr, self::VALID_CLASSIFICATIONS, true)) {
             throw new InvalidArgumentException(sprintf(
                 'Unsupported dependency classification [%s]',
-                $entry['classification']
+                $classificationStr
             ));
         }
 
-        if (! in_array($entry['reviewCadence'], self::VALID_REVIEW_CADENCES, true)) {
+        $reviewCadence = $entry['reviewCadence'] ?? '';
+        $reviewCadenceStr = is_string($reviewCadence) ? $reviewCadence : '';
+        if (! in_array($reviewCadenceStr, self::VALID_REVIEW_CADENCES, true)) {
             throw new InvalidArgumentException(sprintf(
                 'Unsupported review cadence [%s]',
-                $entry['reviewCadence']
+                $reviewCadenceStr
             ));
         }
 
-        if (! in_array($entry['riskLevel'], self::VALID_RISK_LEVELS, true)) {
+        $riskLevel = $entry['riskLevel'] ?? '';
+        $riskLevelStr = is_string($riskLevel) ? $riskLevel : '';
+        if (! in_array($riskLevelStr, self::VALID_RISK_LEVELS, true)) {
             throw new InvalidArgumentException(sprintf(
                 'Unsupported risk level [%s]',
-                $entry['riskLevel']
+                $riskLevelStr
             ));
         }
     }
@@ -149,7 +169,7 @@ final readonly class DependencyRecord
         public string $classification,
         public string $owner,
         public string $justification,
-        public Carbon $lastReviewedAt,
+        public Carbon|CarbonImmutable $lastReviewedAt,
         public string $reviewCadence,
         public string $riskLevel,
         public string $notes,
@@ -157,9 +177,13 @@ final readonly class DependencyRecord
 
     public function reviewDeadline(): Carbon
     {
+        $date = $this->lastReviewedAt instanceof Carbon
+            ? $this->lastReviewedAt
+            : Carbon::parse($this->lastReviewedAt->toDateTimeString());
+
         return match ($this->reviewCadence) {
-            'monthly' => $this->lastReviewedAt->copy()->addMonthNoOverflow()->endOfDay(),
-            'quarterly' => $this->lastReviewedAt->copy()->addMonthsNoOverflow(3)->endOfDay(),
+            'monthly' => $date->copy()->addMonthNoOverflow()->endOfDay(),
+            'quarterly' => $date->copy()->addMonthsNoOverflow(3)->endOfDay(),
             default => throw new InvalidArgumentException(sprintf(
                 'Unsupported review cadence [%s]',
                 $this->reviewCadence
@@ -167,9 +191,11 @@ final readonly class DependencyRecord
         };
     }
 
-    public function isOverdue(Carbon $reference): bool
+    public function isOverdue(Carbon|CarbonImmutable $reference): bool
     {
-        return $this->reviewDeadline()->lessThanOrEqualTo($reference);
+        $carbonRef = $reference instanceof Carbon ? $reference : Date::parse($reference->toDateTimeString());
+
+        return $this->reviewDeadline()->lessThanOrEqualTo($carbonRef);
     }
 
     /**
