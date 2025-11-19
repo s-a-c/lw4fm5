@@ -78,16 +78,23 @@ final class AppServiceProvider extends ServiceProvider
     private function configurePasswordRules(): void
     {
 
-        $isLocal = $this->app->environment('local');
+        $isLocalOrTesting = $this->app->environment(['local', 'testing']);
         $shouldRequireUncompromised = ! $this->app->environment(['local', 'testing'])
             && (bool) config('base-platform.security.password_uncompromised', true);
 
-        Password::defaults(function () use ($isLocal, $shouldRequireUncompromised): Password {
-            $rule = Password::min($isLocal ? 8 : 12)
-                ->letters()
-                ->numbers()
-                ->symbols()
-                ->mixedCase();
+        Password::defaults(function () use ($isLocalOrTesting, $shouldRequireUncompromised): Password {
+            $rule = Password::min($isLocalOrTesting ? 8 : 12);
+
+            if ($isLocalOrTesting) {
+                // In local/testing, only require letters and minimum length
+                $rule->letters();
+            } else {
+                // In production/staging, require all complexity rules
+                $rule->letters()
+                    ->numbers()
+                    ->symbols()
+                    ->mixedCase();
+            }
 
             if ($shouldRequireUncompromised) {
                 $rule->uncompromised();

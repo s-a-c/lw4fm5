@@ -6,5 +6,7 @@ use App\Providers\FolioServiceProvider;
 use Illuminate\Support\Facades\App;
 
 it('boots FolioServiceProvider', function (): void {
-    expect(App::getProvider(FolioServiceProvider::class))->not->toBeNull();
+    $provider = App::getProvider(FolioServiceProvider::class);
+    assert($provider !== null);
+    expect($provider)->not->toBeNull();
 });

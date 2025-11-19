@@ -21,7 +21,9 @@ it('records a validation outcome with prefixed metric name', function (): void {
         ->once()
         ->with(
             'base-platform-metric',
-            m::on(fn (array $payload): bool => ($payload['metric'] ?? null) === 'base_platform_validation_outcome'
+            m::on(fn (array $payload): bool =>
+                /** @phpstan-var array{metric?: string, labels?: array<string, mixed>, value?: int|float, timestamp?: string} $payload */
+                ($payload['metric'] ?? null) === 'base_platform_validation_outcome'
                 && ($payload['labels']['profile'] ?? null) === 'native'
                 && ($payload['labels']['status'] ?? null) === 'pass'
                 && is_numeric($payload['value'] ?? null)
@@ -45,7 +47,9 @@ it('records health check metrics for pass and fail', function (): void {
         ->once()
         ->with(
             'base-platform-metric',
-            m::on(fn (array $payload): bool => ($payload['metric'] ?? null) === 'health_check'
+            m::on(fn (array $payload): bool =>
+                /** @phpstan-var array{metric?: string, labels?: array<string, mixed>} $payload */
+                ($payload['metric'] ?? null) === 'health_check'
                 && ($payload['labels']['check'] ?? null) === 'redis'
                 && ($payload['labels']['status'] ?? null) === 'pass'
                 && ($payload['labels']['region'] ?? null) === 'us')
@@ -78,6 +82,7 @@ it('handles non-string labels gracefully', function (): void {
         ->with(
             'base-platform-metric',
             m::on(function (array $payload): bool {
+                /** @phpstan-var array{labels?: array<string, mixed>} $payload */
                 $labels = $payload['labels'] ?? [];
 
                 // String labels remain strings

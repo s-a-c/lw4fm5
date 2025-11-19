@@ -25,38 +25,16 @@ parameters:
         - '#Call to method .+ of internal class Pest\\PendingCalls\\.+ from outside its root namespace Pest#'
         - '#Call to method .+ of internal class Pest\\Configuration from outside its root namespace Pest#'
         - '#Access to constant on internal class Pest\\Mutate\\Plugins\\Mutate#'
-        # Pest expect() syntax with $not property
-        -
-            message: '#Access to an undefined property Pest\\Mixins\\Expectation.*::\$not\.?#'
-            paths:
-                - tests/**/*.php
-        -
-            message: '#Cannot access property \$not on mixed\.?#'
-            paths:
-                - tests/**/*.php
-        -
-            message: '#Cannot call method (toContain|toBeEmpty|toBeUsed)\(\) on mixed\.#'
-            paths:
-                - tests/**/*.php
+        # Pest expect() syntax with $not property - Fixed with assert() type narrowing
+        # Removed: expect()->not-> patterns now use assert() for type narrowing
         # Mockery expectations - fluent interface pattern
         - '#Call to an undefined method Mockery\\ExpectationInterface.*#'
         -
             message: '#Cannot call method (andReturn|andThrow|with|once)\(\) on mixed\.#'
             paths:
                 - tests/**/*.php
-        # Laravel test helpers from TestCase trait
-        -
-            message: '#Call to an undefined method PHPUnit\\Framework\\TestCase::(get|post|actingAs|assertDatabaseHas|assertAuthenticated|assertGuest|expectsOutputToContain)\(\)\.#'
-            paths:
-                - tests/**/*.php
-        -
-            message: '#Cannot call method (get|post)\(\) on mixed\.#'
-            paths:
-                - tests/**/*.php
-        -
-            message: '#Cannot call method (assertRedirect|assertStatus|assertOk|assertSee|assertDontSee|assertForbidden|assertSessionHasNoErrors|assertSessionHasErrorsIn|withSession)\(\) on mixed\.#'
-            paths:
-                - tests/**/*.php
+        # Laravel test helpers from TestCase trait - Fixed with PHPDoc @method tags
+        # Removed: TestCase.php now has proper @method PHPDoc for all trait methods
         # Laravel command testing
         -
             message: '#Cannot call method (expectsOutputToContain|assertExitCode)\(\) on#'
@@ -71,52 +49,24 @@ parameters:
             message: '#Dynamic call to static method Illuminate\\Contracts\\Auth\\Guard::check\(\)#'
             paths:
                 - tests/**/*.php
-        # Internal class access for testing (BootstrapRecoveryGuidance is intentionally internal for testing)
-        -
-            message: '#Call to method __construct\(\) of internal class App\\Services\\BasePlatform\\BootstrapRecoveryGuidance#'
-            paths:
-                - tests/**/*.php
-        -
-            message: '#Instantiation of internal class App\\Services\\BasePlatform\\BootstrapRecoveryGuidance#'
-            paths:
-                - tests/**/*.php
-        -
-            message: '#Access to property .+ of internal class App\\Services\\BasePlatform\\BootstrapRecoveryGuidance#'
-            paths:
-                - tests/**/*.php
-        # Pest helper function issues
-        -
-            message: '#Cannot call method (freezeTime|toBe)\(\) on mixed\.#'
-            paths:
-                - tests/Pest.php
-        -
-            message: '#Undefined variable: \$this#'
-            paths:
-                - tests/Pest.php
+        # Internal class access for testing - Fixed with @phpstan-ignore-next-line
+        # Removed: BootstrapRecoveryGuidance access now uses targeted annotations
+        # Pest helper function issues - Fixed with annotations
+        # Removed: freezeTime() and $this issues resolved with proper annotations
         # Pest Laravel helper functions (globally available)
         -
             message: '#Function (assertAuthenticated|assertGuest|assertDatabaseHas|skip) not found\.#'
             paths:
                 - tests/**/*.php
-        # Pest plugin arch (preset and expect methods)
-        -
-            message: '#Call to an undefined method Pest\\PendingCalls\\TestCall::(preset|expect)\(\)#'
-            paths:
-                - tests/**/*.php
-        -
-            message: '#Cannot call method (security|expect)\(\) on mixed\.#'
-            paths:
-                - tests/**/*.php
+        # Pest plugin arch (preset and expect methods) - Fixed with @phpstan-ignore-next-line
+        # Removed: arch() calls now use targeted annotations
         # Trait unused warnings (test traits are used via Pest configuration)
         -
             message: '#Trait .+ is used zero times and is not analysed#'
             paths:
                 - tests/**/*.php
-        # Type issues in test data (test-specific arrays)
-        -
-            message: '#Parameter \$issues of class App\\Services\\BasePlatform\\ParityReport constructor expects list<string>#'
-            paths:
-                - tests/**/*.php
+        # Type issues in test data - Fixed with explicit type annotations
+        # Removed: ParityReport issues parameter now uses list<string> type annotations
         # Nullable access in tests (tests verify null handling)
         -
             message: '#Cannot access property \$(name|classification|id) on#'
@@ -131,19 +81,8 @@ parameters:
             message: '#Cannot access offset .+ on mixed#'
             paths:
                 - tests/**/*.php
-        # Test helper methods and properties
-        -
-            message: '#Call to an undefined method PHPUnit\\Framework\\TestCase::appendTimestamps\(\)#'
-            paths:
-                - tests/**/*.php
-        -
-            message: '#Access to an undefined property PHPUnit\\Framework\\TestCase::\$app#'
-            paths:
-                - tests/**/*.php
-        -
-            message: '#Cannot call method instance\(\) on mixed#'
-            paths:
-                - tests/**/*.php
+        # Test helper methods and properties - Fixed with type annotations
+        # Removed: appendTimestamps() and $app access now use proper type hints
         -
             message: '#Parameter .+ expects .+, mixed given#'
             paths:
@@ -181,16 +120,10 @@ parameters:
             message: '#Ternary operator condition is always true#'
             paths:
                 - tests/**/*.php
-        # Mockery property access - Mockery mocks use magic properties
-        -
-            message: '#Access to an undefined property Mockery\\MockInterface::\$path#'
-            paths:
-                - tests/**/*.php
-        # Filament class not found - may be missing from stubs
-        -
-            message: '#Class Filament\\Facades\\Filament\\Support\\Assets\\AlpineComponent not found#'
-            paths:
-                - tests/**/*.php
+        # Mockery property access - Fixed with type annotations
+        # Removed: Mockery property access now uses proper @phpstan-var annotations
+        # Filament class not found - Fixed with @phpstan-ignore-next-line
+        # Removed: AlpineComponent access now uses targeted annotations
         # Type coverage warnings (informational, not blocking)
         -
             message: '#Out of .+ possible param types, only .+ - .+ % actually have it#'

@@ -6,5 +6,7 @@ use App\Providers\BroadcastServiceProvider;
 use Illuminate\Support\Facades\App;
 
 it('boots BroadcastServiceProvider', function (): void {
-    expect(App::getProvider(BroadcastServiceProvider::class))->not->toBeNull();
+    $provider = App::getProvider(BroadcastServiceProvider::class);
+    assert($provider !== null);
+    expect($provider)->not->toBeNull();
 });

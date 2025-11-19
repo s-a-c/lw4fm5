@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Models\EnvironmentProfile;
 use App\Services\BasePlatform\EnvironmentProfileValidator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 
 uses(RefreshDatabase::class);
 
@@ -37,9 +38,10 @@ it('returns all supported profiles when none are specified', function (): void {
     $results = $validator->validate([]);
 
     // Only the 2 supported profiles should be returned
-    expect($results)->toHaveCount(2)
-        ->and(collect($results)->pluck('profile')->all())
-        ->toEqualCanonicalizing(['native', 'container']);
+    expect($results)->toHaveCount(2);
+    /** @phpstan-var Collection<int, string> $profiles */
+    $profiles = collect($results)->pluck('profile');
+    expect($profiles->all())->toEqualCanonicalizing(['native', 'container']);
 });
 
 it('filters by provided profile names', function (): void {

@@ -7,10 +7,12 @@ use App\Contracts\BasePlatform\BootstrapRunnerContract;
 use App\Services\BasePlatform\BootstrapRun;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
+use Mockery\MockInterface;
 
 it('renders a warning message when the bootstrap completes with warnings', function (): void {
     Config::set('base-platform.profiles.supported', ['native']);
 
+    /** @phpstan-var MockInterface&BootstrapRunnerContract $mock */
     $mock = mock(BootstrapRunnerContract::class);
     $mock->shouldReceive('run')
         ->once()

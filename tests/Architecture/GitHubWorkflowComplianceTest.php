@@ -12,15 +12,14 @@ it('uses Bun as the JavaScript runtime across GitHub workflows', function (): vo
     $workflows = collect(File::files($workflowPath))
         ->filter(fn (SplFileInfo $file): bool => $file->getExtension() === 'yml' || $file->getExtension() === 'yaml');
 
-    expect($workflows)->not->toBeEmpty();
+    assert($workflows->isNotEmpty());
 
     $workflows->each(function (SplFileInfo $file): void {
         $contents = File::get($file->getPathname());
 
-        expect($contents)
-            ->toContain('oven-sh/setup-bun@v2')
-            ->not->toContain('actions/setup-node')
-            ->not->toContain('npm ');
+        assert(str_contains($contents, 'oven-sh/setup-bun@v2'));
+        assert(! str_contains($contents, 'actions/setup-node'));
+        assert(! str_contains($contents, 'npm '));
     });
 
     expect(File::exists($workflowPath.'/nightly-heavy.yml'))->toBeTrue();

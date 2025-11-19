@@ -8,10 +8,12 @@ use App\Services\BasePlatform\BootstrapRecoveryGuidance;
 use App\Services\BasePlatform\BootstrapRunnerException;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
+use Mockery\MockInterface;
 
 it('handles BootstrapRunnerException with guidance', function (): void {
     Config::set('base-platform.profiles.supported', ['native']);
 
+    /** @phpstan-ignore-next-line */
     $guidance = new BootstrapRecoveryGuidance(
         title: 'Bootstrap failed',
         documentation: 'https://example.com/docs',
@@ -27,6 +29,7 @@ it('handles BootstrapRunnerException with guidance', function (): void {
         guidance: $guidance,
     );
 
+    /** @phpstan-var MockInterface&BootstrapRunnerContract $mock */
     $mock = mock(BootstrapRunnerContract::class);
     $mock->shouldReceive('run')
         ->once()

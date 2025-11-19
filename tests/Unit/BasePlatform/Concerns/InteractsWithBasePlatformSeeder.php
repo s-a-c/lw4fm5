@@ -12,6 +12,9 @@ use Closure;
 use Database\Seeders\BasePlatformSeeder;
 use RuntimeException;
 
+/**
+ * @method Closure(BasePlatformSeeder, list<array<string, mixed>>): list<array<string, mixed>> appendTimestamps()
+ */
 trait InteractsWithBasePlatformSeeder
 {
     /**

@@ -6,6 +6,7 @@ use App\Contracts\BasePlatform\EnvironmentProfileValidatorContract;
 use App\Models\EnvironmentProfile;
 use App\Services\BasePlatform\ProfileValidationResult;
 use Illuminate\Support\Str;
+use Mockery\MockInterface;
 
 use function Pest\Laravel\artisan;
 use function Pest\Laravel\mock;
@@ -29,8 +30,9 @@ it('validates only the native profile when requested', function (): void {
         'status' => 'supported',
     ]);
 
-    mock(EnvironmentProfileValidatorContract::class)
-        ->shouldReceive('validate')
+    /** @phpstan-var MockInterface&EnvironmentProfileValidatorContract $mock */
+    $mock = mock(EnvironmentProfileValidatorContract::class);
+    $mock->shouldReceive('validate')
         ->once()
         ->with(['native'])
         ->andReturn([
@@ -40,6 +42,8 @@ it('validates only the native profile when requested', function (): void {
                 issues: []
             ),
         ]);
+
+    app()->instance(EnvironmentProfileValidatorContract::class, $mock);
 
     artisan('platform:validate-profiles', ['--profile' => 'native'])
         ->expectsOutputToContain('Validation complete for native')

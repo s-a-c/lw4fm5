@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
+use Mockery\MockInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
 use function Pest\Laravel\mock;
@@ -54,6 +55,7 @@ afterEach(function (): void {
 });
 
 it('generates a dependency review report with severity counts and overdue entries', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     // Clear any existing report files first
     $reportPath = 'base-platform/dependency-reports/2025-11-dependency-review.json';
     Storage::disk('local')->delete($reportPath);
@@ -85,16 +87,20 @@ it('generates a dependency review report with severity counts and overdue entrie
         exitCode: 0,
     );
 
+    /** @phpstan-var MockInterface&ComposerAuditRunnerContract $mock */
     $mock = mock(ComposerAuditRunnerContract::class);
     $mock->shouldReceive('run')
         ->once()
         ->andReturn($fakeResult);
 
     // Bind mock before command is instantiated
-    $this->app->instance(ComposerAuditRunnerContract::class, $mock);
+    /** @phpstan-var Illuminate\Foundation\Application $app */
+    /** @phpstan-ignore-next-line */
+    $app = $this->app;
+    $app->instance(ComposerAuditRunnerContract::class, $mock);
 
     $command = app(DependencyReviewReport::class);
-    $command->setLaravel($this->app);
+    $command->setLaravel($app);
 
     $tester = new CommandTester($command);
     $exitCode = $tester->execute([]);
@@ -137,12 +143,20 @@ it('generates a dependency review report with severity counts and overdue entrie
         'low' => 0,
     ]);
 
-    expect(Collection::make($report['overdue_reviews'])->pluck('name'))->toContain('laravel/framework');
-    expect(Collection::make($report['dependencies'])->firstWhere('name', 'laravel/framework')['classification'])->toBe('core');
+    /** @phpstan-var Collection<int, array<string, mixed>> $overdueReviews */
+    $overdueReviews = Collection::make($report['overdue_reviews']);
+    expect($overdueReviews->pluck('name'))->toContain('laravel/framework');
+    /** @phpstan-var Collection<int, array<string, mixed>> $dependencies */
+    $dependencies = Collection::make($report['dependencies']);
+    $dependency = $dependencies->firstWhere('name', 'laravel/framework');
+    assert($dependency !== null);
+    expect($dependency['classification'])->toBe('core');
     expect($report['issue_template'])->toBe('.github/ISSUE_TEMPLATE/dependency-review.md');
 });
 
 it('handles composer audit failure with error output', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
+    /** @phpstan-var MockInterface&ComposerAuditRunnerContract $mock */
     $mock = mock(ComposerAuditRunnerContract::class);
     $mock->shouldReceive('run')
         ->once()
@@ -155,7 +169,10 @@ it('handles composer audit failure with error output', function (): void {
     app()->instance(ComposerAuditRunnerContract::class, $mock);
 
     $command = app(DependencyReviewReport::class);
-    $command->setLaravel($this->app);
+    /** @phpstan-var Illuminate\Foundation\Application $app */
+    /** @phpstan-ignore-next-line */
+    $app = $this->app;
+    $command->setLaravel($app);
 
     $tester = new CommandTester($command);
     $exitCode = $tester->execute([]);
@@ -166,6 +183,8 @@ it('handles composer audit failure with error output', function (): void {
 });
 
 it('handles composer audit returning malformed JSON', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
+    /** @phpstan-var MockInterface&ComposerAuditRunnerContract $mock */
     $mock = mock(ComposerAuditRunnerContract::class);
     $mock->shouldReceive('run')
         ->once()
@@ -178,7 +197,10 @@ it('handles composer audit returning malformed JSON', function (): void {
     app()->instance(ComposerAuditRunnerContract::class, $mock);
 
     $command = app(DependencyReviewReport::class);
-    $command->setLaravel($this->app);
+    /** @phpstan-var Illuminate\Foundation\Application $app */
+    /** @phpstan-ignore-next-line */
+    $app = $this->app;
+    $command->setLaravel($app);
 
     $tester = new CommandTester($command);
     $exitCode = $tester->execute([]);
@@ -189,6 +211,8 @@ it('handles composer audit returning malformed JSON', function (): void {
 });
 
 it('handles warning status when medium advisories exist', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
+    /** @phpstan-var MockInterface&ComposerAuditRunnerContract $mock */
     $mock = mock(ComposerAuditRunnerContract::class);
     $mock->shouldReceive('run')
         ->once()
@@ -208,7 +232,10 @@ it('handles warning status when medium advisories exist', function (): void {
     app()->instance(ComposerAuditRunnerContract::class, $mock);
 
     $command = app(DependencyReviewReport::class);
-    $command->setLaravel($this->app);
+    /** @phpstan-var Illuminate\Foundation\Application $app */
+    /** @phpstan-ignore-next-line */
+    $app = $this->app;
+    $command->setLaravel($app);
 
     $tester = new CommandTester($command);
     $exitCode = $tester->execute([]);
@@ -226,6 +253,8 @@ it('handles warning status when medium advisories exist', function (): void {
 });
 
 it('handles unknown severity in advisories', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
+    /** @phpstan-var MockInterface&ComposerAuditRunnerContract $mock */
     $mock = mock(ComposerAuditRunnerContract::class);
     $mock->shouldReceive('run')
         ->once()
@@ -245,7 +274,10 @@ it('handles unknown severity in advisories', function (): void {
     app()->instance(ComposerAuditRunnerContract::class, $mock);
 
     $command = app(DependencyReviewReport::class);
-    $command->setLaravel($this->app);
+    /** @phpstan-var Illuminate\Foundation\Application $app */
+    /** @phpstan-ignore-next-line */
+    $app = $this->app;
+    $command->setLaravel($app);
 
     $tester = new CommandTester($command);
     $exitCode = $tester->execute([]);
@@ -255,6 +287,8 @@ it('handles unknown severity in advisories', function (): void {
 });
 
 it('uses custom output path when provided', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
+    /** @phpstan-var MockInterface&ComposerAuditRunnerContract $mock */
     $mock = mock(ComposerAuditRunnerContract::class);
     $mock->shouldReceive('run')
         ->once()
@@ -267,7 +301,10 @@ it('uses custom output path when provided', function (): void {
     app()->instance(ComposerAuditRunnerContract::class, $mock);
 
     $command = app(DependencyReviewReport::class);
-    $command->setLaravel($this->app);
+    /** @phpstan-var Illuminate\Foundation\Application $app */
+    /** @phpstan-ignore-next-line */
+    $app = $this->app;
+    $command->setLaravel($app);
 
     $tester = new CommandTester($command);
     $exitCode = $tester->execute([

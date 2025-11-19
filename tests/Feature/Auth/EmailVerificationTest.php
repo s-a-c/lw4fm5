@@ -4,18 +4,23 @@ declare(strict_types=1);
 
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Testing\TestResponse;
 
 test('email verification screen can be rendered', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     $user = User::factory()->unverified()->create();
 
+    /** @phpstan-var TestResponse<Response> $response */
     $response = $this->actingAs($user)->get(route('verification.notice'));
 
     $response->assertStatus(200);
 });
 
 test('email can be verified', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     $user = User::factory()->unverified()->create();
 
     Event::fake();
@@ -26,6 +31,7 @@ test('email can be verified', function (): void {
         ['id' => $user->id, 'hash' => sha1((string) $user->email)]
     );
 
+    /** @phpstan-var TestResponse<Response> $response */
     $response = $this->actingAs($user)->get($verificationUrl);
 
     Event::assertDispatched(Verified::class);
@@ -35,6 +41,7 @@ test('email can be verified', function (): void {
 });
 
 test('email is not verified with invalid hash', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     $user = User::factory()->unverified()->create();
 
     $verificationUrl = URL::temporarySignedRoute(
@@ -43,12 +50,15 @@ test('email is not verified with invalid hash', function (): void {
         ['id' => $user->id, 'hash' => sha1('wrong-email')]
     );
 
-    $this->actingAs($user)->get($verificationUrl);
+    /** @phpstan-var Tests\TestCase $this */
+    /** @phpstan-var TestResponse<Response> $response */
+    $response = $this->actingAs($user)->get($verificationUrl);
 
     expect($user->fresh()->hasVerifiedEmail())->toBeFalse();
 });
 
 test('already verified user visiting verification link is redirected without firing event again', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     $user = User::factory()->create([
         'email_verified_at' => now(),
     ]);
@@ -61,9 +71,13 @@ test('already verified user visiting verification link is redirected without fir
         ['id' => $user->id, 'hash' => sha1((string) $user->email)]
     );
 
-    $this->actingAs($user)->get($verificationUrl)
+    /** @phpstan-var TestResponse<Response> $response */
+    $response = $this->actingAs($user)->get($verificationUrl);
+    $response
         ->assertRedirect(route('dashboard', absolute: false).'?verified=1');
 
-    expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
+    $freshUser = $user->fresh();
+    assert($freshUser !== null);
+    expect($freshUser->hasVerifiedEmail())->toBeTrue();
     Event::assertNotDispatched(Verified::class);
 });

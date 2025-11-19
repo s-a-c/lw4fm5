@@ -6,7 +6,6 @@
  We recommend using `mocha` for dark mode.
 */
 @import '@catppuccin/tailwindcss/frappe.css';
-@import '@catppuccin/tailwindcss/latte.css';
 @import '@catppuccin/tailwindcss/macchiato.css';
 @import '@catppuccin/tailwindcss/mocha.css';
 

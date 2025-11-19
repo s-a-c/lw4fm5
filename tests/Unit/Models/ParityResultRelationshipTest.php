@@ -23,6 +23,8 @@ it('has environmentProfile relationship', function (): void {
         'issues' => [],
     ]);
 
-    expect($result->environmentProfile)->not->toBeNull();
-    expect($result->environmentProfile->id)->toBe($profile->id);
+    $environmentProfile = $result->environmentProfile;
+    assert($environmentProfile !== null);
+    expect($environmentProfile)->not->toBeNull();
+    expect($environmentProfile->id)->toBe($profile->id);
 });

@@ -12,9 +12,12 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Mockery as m;
+use Mockery\MockInterface;
 
 it('boots SupportCustomizationServiceProvider', function (): void {
-    expect(App::getProvider(SupportCustomizationServiceProvider::class))->not->toBeNull();
+    $provider = App::getProvider(SupportCustomizationServiceProvider::class);
+    assert($provider !== null);
+    expect($provider)->not->toBeNull();
 });
 
 it('configures Filament assets on serving event', function (): void {
@@ -25,6 +28,7 @@ it('configures Filament assets on serving event', function (): void {
     ]);
 
     // Mock FilamentAsset to return scripts
+    /** @phpstan-var MockInterface&Js $script */
     $script = m::mock(Js::class);
     $script->shouldReceive('getPackage')->andReturn('filament');
     $script->shouldReceive('getId')->andReturn('app');
@@ -49,7 +53,9 @@ it('configures Filament assets on serving event', function (): void {
     $method = $reflection->getMethod('configureFilamentAssets');
     $method->invoke($provider); // This executes the same code as line 30
 
-    expect(App::getProvider(SupportCustomizationServiceProvider::class))->not->toBeNull();
+    $providerCheck = App::getProvider(SupportCustomizationServiceProvider::class);
+    assert($providerCheck !== null);
+    expect($providerCheck)->not->toBeNull();
 });
 
 it('calls onFilamentServing from Filament serving callback', function (): void {
@@ -84,6 +90,7 @@ it('configures Filament assets on view composer', function (): void {
     ]);
 
     // Mock FilamentAsset to return scripts
+    /** @phpstan-var MockInterface&Js $script */
     $script = m::mock(Js::class);
     $script->shouldReceive('getPackage')->andReturn('filament');
     $script->shouldReceive('getId')->andReturn('app');
@@ -155,7 +162,9 @@ it('applies async attribute to scripts', function (): void {
     $method = $reflection->getMethod('configureFilamentAssets');
     $method->invoke($provider);
 
-    expect(App::getProvider(SupportCustomizationServiceProvider::class))->not->toBeNull();
+    $providerCheck = App::getProvider(SupportCustomizationServiceProvider::class);
+    assert($providerCheck !== null);
+    expect($providerCheck)->not->toBeNull();
 });
 
 it('mutates scripts based on identifier match', function (): void {
@@ -182,7 +191,9 @@ it('mutates scripts based on identifier match', function (): void {
     $method = $reflection->getMethod('configureFilamentAssets');
     $method->invoke($provider);
 
-    expect(App::getProvider(SupportCustomizationServiceProvider::class))->not->toBeNull();
+    $providerCheck = App::getProvider(SupportCustomizationServiceProvider::class);
+    assert($providerCheck !== null);
+    expect($providerCheck)->not->toBeNull();
 });
 
 it('excludes scripts that match exclude list', function (): void {
@@ -254,7 +265,10 @@ it('disables Alpine components when load_alpine is false', function (): void {
     Config::set('filament.assets.load_alpine', false);
 
     // Mock Alpine component (lines 93-96)
+    /** @phpstan-var MockInterface&AlpineComponent $component */
+    /** @phpstan-ignore-next-line */
     $component = m::mock(AlpineComponent::class);
+    /** @phpstan-ignore-next-line */
     $component->shouldReceive('loadedOnRequest')->once();
 
     FilamentAsset::shouldReceive('getScripts')->andReturn([]);

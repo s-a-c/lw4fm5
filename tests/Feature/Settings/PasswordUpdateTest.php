@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Livewire\Features\SupportTesting\Testable;
 use Livewire\Volt\Volt;
 
 test('password can be updated', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     $user = User::factory()->create([
         'password' => Hash::make('password'),
     ]);
 
     $this->actingAs($user);
 
+    /** @phpstan-var Testable $response */
     $response = Volt::test('settings.password')
         ->set('current_password', 'password')
         ->set('password', 'NewPassword123!@#')
@@ -25,12 +28,14 @@ test('password can be updated', function (): void {
 });
 
 test('correct password must be provided to update password', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     $user = User::factory()->create([
         'password' => Hash::make('password'),
     ]);
 
     $this->actingAs($user);
 
+    /** @phpstan-var Testable $response */
     $response = Volt::test('settings.password')
         ->set('current_password', 'wrong-password')
         ->set('password', 'NewPassword123!@#')

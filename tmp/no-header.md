@@ -1,1 +1,0 @@
-# File without acknowledgement header

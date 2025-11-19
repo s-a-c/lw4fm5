@@ -12,10 +12,13 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Validation\Rules\Password;
 use Mockery as m;
+use Mockery\MockInterface;
 
 it('boots AppServiceProvider and configures application', function (): void {
     // The provider should be booted automatically, but we can verify its effects
-    expect(App::getProvider(AppServiceProvider::class))->not->toBeNull();
+    $provider = App::getProvider(AppServiceProvider::class);
+    assert($provider !== null);
+    expect($provider)->not->toBeNull();
 });
 
 it('configures Carbon to use CarbonImmutable', function (): void {
@@ -56,6 +59,7 @@ it('configures password defaults without uncompromised when disabled', function 
 
 it('configures password defaults for local environment without uncompromised', function (): void {
     // Create a mock app that returns true for environment('local')
+    /** @phpstan-var MockInterface&Application $app */
     $app = m::mock(Application::class)->makePartial();
     $app->shouldReceive('environment')->with('local')->andReturn(true);
     $app->shouldReceive('make')->andReturnUsing(fn (string $abstract) => App::getInstance()->make($abstract));

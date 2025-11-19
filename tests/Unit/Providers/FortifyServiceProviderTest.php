@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\App;
 use Laravel\Fortify\Fortify;
 
 it('boots FortifyServiceProvider and configures Fortify', function (): void {
-    expect(App::getProvider(FortifyServiceProvider::class))->not->toBeNull();
+    $provider = App::getProvider(FortifyServiceProvider::class);
+    assert($provider !== null);
+    expect($provider)->not->toBeNull();
 });
 
 it('registers Fortify actions', function (): void {

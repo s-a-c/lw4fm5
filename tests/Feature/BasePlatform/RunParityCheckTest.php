@@ -9,12 +9,14 @@ use App\Services\BasePlatform\ParityReport;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
+use Mockery\MockInterface;
 
 uses(RefreshDatabase::class);
 
 it('handles empty profiles list', function (): void {
     Config::set('base-platform.profiles.supported', []);
 
+    /** @phpstan-var MockInterface&ParityCheckerContract $mock */
     $mock = mock(ParityCheckerContract::class);
     $mock->shouldNotReceive('run');
 
@@ -37,12 +39,15 @@ it('handles warning status in parity results', function (): void {
         'status' => 'supported',
     ]);
 
+    /** @var list<string> $issues */
+    $issues = ['Warning: Some configuration drift detected'];
     $report = new ParityReport(
         profile: 'native',
         status: ParityReport::STATUS_WARNING,
-        issues: ['Warning: Some configuration drift detected'],
+        issues: $issues,
     );
 
+    /** @phpstan-var MockInterface&ParityCheckerContract $mock */
     $mock = mock(ParityCheckerContract::class);
     $mock->shouldReceive('run')
         ->once()
@@ -70,16 +75,20 @@ it('handles non-string issues in parity results', function (): void {
         'status' => 'supported',
     ]);
 
+    /** @var array<int, string|int|array<string, string>> $mixedIssues */
+    $mixedIssues = [
+        'String issue',
+        123, // Non-string issue
+        ['array' => 'issue'], // Non-string issue
+    ];
     $report = new ParityReport(
         profile: 'native',
         status: ParityReport::STATUS_FAIL,
-        issues: [
-            'String issue',
-            123, // Non-string issue
-            ['array' => 'issue'], // Non-string issue
-        ],
+        /** @phpstan-ignore-next-line */
+        issues: $mixedIssues,
     );
 
+    /** @phpstan-var MockInterface&ParityCheckerContract $mock */
     $mock = mock(ParityCheckerContract::class);
     $mock->shouldReceive('run')
         ->once()
@@ -114,12 +123,15 @@ it('filters profiles by option', function (): void {
         'status' => 'supported',
     ]);
 
+    /** @var list<string> $emptyIssues */
+    $emptyIssues = [];
     $report = new ParityReport(
         profile: 'native',
         status: ParityReport::STATUS_PASS,
-        issues: [],
+        issues: $emptyIssues,
     );
 
+    /** @phpstan-var MockInterface&ParityCheckerContract $mock */
     $mock = mock(ParityCheckerContract::class);
     $mock->shouldReceive('run')
         ->once()
@@ -138,6 +150,7 @@ it('filters profiles by option', function (): void {
 it('handles non-array supported profiles config', function (): void {
     Config::set('base-platform.profiles.supported', 'not-an-array');
 
+    /** @phpstan-var MockInterface&ParityCheckerContract $mock */
     $mock = mock(ParityCheckerContract::class);
     $mock->shouldNotReceive('run');
 
@@ -160,12 +173,15 @@ it('handles fail status in parity results', function (): void {
         'status' => 'supported',
     ]);
 
+    /** @var list<string> $criticalIssues */
+    $criticalIssues = ['Critical issue'];
     $report = new ParityReport(
         profile: 'native',
         status: ParityReport::STATUS_FAIL, // Use valid status that matches default case in renderStatusMessage
-        issues: ['Critical issue'],
+        issues: $criticalIssues,
     );
 
+    /** @phpstan-var MockInterface&ParityCheckerContract $mock */
     $mock = mock(ParityCheckerContract::class);
     $mock->shouldReceive('run')
         ->once()

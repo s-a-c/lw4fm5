@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Testing\TestResponse;
 
 test('reset password link screen can be rendered', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
+    /** @phpstan-var TestResponse<Response> $response */
     $response = $this->get(route('password.request'));
 
     $response->assertStatus(200);
 });
 
 test('reset password link can be requested', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     Notification::fake();
 
     $user = User::factory()->create();
@@ -23,6 +28,7 @@ test('reset password link can be requested', function (): void {
 });
 
 test('reset password screen can be rendered', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     Notification::fake();
 
     $user = User::factory()->create();
@@ -30,6 +36,8 @@ test('reset password screen can be rendered', function (): void {
     $this->post(route('password.request'), ['email' => $user->email]);
 
     Notification::assertSentTo($user, ResetPassword::class, function ($notification): true {
+        /** @phpstan-var Tests\TestCase $this */
+        /** @phpstan-var TestResponse<Response> $response */
         $response = $this->get(route('password.reset', $notification->token));
 
         $response->assertStatus(200);
@@ -39,6 +47,7 @@ test('reset password screen can be rendered', function (): void {
 });
 
 test('password can be reset with valid token', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
     Notification::fake();
 
     $user = User::factory()->create();
@@ -46,6 +55,8 @@ test('password can be reset with valid token', function (): void {
     $this->post(route('password.request'), ['email' => $user->email]);
 
     Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user): true {
+        /** @phpstan-var Tests\TestCase $this */
+        /** @phpstan-var TestResponse<Response> $response */
         $response = $this->post(route('password.update'), [
             'token' => $notification->token,
             'email' => $user->email,

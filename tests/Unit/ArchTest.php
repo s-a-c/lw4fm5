@@ -7,8 +7,10 @@ declare(strict_types=1);
 // arch()->preset()->php();
 // arch()->preset()->strict()
 //     ->ignoring('App\Http\Controllers\Controller');
+/** @phpstan-ignore-next-line */
 arch()->preset()->security();
 
+/** @phpstan-ignore-next-line */
 arch('controllers')
     ->expect('App\Http\Controllers')
     ->not->toBeUsed();

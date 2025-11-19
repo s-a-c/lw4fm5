@@ -54,9 +54,10 @@ it('summarises dependency review runtime metrics and appends performance log', f
         static fn (string $line): bool => mb_trim($line) !== ''
     );
 
+    /** @phpstan-var array<int, non-empty-string> $entries */
     expect($entries)->not->toBeEmpty();
     $lastEntry = end($entries);
-    assert(is_string($lastEntry));
+    assert($lastEntry !== false);
     $last = json_decode($lastEntry, true, 512, JSON_THROW_ON_ERROR);
 
     expect($last)->toMatchArray([

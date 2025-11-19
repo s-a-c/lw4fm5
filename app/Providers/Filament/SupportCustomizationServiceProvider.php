@@ -108,13 +108,13 @@ final class SupportCustomizationServiceProvider extends ServiceProvider
 
     /**
      * @param  array<string, bool|int|string>  $attributes
-     * @return Collection<string, string>
+     * @return Collection<string, non-empty-string>
      */
     private function stringifyAttributes(array $attributes): Collection
     {
         return collect($attributes)
             ->mapWithKeys(static fn (string|int|bool $value, string $key): array => [$key => (string) $value])
-            ->filter();
+            ->reject(static fn (string $value): bool => $value === '');
     }
 
     /**

@@ -7,11 +7,16 @@ declare(strict_types=1);
  */
 
 use Database\Seeders\BasePlatformSeeder;
+use Illuminate\Support\Carbon;
 use Tests\Unit\BasePlatform\Concerns\InteractsWithBasePlatformSeeder;
 
 uses(InteractsWithBasePlatformSeeder::class);
 
 it('appends timestamp keys without dropping existing attributes', function (): void {
+    /** @phpstan-var Tests\TestCase $this */
+    $frozenNow = Carbon::now();
+    Carbon::setTestNow($frozenNow);
+
     $seeder = new BasePlatformSeeder();
 
     $records = [
@@ -22,6 +27,7 @@ it('appends timestamp keys without dropping existing attributes', function (): v
     ];
 
     /** @var list<array<string, mixed>> $result */
+    /** @phpstan-ignore-next-line */
     $result = ($this->appendTimestamps())($seeder, $records);
 
     expect($result)->toHaveCount(1);
@@ -31,6 +37,8 @@ it('appends timestamp keys without dropping existing attributes', function (): v
     expect($record)->toHaveKeys(['id', 'name', 'created_at', 'updated_at']);
     expect($record['id'])->toBe('example-id');
     expect($record['name'])->toBe('example-name');
-    expect($record['created_at'])->toEqual(now());
-    expect($record['updated_at'])->toEqual(now());
+    expect($record['created_at'])->toEqual($frozenNow);
+    expect($record['updated_at'])->toEqual($frozenNow);
+
+    Carbon::setTestNow();
 });

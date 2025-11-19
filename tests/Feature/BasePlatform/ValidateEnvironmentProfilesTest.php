@@ -7,6 +7,7 @@ use App\Models\EnvironmentProfile;
 use App\Services\BasePlatform\ProfileValidationResult;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
+use Mockery\MockInterface;
 
 use function Pest\Laravel\artisan;
 
@@ -74,6 +75,7 @@ it('handles fail status in validation results', function (): void {
     ]);
 
     // Mock the validator to return a fail result
+    /** @phpstan-var MockInterface&EnvironmentProfileValidatorContract $validator */
     $validator = mock(EnvironmentProfileValidatorContract::class);
     $validator->shouldReceive('validate')
         ->once()
