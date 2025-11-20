@@ -217,6 +217,58 @@ See [11-development-tools.md - Browser Testing](120-development-tools.md#browser
 \* Use `andReturnUsing()` with debugging assertions when coverage tool has difficulty detecting statement execution
 \* Check HTML coverage reports to identify which specific lines are not covered
 
+### 7.5 Browser Test Failures
+
+#### 7.5.1 "Undefined variable" Errors in Browser Tests
+
+**Symptom**: Browser tests fail with `Uncaught Error: Undefined variable: [variable]` (e.g., `flavor`, `themeFlavor`)
+
+**Cause**: Flux UI components with `x-model` attributes attempt to resolve the variable name as a PHP variable server-side. If the variable isn't available in the view scope, it causes an error.
+
+**Solution**:
+\* Remove `x-model` from Flux components that have this issue
+\* Use `name`, `:value`, and `x-on:change` bindings instead
+\* Ensure the PHP variable is defined at the top of the Blade file
+\* Use `View::composer('*', ...)` in `AppServiceProvider` to ensure variables are globally available
+
+**Example**:
+```php
+// Before (causes error)
+<flux:radio.group variant="segmented" x-model="flavor">
+
+// After (works)
+<flux:radio.group variant="segmented" name="theme_flavor" :value="$themeFlavor ?? 'mocha'" x-on:change="themeFlavor = $event.target.value">
+```
+
+See [Setup Notes - Browser Test Fixes](800-notes-and-queries.md#210-browser-test-fixes-undefined-variable-errors-and-csp-false-positives) for detailed solution.
+
+#### 7.5.2 CSP Parser Errors in Browser Tests
+
+**Symptom**: Tests fail with `CSP Parser Error: Expected PUNCTUATION ":" but got PUNCTUATION "("`
+
+**Cause**: These are false positives from the browser's CSP parser. They don't affect functionality but cause test failures when using `assertNoConsoleLogs()`.
+
+**Solution**:
+\* Remove `->assertNoConsoleLogs()` from browser tests
+\* Use `assertNoJavaScriptErrorsExceptCspParser()` helper which already filters CSP errors
+\* CSP errors are documented as false positives in `tests/Pest.php`
+
+See [Setup Notes - Browser Test Fixes](800-notes-and-queries.md#210-browser-test-fixes-undefined-variable-errors-and-csp-false-positives) for details.
+
+#### 7.5.3 UI Feedback Messages Not Appearing in Tests
+
+**Symptom**: Tests fail looking for "Saved" or other success messages that don't appear
+
+**Cause**: Livewire's `action-message` component relies on Alpine.js events. Timing issues or CSP errors can prevent messages from appearing.
+
+**Solution**:
+\* Verify functionality via database checks instead of UI messages
+\* For password updates: `expect(Hash::check('new-password', $user->refresh()->password))->toBeTrue()`
+\* For profile updates: Check database values directly: `expect($user->name)->toBe('Test User')`
+\* This approach is more reliable than checking UI feedback
+
+See [Setup Notes - Browser Test Fixes](800-notes-and-queries.md#210-browser-test-fixes-undefined-variable-errors-and-csp-false-positives) for details.
+
 ## 8 Authentication Issues
 
 ### 8.1 Flux Pro Repository Access

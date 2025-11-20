@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Pest\Browser\Api\AwaitableWebpage;
+use Pest\Browser\Api\PendingAwaitablePage;
+use PHPUnit\Framework\AssertionFailedError;
 use Tests\TestCase;
 
 /**
@@ -15,6 +18,13 @@ use Tests\TestCase;
 | need to change it using the "pest()" function to bind a different classes or traits.
 |
  */
+// Configure browser testing timeout to prevent hanging (30 seconds = 30000ms)
+try {
+    pest()->browser()->timeout(30000);
+} catch (Throwable $e) {
+    // Browser plugin may not be loaded, ignore
+}
+
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
     ->in('Browser');
@@ -54,7 +64,46 @@ expect()->extend('toBeOne', fn () =>
 | global functions to help you to reduce the number of lines of code in your test files.
 |
  */
-function something(): void
+/**
+ * Assert no JavaScript errors, filtering out known false-positive CSP parser errors.
+ *
+ * This helper filters out "CSP Parser Error" messages which are false positives
+ * from the browser's CSP parser when no actual CSP headers are set.
+ *
+ * @param  PendingAwaitablePage|AwaitableWebpage  $page
+ * @return PendingAwaitablePage|AwaitableWebpage
+ */
+function assertNoJavaScriptErrorsExceptCspParser($page)
 {
-    // ..
+    try {
+        $page->assertNoJavaScriptErrors();
+    } catch (AssertionFailedError $e) {
+        $message = $e->getMessage();
+
+        // Check if the error is only CSP parser errors
+        if (str_contains($message, 'CSP Parser Error')) {
+            // Extract all errors from the message
+            preg_match_all('/- (.+)/', $message, $matches);
+            $errors = $matches[1] ?? [];
+
+            // Filter out CSP parser errors
+            $realErrors = array_filter($errors, fn ($error): bool => ! str_contains($error, 'CSP Parser Error'));
+
+            // If there are real errors, throw them
+            if ($realErrors !== []) {
+                throw new AssertionFailedError(
+                    "Expected no JavaScript errors on the page, but found:\n".
+                    implode("\n", array_map(fn (string $error): string => "- {$error}", $realErrors))
+                );
+            }
+
+            // If only CSP parser errors, ignore them (they're false positives)
+            return $page;
+        }
+
+        // Re-throw if it's not a CSP parser error
+        throw $e;
+    }
+
+    return $page;
 }

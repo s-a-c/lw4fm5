@@ -10,5 +10,5 @@ test('returns a successful response', function (): void {
     /** @phpstan-var TestResponse<Response> $response */
     $response = $this->get(route('home'));
 
-    $response->assertStatus(200);
+    expect($response)->assertOk();
 });

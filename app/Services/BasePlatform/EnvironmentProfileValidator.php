@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services\BasePlatform;
 
 use App\Contracts\BasePlatform\EnvironmentProfileValidatorContract;
+use App\Data\ProfileValidationResultData;
+use App\Enums\ValidationStatus;
 use App\Models\EnvironmentProfile;
 use Illuminate\Support\Collection;
 
@@ -12,15 +14,15 @@ final class EnvironmentProfileValidator implements EnvironmentProfileValidatorCo
 {
     /**
      * @param  array<int, string>  $profiles
-     * @return array<int, ProfileValidationResult>
+     * @return array<int, ProfileValidationResultData>
      */
     public function validate(array $profiles): array
     {
         $targets = $this->resolveProfiles($profiles);
 
-        return $targets->map(static fn (EnvironmentProfile $profile): ProfileValidationResult => new ProfileValidationResult(
+        return $targets->map(static fn (EnvironmentProfile $profile): ProfileValidationResultData => new ProfileValidationResultData(
             profile: $profile->name,
-            status: ProfileValidationResult::STATUS_PASS,
+            status: ValidationStatus::Pass,
             issues: [],
         ))->all();
     }

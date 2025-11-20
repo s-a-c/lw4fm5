@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Contracts\BasePlatform;
 
-use App\Services\BasePlatform\BootstrapRun;
+use App\Data\BootstrapRunData;
 
 interface BootstrapRunnerContract
 {
-    public function run(string $profile, bool $forceClean): BootstrapRun;
+    public function run(string $profile, bool $forceClean): BootstrapRunData;
 }

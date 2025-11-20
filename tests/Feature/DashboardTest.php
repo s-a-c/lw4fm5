@@ -10,7 +10,7 @@ test('guests are redirected to the login page', function (): void {
     /** @phpstan-var Tests\TestCase $this */
     /** @phpstan-var TestResponse<Response> $response */
     $response = $this->get(route('dashboard'));
-    $response->assertRedirect(route('login'));
+    expect($response)->assertRedirect(route('login'));
 });
 
 test('authenticated users can visit the dashboard', function (): void {
@@ -20,7 +20,7 @@ test('authenticated users can visit the dashboard', function (): void {
 
     /** @phpstan-var TestResponse<Response> $response */
     $response = $this->get(route('dashboard'));
-    $response->assertStatus(200);
+    expect($response)->assertOk();
 });
 
 test('filament script attributes are applied from config overrides', function (): void {
@@ -45,11 +45,12 @@ test('filament script attributes are applied from config overrides', function ()
     /** @phpstan-var TestResponse<Response> $response */
     $response = $this->get(route('dashboard'));
 
-    $response->assertOk();
-    $response->assertSee('data-turbo-eval=', escape: false);
-    $response->assertSee('data-qa-script="true"', escape: false);
-    $response->assertSee('<script', escape: false);
-    $response->assertSee('defer', escape: false);
+    expect($response)
+        ->assertOk()
+        ->assertSee('data-turbo-eval=', escape: false)
+        ->assertSee('data-qa-script="true"', escape: false)
+        ->assertSee('<script', escape: false)
+        ->assertSee('defer', escape: false);
 
     config()->set('filament.assets', $originalConfig);
 });
@@ -73,9 +74,10 @@ test('filament scripts can be excluded and alpine disabled through config', func
     /** @phpstan-var TestResponse<Response> $response */
     $response = $this->get(route('dashboard'));
 
-    $response->assertOk();
-    $response->assertDontSee('filament/filament/app.js');
-    $response->assertDontSee('/components/', escape: false);
+    expect($response)
+        ->assertOk()
+        ->assertDontSee('filament/filament/app.js')
+        ->assertDontSee('/components/', escape: false);
 
     config()->set('filament.assets', $originalConfig);
 });

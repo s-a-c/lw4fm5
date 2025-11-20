@@ -16,7 +16,7 @@ test('two factor challenge redirects to login when not authenticated', function 
     /** @phpstan-var TestResponse<Response> $response */
     $response = $this->get(route('two-factor.login'));
 
-    $response->assertRedirect(route('login'));
+    expect($response)->assertRedirect(route('login'));
 });
 
 test('two factor challenge can be rendered', function (): void {
@@ -37,5 +37,5 @@ test('two factor challenge can be rendered', function (): void {
         'email' => $user->email,
         'password' => 'password',
     ]);
-    $response->assertRedirect(route('two-factor.login'));
+    expect($response)->assertRedirect(route('two-factor.login'));
 });

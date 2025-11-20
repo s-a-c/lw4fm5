@@ -16,3 +16,5 @@
 @filamentStyles
 
 @fluxAppearance
+
+@include('partials.theme-script')

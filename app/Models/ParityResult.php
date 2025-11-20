@@ -8,6 +8,7 @@ namespace App\Models;
  * Compliant with [.ai/AI-GUIDELINES.md](../../.ai/AI-GUIDELINES.md) v3b99cda02934ad7cdc87310613fb7faac37a49f19d9620106e96e73cacb6bb8e
  */
 
+use App\Enums\ParityStatus;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -47,6 +48,7 @@ final class ParityResult extends Model
         return [
             'run_date' => 'datetime',
             'issues' => 'array',
+            'status' => ParityStatus::class,
         ];
     }
 }

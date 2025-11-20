@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Data\DependencyRecordData;
+use App\Enums\DependencyClassification;
+use App\Enums\ReviewCadence;
+use App\Enums\RiskLevel;
 use App\Services\BasePlatform\DependencyCatalogue;
-use App\Services\BasePlatform\DependencyRecord;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -51,7 +54,7 @@ it('parses the dependency catalogue and flags overdue reviews', function (): voi
 
     expect($entries)->toHaveCount(2);
     expect($entries->first()->name)->toBe('laravel/framework');
-    expect($entries->first()->classification)->toBe('core');
+    expect($entries->first()->classification)->toBe(DependencyClassification::Core);
 
     $overdue = $catalogue->overdue();
 
@@ -162,6 +165,66 @@ it('throws when catalogue entry has invalid risk level', function (): void {
     expect(fn (): Collection => $catalogue->entries())->toThrow(InvalidArgumentException::class);
 });
 
+it('throws when catalogue entry has empty classification', function (): void {
+    Storage::disk('local')->put('base-platform/dependencies.json', json_encode([
+        [
+            'name' => 'test/package',
+            'version' => '1.0.0',
+            'classification' => '', // Empty string
+            'owner' => 'Platform Engineering',
+            'justification' => 'Test',
+            'lastReviewedAt' => '2025-10-10',
+            'reviewCadence' => 'monthly',
+            'riskLevel' => 'medium',
+            'notes' => 'Test',
+        ],
+    ], JSON_THROW_ON_ERROR));
+
+    $catalogue = new DependencyCatalogue(Storage::disk('local'));
+
+    expect(fn (): Collection => $catalogue->entries())->toThrow(InvalidArgumentException::class, 'classification cannot be empty');
+});
+
+it('throws when catalogue entry has empty reviewCadence', function (): void {
+    Storage::disk('local')->put('base-platform/dependencies.json', json_encode([
+        [
+            'name' => 'test/package',
+            'version' => '1.0.0',
+            'classification' => 'core',
+            'owner' => 'Platform Engineering',
+            'justification' => 'Test',
+            'lastReviewedAt' => '2025-10-10',
+            'reviewCadence' => '', // Empty string
+            'riskLevel' => 'medium',
+            'notes' => 'Test',
+        ],
+    ], JSON_THROW_ON_ERROR));
+
+    $catalogue = new DependencyCatalogue(Storage::disk('local'));
+
+    expect(fn (): Collection => $catalogue->entries())->toThrow(InvalidArgumentException::class, 'reviewCadence cannot be empty');
+});
+
+it('throws when catalogue entry has empty riskLevel', function (): void {
+    Storage::disk('local')->put('base-platform/dependencies.json', json_encode([
+        [
+            'name' => 'test/package',
+            'version' => '1.0.0',
+            'classification' => 'core',
+            'owner' => 'Platform Engineering',
+            'justification' => 'Test',
+            'lastReviewedAt' => '2025-10-10',
+            'reviewCadence' => 'monthly',
+            'riskLevel' => '', // Empty string
+            'notes' => 'Test',
+        ],
+    ], JSON_THROW_ON_ERROR));
+
+    $catalogue = new DependencyCatalogue(Storage::disk('local'));
+
+    expect(fn (): Collection => $catalogue->entries())->toThrow(InvalidArgumentException::class, 'riskLevel cannot be empty');
+});
+
 it('handles non-string values in catalogue entries gracefully', function (): void {
     Storage::disk('local')->put('base-platform/dependencies.json', json_encode([
         [
@@ -201,7 +264,7 @@ it('defaults lastReviewedAt to now when value is not a string', function (): voi
     $catalogue = new DependencyCatalogue(Storage::disk('local'));
     $record = $catalogue->entries()->first();
 
-    assert($record !== null);
+    expect($record)->not->toBeNull();
     expect($record->lastReviewedAt->toDateTimeString())->toBe('2025-11-09 00:00:00');
 });
 
@@ -276,39 +339,43 @@ it('converts dependency record to array', function (): void {
     expect($array)->toBeArray();
     expect($array['name'])->toBe('test/package');
     expect($array['version'])->toBe('1.0.0');
+    expect($array['classification'])->toBe('core');
+    expect($array['reviewCadence'])->toBe('monthly');
+    expect($array['riskLevel'])->toBe('medium');
     expect($array)->toHaveKey('reviewDeadline');
 });
 
-it('throws when reviewDeadline encounters unsupported cadence', function (): void {
-    // Create a DependencyRecord directly with invalid cadence to test the default case
-    // Use Carbon::parse() directly to get mutable Carbon (required by DependencyRecord constructor)
-    $record = new DependencyRecord(
+it('handles reviewDeadline with valid cadence', function (): void {
+    // Create a DependencyRecordData directly with valid cadence
+    // Use Carbon::parse() directly to get mutable Carbon (required by DependencyRecordData constructor)
+    $record = new DependencyRecordData(
         name: 'test/package',
         version: '1.0.0',
-        classification: 'core',
+        classification: DependencyClassification::Core,
         owner: 'Platform Engineering',
         justification: 'Test',
         lastReviewedAt: Date::parse('2025-10-10'),
-        reviewCadence: 'unsupported-cadence',
-        riskLevel: 'medium',
+        reviewCadence: ReviewCadence::Monthly,
+        riskLevel: RiskLevel::Medium,
         notes: 'Test',
     );
 
-    expect(fn (): Carbon => $record->reviewDeadline())->toThrow(InvalidArgumentException::class);
+    $deadline = $record->reviewDeadline();
+    expect($deadline)->toBeInstanceOf(Carbon::class);
 });
 
 it('handles reviewDeadline with CarbonImmutable lastReviewedAt', function (): void {
-    // Test line 182: when lastReviewedAt is CarbonImmutable (not Carbon instance)
+    // Test when lastReviewedAt is CarbonImmutable (not Carbon instance)
     $carbonImmutable = CarbonImmutable::parse('2025-10-10');
-    $record = new DependencyRecord(
+    $record = new DependencyRecordData(
         name: 'test/package',
         version: '1.0.0',
-        classification: 'core',
+        classification: DependencyClassification::Core,
         owner: 'Platform Engineering',
         justification: 'Test',
         lastReviewedAt: $carbonImmutable,
-        reviewCadence: 'monthly',
-        riskLevel: 'medium',
+        reviewCadence: ReviewCadence::Monthly,
+        riskLevel: RiskLevel::Medium,
         notes: 'Test',
     );
 
@@ -319,17 +386,17 @@ it('handles reviewDeadline with CarbonImmutable lastReviewedAt', function (): vo
 });
 
 it('handles reviewDeadline with Carbon lastReviewedAt', function (): void {
-    // Test line 181: when lastReviewedAt is Carbon instance (if branch)
+    // Test when lastReviewedAt is Carbon instance (if branch)
     $carbon = Carbon::parse('2025-10-10');
-    $record = new DependencyRecord(
+    $record = new DependencyRecordData(
         name: 'test/package',
         version: '1.0.0',
-        classification: 'core',
+        classification: DependencyClassification::Core,
         owner: 'Platform Engineering',
         justification: 'Test',
         lastReviewedAt: $carbon,
-        reviewCadence: 'monthly',
-        riskLevel: 'medium',
+        reviewCadence: ReviewCadence::Monthly,
+        riskLevel: RiskLevel::Medium,
         notes: 'Test',
     );
 

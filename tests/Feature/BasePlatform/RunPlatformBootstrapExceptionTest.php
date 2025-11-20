@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Console\Commands\RunPlatformBootstrap;
 use App\Contracts\BasePlatform\BootstrapRunnerContract;
-use App\Services\BasePlatform\BootstrapRecoveryGuidance;
+use App\Data\BootstrapRecoveryGuidanceData;
 use App\Services\BasePlatform\BootstrapRunnerException;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
@@ -14,7 +14,7 @@ it('handles BootstrapRunnerException with guidance', function (): void {
     Config::set('base-platform.profiles.supported', ['native']);
 
     /** @phpstan-ignore-next-line */
-    $guidance = new BootstrapRecoveryGuidance(
+    $guidance = new BootstrapRecoveryGuidanceData(
         title: 'Bootstrap failed',
         documentation: 'https://example.com/docs',
         nextSteps: [

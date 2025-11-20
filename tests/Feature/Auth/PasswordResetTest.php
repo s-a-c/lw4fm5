@@ -13,7 +13,7 @@ test('reset password link screen can be rendered', function (): void {
     /** @phpstan-var TestResponse<Response> $response */
     $response = $this->get(route('password.request'));
 
-    $response->assertStatus(200);
+    expect($response)->assertOk();
 });
 
 test('reset password link can be requested', function (): void {
@@ -40,7 +40,7 @@ test('reset password screen can be rendered', function (): void {
         /** @phpstan-var TestResponse<Response> $response */
         $response = $this->get(route('password.reset', $notification->token));
 
-        $response->assertStatus(200);
+        expect($response)->assertOk();
 
         return true;
     });
@@ -64,7 +64,7 @@ test('password can be reset with valid token', function (): void {
             'password_confirmation' => 'NewPassword123!@#',
         ]);
 
-        $response
+        expect($response)
             ->assertSessionHasNoErrors()
             ->assertRedirect(route('login', absolute: false));
 

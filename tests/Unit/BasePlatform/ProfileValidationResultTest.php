@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-use App\Services\BasePlatform\ProfileValidationResult;
+use App\Data\ProfileValidationResultData;
+use App\Enums\ValidationStatus;
 
 it('exposes helpers for pass, warning and fail statuses', function (): void {
-    $pass = new ProfileValidationResult('native', ProfileValidationResult::STATUS_PASS);
-    $warn = new ProfileValidationResult('native', ProfileValidationResult::STATUS_WARNING);
-    $fail = new ProfileValidationResult('native', ProfileValidationResult::STATUS_FAIL);
+    $pass = new ProfileValidationResultData('native', ValidationStatus::Pass);
+    $warn = new ProfileValidationResultData('native', ValidationStatus::Warning);
+    $fail = new ProfileValidationResultData('native', ValidationStatus::Fail);
 
     expect($pass->isPass())->toBeTrue()
         ->and($pass->isWarning())->toBeFalse()

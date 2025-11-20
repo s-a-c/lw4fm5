@@ -11,7 +11,7 @@ export default {
     trailingComma: "all",
 
     // Specify the line length that the printer will wrap on
-    printWidth: 120,
+    printWidth: 200,
 
     // Use spaces instead of tabs
     useTabs: false,
@@ -44,7 +44,7 @@ export default {
     requirePragma: false,
 
     // Insert pragma at the top of formatted files
-    insertPragma: false,
+    insertPragma: true,
 
     // Use prose wrapping for markdown text
     proseWrap: "preserve",
@@ -53,7 +53,7 @@ export default {
     htmlWhitespaceSensitivity: "css",
 
     // Vue files script and style tags indentation
-    vueIndentScriptAndStyle: false,
+    vueIndentScriptAndStyle: true,
 
     // Enforce consistent quote style in object literals
     quoteProps: "as-needed",

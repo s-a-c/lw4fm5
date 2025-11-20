@@ -18,6 +18,7 @@ resources/js/tests/coverage/
 test-output.log
 test-coverage-pcov.log
 test-coverage-xdebug.log
+tmp-run.php
 Homestead.json
 Homestead.yaml
 npm-debug.log

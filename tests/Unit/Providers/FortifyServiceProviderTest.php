@@ -8,7 +8,7 @@ use Laravel\Fortify\Fortify;
 
 it('boots FortifyServiceProvider and configures Fortify', function (): void {
     $provider = App::getProvider(FortifyServiceProvider::class);
-    assert($provider !== null);
+    expect($provider)->not->toBeNull();
     expect($provider)->not->toBeNull();
 });
 

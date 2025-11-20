@@ -24,7 +24,7 @@ it('has environmentProfile relationship', function (): void {
     ]);
 
     $environmentProfile = $result->environmentProfile;
-    assert($environmentProfile !== null);
+    expect($environmentProfile)->not->toBeNull();
     expect($environmentProfile)->not->toBeNull();
     expect($environmentProfile->id)->toBe($profile->id);
 });

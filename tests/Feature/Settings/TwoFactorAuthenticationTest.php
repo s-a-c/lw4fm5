@@ -7,7 +7,7 @@ use Illuminate\Http\Response;
 use Illuminate\Testing\TestResponse;
 use Laravel\Fortify\Features;
 use Livewire\Features\SupportTesting\Testable;
-use Livewire\Volt\Volt;
+use Livewire\Livewire;
 
 use function Pest\Laravel\assertDatabaseHas;
 
@@ -73,7 +73,7 @@ test('two factor authentication disabled when confirmation abandoned between req
     $this->actingAs($user);
 
     /** @phpstan-var Testable $component */
-    $component = Volt::test('settings.two-factor');
+    $component = Livewire::test('settings.two-factor');
 
     $component->assertSet('twoFactorEnabled', false);
 

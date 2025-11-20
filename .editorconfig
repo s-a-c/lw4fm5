@@ -9,10 +9,10 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 
 [*.md]
-trim_trailing_whitespace = false
+trim_trailing_whitespace = true
 
 [*.{yml,yaml}]
-indent_size = 2
+indent_size = 4
 
 [compose.yaml]
 indent_size = 4

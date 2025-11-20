@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Contracts\BasePlatform\ParityCheckerContract;
+use App\Data\ParityReportData;
+use App\Enums\ParityStatus;
 use App\Models\EnvironmentProfile;
 use App\Models\ParityResult;
-use App\Services\BasePlatform\ParityReport;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
 
@@ -36,12 +37,12 @@ final class RunParityCheck extends Command
 
         $reports = $this->checker->run($profiles);
 
-        ParityReport::persistMany($reports)->each(function (ParityResult $result): void {
+        ParityReportData::persistMany($reports)->each(function (ParityResult $result): void {
             $message = $this->renderStatusMessage($result);
 
             match ($result->status) {
-                ParityReport::STATUS_PASS => $this->components->info($message),
-                ParityReport::STATUS_WARNING => $this->components->warn($message),
+                ParityStatus::Pass => $this->components->info($message),
+                ParityStatus::Warning => $this->components->warn($message),
                 default => $this->components->error($message),
             };
 
@@ -88,8 +89,8 @@ final class RunParityCheck extends Command
         $profile = $environmentProfile->name ?? 'unknown';
 
         return match ($result->status) {
-            ParityReport::STATUS_PASS => "Parity check passed for {$profile}",
-            ParityReport::STATUS_WARNING => "Parity check finished with warnings for {$profile}",
+            ParityStatus::Pass => "Parity check passed for {$profile}",
+            ParityStatus::Warning => "Parity check finished with warnings for {$profile}",
             default => "Parity check failed for {$profile}",
         };
     }

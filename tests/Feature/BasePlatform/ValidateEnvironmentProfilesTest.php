@@ -3,8 +3,9 @@
 declare(strict_types=1);
 
 use App\Contracts\BasePlatform\EnvironmentProfileValidatorContract;
+use App\Data\ProfileValidationResultData;
+use App\Enums\ValidationStatus;
 use App\Models\EnvironmentProfile;
-use App\Services\BasePlatform\ProfileValidationResult;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Mockery\MockInterface;
@@ -80,9 +81,9 @@ it('handles fail status in validation results', function (): void {
     $validator->shouldReceive('validate')
         ->once()
         ->andReturn([
-            new ProfileValidationResult(
+            new ProfileValidationResultData(
                 profile: 'native',
-                status: 'fail',
+                status: ValidationStatus::Fail,
                 issues: ['Validation failed'],
             ),
         ]);

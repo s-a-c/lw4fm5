@@ -1,75 +1,355 @@
+/* trunk-ignore-all(prettier) */
 @import 'tailwindcss';
 @import '../../vendor/livewire/flux/dist/flux.css';
-
-/*
- Choose between `mocha`, `frappe` or `macchiato` for dark mode, latte is included as the light mode flavour.
- We recommend using `mocha` for dark mode.
-*/
+/* 1. THEME EXTRAS (Animations, Gradients) */
+@import './catppuccin.css';
+@import './kanagawa.css';
+/* 2. TAILWIND PLUGINS (Catppuccin) */
+/* Kanagawa is defined manually below as there is no standard v4 plugin yet */
 @import '@catppuccin/tailwindcss/frappe.css';
 @import '@catppuccin/tailwindcss/macchiato.css';
 @import '@catppuccin/tailwindcss/mocha.css';
-
-@source '../views';
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
-@source '../../vendor/livewire/flux/stubs/**/*.blade.php';
-
+/* 3. SOURCES (JIT Detection) */
+@source "../views";
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+@source "../../vendor/livewire/flux-pro/stubs/**/*.blade.php";
+@source "../../vendor/livewire/flux/stubs/**/*.blade.php";
+@source "../../vendor/filament/**/*.blade.php";
+/* Essential for Filament v4/v5 */
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans:
-    'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-    'Noto Color Emoji';
-
-  --color-zinc-50: #fafafa;
-  --color-zinc-100: #f5f5f5;
-  --color-zinc-200: #e5e5e5;
-  --color-zinc-300: #d4d4d4;
-  --color-zinc-400: #a3a3a3;
-  --color-zinc-500: #737373;
-  --color-zinc-600: #525252;
-  --color-zinc-700: #404040;
-  --color-zinc-800: #262626;
-  --color-zinc-900: #171717;
-  --color-zinc-950: #0a0a0a;
-
-  --color-accent: var(--color-neutral-800);
-  --color-accent-content: var(--color-neutral-800);
-  --color-accent-foreground: var(--color-white);
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    /* ====================================================
+       THE ZINC BRIDGE
+       ====================================================
+       Flux uses 'zinc'. Filament uses 'gray'.
+       We map 'gray' to 'zinc', then we map 'zinc' to the
+       active theme colors. This syncs both frameworks.
+    */
+    --color-gray-50: var(--color-zinc-50);
+    --color-gray-100: var(--color-zinc-100);
+    --color-gray-200: var(--color-zinc-200);
+    --color-gray-300: var(--color-zinc-300);
+    --color-gray-400: var(--color-zinc-400);
+    --color-gray-500: var(--color-zinc-500);
+    --color-gray-600: var(--color-zinc-600);
+    --color-gray-700: var(--color-zinc-700);
+    --color-gray-800: var(--color-zinc-800);
+    --color-gray-900: var(--color-zinc-900);
+    --color-gray-950: var(--color-zinc-950);
+    /* Filament v4 Specific Background Variables */
+    --color-gray-950: var(--color-zinc-950);
+    /* Main Background */
+    --color-gray-900: var(--color-zinc-900);
+    /* Sidebar/Component Background */
+    /* Default Zinc Fallback (Standard Tailwind Zinc) */
+    --color-zinc-50: #fafafa;
+    --color-zinc-100: #f5f5f5;
+    --color-zinc-200: #e5e5e5;
+    --color-zinc-300: #d4d4d4;
+    --color-zinc-400: #a3a3a3;
+    --color-zinc-500: #737373;
+    --color-zinc-600: #525252;
+    --color-zinc-700: #404040;
+    --color-zinc-800: #262626;
+    --color-zinc-900: #171717;
+    --color-zinc-950: #0a0a0a;
+    /* Generic Accent Variable (Default) */
+    --color-accent: var(--color-zinc-900);
+    --color-accent-content: #ffffff;
 }
 
 @layer theme {
-  .dark {
-    --color-accent: var(--color-white);
-    --color-accent-content: var(--color-white);
-    --color-accent-foreground: var(--color-neutral-800);
-  }
+
+    /* ====================================================
+       THEME FAMILY: CATPPUCCIN
+       ==================================================== */
+    /* MOCHA (Deep Dark) */
+    [data-theme='catppuccin'][data-flavor='mocha'] {
+        --color-zinc-50: #cdd6f4;
+        /* Text */
+        --color-zinc-100: #bac2de;
+        /* Subtext1 */
+        --color-zinc-200: #a6adc8;
+        /* Subtext0 */
+        --color-zinc-300: #9399b2;
+        /* Overlay2 */
+        --color-zinc-400: #7f849c;
+        /* Overlay1 */
+        --color-zinc-500: #6c7086;
+        /* Overlay0 */
+        --color-zinc-600: #585b70;
+        /* Surface2 */
+        --color-zinc-700: #45475a;
+        /* Surface1 */
+        --color-zinc-800: #313244;
+        /* Surface0 */
+        --color-zinc-900: #1e1e2e;
+        /* Base */
+        --color-zinc-950: #11111b;
+        /* Crust */
+        /* Accents */
+        --accent-primary: #cba6f7;
+        /* Mauve */
+        --accent-blue: #89b4fa;
+        --accent-red: #f38ba8;
+        --accent-green: #a6e3a1;
+        --accent-content: #11111b;
+    }
+
+    /* LATTE (Light) */
+    [data-theme='catppuccin'][data-flavor='latte'] {
+        --color-zinc-50: #eff1f5;
+        /* Base */
+        --color-zinc-100: #e6e9ef;
+        /* Mantle */
+        --color-zinc-200: #ccd0da;
+        /* Surface0 */
+        --color-zinc-300: #bcc0cc;
+        /* Surface1 */
+        --color-zinc-400: #acb0be;
+        /* Surface2 */
+        --color-zinc-500: #9ca0b0;
+        /* Overlay0 */
+        --color-zinc-600: #7c7f93;
+        /* Overlay2 */
+        --color-zinc-700: #6c6f85;
+        /* Subtext0 */
+        --color-zinc-800: #5c5f77;
+        /* Subtext1 */
+        --color-zinc-900: #4c4f69;
+        /* Text */
+        --color-zinc-950: #171717;
+        /* High Contrast Text */
+        /* Accents (Latte has specific darker accents) */
+        --accent-primary: #8839ef;
+        /* Deep Mauve */
+        --accent-blue: #1e66f5;
+        --accent-red: #d20f39;
+        --accent-green: #40a02b;
+        --accent-content: #ffffff;
+    }
+
+    /* FRAPPE (Soft Dark) */
+    [data-theme='catppuccin'][data-flavor='frappe'] {
+        --color-zinc-50: #c6d0f5;
+        /* Text */
+        --color-zinc-100: #b5bfe2;
+        /* Subtext1 */
+        --color-zinc-200: #a5adce;
+        /* Subtext0 */
+        --color-zinc-300: #949cbb;
+        /* Overlay2 */
+        --color-zinc-400: #838ba7;
+        /* Overlay1 */
+        --color-zinc-500: #737994;
+        /* Overlay0 */
+        --color-zinc-600: #626880;
+        /* Surface2 */
+        --color-zinc-700: #51576d;
+        /* Surface1 */
+        --color-zinc-800: #414559;
+        /* Surface0 */
+        --color-zinc-900: #292c3c;
+        /* Base */
+        --color-zinc-950: #232634;
+        /* Crust */
+        --accent-primary: #ca9ee6;
+        /* Mauve */
+        --accent-blue: #8caaee;
+        --accent-red: #e78284;
+        --accent-green: #a6d189;
+        --accent-content: #292c3c;
+    }
+
+    /* MACCHIATO (Medium Dark) */
+    [data-theme='catppuccin'][data-flavor='macchiato'] {
+        --color-zinc-50: #cad3f5;
+        /* Text */
+        --color-zinc-100: #b8c0e0;
+        /* Subtext1 */
+        --color-zinc-200: #a5adcb;
+        /* Subtext0 */
+        --color-zinc-300: #939ab7;
+        /* Overlay2 */
+        --color-zinc-400: #8087a2;
+        /* Overlay1 */
+        --color-zinc-500: #6e738d;
+        /* Overlay0 */
+        --color-zinc-600: #5b6078;
+        /* Surface2 */
+        --color-zinc-700: #494d64;
+        /* Surface1 */
+        --color-zinc-800: #363a4f;
+        /* Surface0 */
+        --color-zinc-900: #24273a;
+        /* Base */
+        --color-zinc-950: #181926;
+        /* Crust */
+        --accent-primary: #c6a0f6;
+        /* Mauve */
+        --accent-blue: #8aadf4;
+        --accent-red: #ed8796;
+        --accent-green: #a6da95;
+        --accent-content: #181926;
+    }
+
+    /* ====================================================
+       THEME FAMILY: KANAGAWA
+       ==================================================== */
+    /* WAVE (Default Dark) */
+    [data-theme='kanagawa'][data-flavor='wave'] {
+        --color-zinc-50: #dcd7ba;
+        /* Fuji White (Text) */
+        --color-zinc-100: #c8c093;
+        /* Old White */
+        --color-zinc-200: #727169;
+        /* Fuji Gray */
+        --color-zinc-300: #54546d;
+        /* Katana Gray */
+        --color-zinc-400: #363646;
+        /* Sumi Ink 3 */
+        --color-zinc-500: #2d4f67;
+        /* Wave Blue 2 (Muted) */
+        --color-zinc-600: #2a2a37;
+        /* Sumi Ink 2 */
+        --color-zinc-700: #223249;
+        /* Wave Blue 1 */
+        --color-zinc-800: #1f1f28;
+        /* Sumi Ink 1 (Surface) */
+        --color-zinc-900: #16161d;
+        /* Sumi Ink 0 (Base) */
+        --color-zinc-950: #181616;
+        /* Dragon Black (Crust) */
+        /* Accents */
+        --accent-primary: #7e9cd8;
+        /* Spring Blue */
+        --accent-blue: #7fb4ca;
+        /* Crystal Blue */
+        --accent-red: #c34043;
+        /* Autumn Red */
+        --accent-green: #76946a;
+        /* Autumn Green */
+        --accent-content: #16161d;
+    }
+
+    /* DRAGON (Deep Dark) */
+    [data-theme='kanagawa'][data-flavor='dragon'] {
+        --color-zinc-50: #c5c9c5;
+        /* Dragon White */
+        --color-zinc-100: #a6a69c;
+        /* Dragon Gray */
+        --color-zinc-200: #8a9a7b;
+        /* Dragon Green */
+        --color-zinc-300: #727169;
+        /* Fuji Gray */
+        --color-zinc-400: #54546d;
+        /* Katana Gray */
+        --color-zinc-500: #363646;
+        /* Sumi Ink 3 */
+        --color-zinc-600: #282727;
+        /* Dragon Black 4 */
+        --color-zinc-700: #1d1c19;
+        /* Dragon Black 3 */
+        --color-zinc-800: #181616;
+        /* Dragon Black 2 */
+        --color-zinc-900: #12120f;
+        /* Dragon Black 1 (Base) */
+        --color-zinc-950: #0d0c0c;
+        /* Dragon Black 0 (Crust) */
+        /* Accents */
+        --accent-primary: #8ba4b0;
+        /* Dragon Blue */
+        --accent-blue: #8ba4b0;
+        --accent-red: #c4746e;
+        /* Dragon Red */
+        --accent-green: #8a9a7b;
+        /* Dragon Green */
+        --accent-content: #0d0c0c;
+    }
+
+    /* LOTUS (Light) */
+    [data-theme='kanagawa'][data-flavor='lotus'] {
+        --color-zinc-50: #f2ecbc;
+        /* Lotus Ice (Base) */
+        --color-zinc-100: #e5ddb0;
+        /* Lotus Ground */
+        --color-zinc-200: #d5cea3;
+        /* Lotus White */
+        --color-zinc-300: #c9c19f;
+        /* Lotus Gray */
+        --color-zinc-400: #a0975e;
+        /* Lotus Yellow */
+        --color-zinc-500: #716e61;
+        /* Lotus Green 2 */
+        --color-zinc-600: #625c87;
+        /* Lotus Blue 2 */
+        --color-zinc-700: #545464;
+        /* Lotus Ink 2 */
+        --color-zinc-800: #43436c;
+        /* Lotus Ink 1 */
+        --color-zinc-900: #1f1f28;
+        /* Sumi Ink 1 (Text) */
+        --color-zinc-950: #16161d;
+        /* Sumi Ink 0 (Deep Text) */
+        /* Accents */
+        --accent-primary: #5d57a3;
+        /* Lotus Violet */
+        --accent-blue: #4d699b;
+        /* Lotus Blue */
+        --accent-red: #c84053;
+        /* Lotus Red */
+        --accent-green: #6f894e;
+        /* Lotus Green */
+        --accent-content: #ffffff;
+    }
+
+    /* ====================================================
+       ACCENT MAPPING
+       ====================================================
+       Maps the abstract "Blue" selection to the theme-specific
+       variable defined in the blocks above.
+    */
+    [data-accent='primary'] {
+        --color-accent: var(--accent-primary);
+    }
+
+    [data-accent='blue'] {
+        --color-accent: var(--accent-blue);
+    }
+
+    [data-accent='red'] {
+        --color-accent: var(--accent-red);
+    }
+
+    [data-accent='green'] {
+        --color-accent: var(--accent-green);
+    }
+
+    --color-accent-content: var(--accent-content);
+
+    /* ====================================================
+       ROOT DEFAULTS
+       ==================================================== */
+    :root {
+        /* Force page background to match the theme's base */
+        background-color: var(--color-zinc-950);
+        color: var(--color-zinc-50);
+    }
 }
 
-@layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
-  }
-}
-
+/* Helper utilities for Flux components */
 [data-flux-field]:not(ui-radio, ui-checkbox) {
-  @apply grid gap-2;
+    @apply grid gap-2;
 }
 
 [data-flux-label] {
-  @apply mb-0! leading-tight!;
+    @apply mb-0 !leading-tight;
 }
 
 input:focus[data-flux-control],
 textarea:focus[data-flux-control],
 select:focus[data-flux-control] {
-  @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
-
-/* \[:where(&)\]:size-4 {
-    @apply size-4;
-} */

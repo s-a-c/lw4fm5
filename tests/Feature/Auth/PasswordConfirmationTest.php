@@ -13,5 +13,5 @@ test('confirm password screen can be rendered', function (): void {
     /** @phpstan-var TestResponse<Response> $response */
     $response = $this->actingAs($user)->get(route('password.confirm'));
 
-    $response->assertStatus(200);
+    expect($response)->assertOk();
 });

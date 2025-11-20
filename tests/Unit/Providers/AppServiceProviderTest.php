@@ -17,7 +17,7 @@ use Mockery\MockInterface;
 it('boots AppServiceProvider and configures application', function (): void {
     // The provider should be booted automatically, but we can verify its effects
     $provider = App::getProvider(AppServiceProvider::class);
-    assert($provider !== null);
+    expect($provider)->not->toBeNull();
     expect($provider)->not->toBeNull();
 });
 

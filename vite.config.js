@@ -3,11 +3,19 @@
 import { defineConfig } from 'vitest/config';
 import laravel from 'laravel-vite-plugin';
 import tailwindcss from "@tailwindcss/vite";
+import { glob } from 'glob';
+import path from 'path';
+
+// Automatically discover all CSS and JS files
+const cssFiles = glob.sync('resources/css/**/*.css').map(file => path.resolve(file));
+const jsFiles = glob.sync('resources/js/**/*.js', {
+    ignore: ['**/tests/**', '**/*.test.js', '**/*.spec.js']
+}).map(file => path.resolve(file));
 
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
+            input: [...cssFiles, ...jsFiles],
             refresh: true,
         }),
         tailwindcss(),

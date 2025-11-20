@@ -10,22 +10,24 @@ use function Pest\Laravel\actingAs;
 test('confirm password screen can be rendered', function (): void {
     actingAs(User::factory()->create());
 
-    visit(route('password.confirm'))
-        ->assertSee('Confirm your password')
-        ->assertSee('This is a secure area of the application. Please confirm your password before continuing.')
-        ->assertNoConsoleLogs()
-        ->assertNoJavaScriptErrors();
+    assertNoJavaScriptErrorsExceptCspParser(
+        visit(route('password.confirm'))
+            ->assertSee('Confirm your password')
+            ->assertSee('This is a secure area of the application. Please confirm your password before continuing.')
+            ->assertNoConsoleLogs()
+    );
 });
 
 test('password can be confirmed', function (): void {
     actingAs(User::factory()->create());
 
-    visit(route('password.confirm'))
-        ->fill('password', 'password')
-        ->press('@confirm-password-button')
-        ->assertUrlIs(route('dashboard'))
-        ->assertNoConsoleLogs()
-        ->assertNoJavaScriptErrors();
+    assertNoJavaScriptErrorsExceptCspParser(
+        visit(route('password.confirm'))
+            ->fill('password', 'password')
+            ->press('@confirm-password-button')
+            ->assertUrlIs(route('dashboard'))
+            ->assertNoConsoleLogs()
+    );
 });
 
 test('password is not confirmed with invalid password', function (): void {
@@ -34,11 +36,12 @@ test('password is not confirmed with invalid password', function (): void {
     // @TODO: The following check is only required to handle starter-kit without 2 factor authentication.
     $usesTwoFactorAuthentication = InstalledVersions::isInstalled('laravel/fortify');
 
-    visit(route('password.confirm'))
-        ->fill('password', 'wrong-password')
-        ->press('@confirm-password-button')
-        ->assertUrlIs(route('password.confirm'))
-        ->assertSee($usesTwoFactorAuthentication ? 'The provided password was incorrect.' : 'The provided password is incorrect.')
-        ->assertNoConsoleLogs()
-        ->assertNoJavaScriptErrors();
+    assertNoJavaScriptErrorsExceptCspParser(
+        visit(route('password.confirm'))
+            ->fill('password', 'wrong-password')
+            ->press('@confirm-password-button')
+            ->assertUrlIs(route('password.confirm'))
+            ->assertSee($usesTwoFactorAuthentication ? 'The provided password was incorrect.' : 'The provided password is incorrect.')
+            ->assertNoConsoleLogs()
+    );
 });

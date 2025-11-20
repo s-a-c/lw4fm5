@@ -7,15 +7,16 @@
         "bun-git-hooks": "^0.3.1",
         "bun-plugin-tailwind": "^0.1.2",
         "prettier-plugin-packagejson": "^2.5.19",
-        "rolldown-vite": "^7.2.6"
+        "rolldown-vite": "^7.2.7"
     },
     "devDependencies": {
         "@catppuccin/tailwindcss": "^1.0.0",
         "@tailwindcss/vite": "^4.1.17",
-        "@vitest/browser-playwright": "^4.0.10",
-        "@vitest/coverage-v8": "^4.0.10",
-        "@vitest/ui": "^4.0.10",
+        "@vitest/browser-playwright": "^4.0.13",
+        "@vitest/coverage-v8": "^4.0.13",
+        "@vitest/ui": "^4.0.13",
         "concurrently": "^9.2.1",
+        "glob": "^13.0.0",
         "jsdom": "^27.2.0",
         "laravel-echo": "^2.2.6",
         "laravel-vite-plugin": "^2.0.1",
@@ -26,8 +27,8 @@
         "prettier-plugin-tailwindcss": "^0.7.1",
         "pusher-js": "^8.4.0",
         "tailwindcss": "^4.1.17",
-        "vite": "^7.2.2",
-        "vitest": "^4.0.10"
+        "vite": "^7.2.4",
+        "vitest": "^4.0.13"
     },
     "engines": {
         "bun": ">=1.1.0",
@@ -48,11 +49,7 @@
     "private": true,
     "scripts": {
         "build": "vite build",
-        "dev": "vite",
-        "docs:build": "vitepress build docs",
-        "docs:deploy": "vitepress deploy docs",
-        "docs:dev": "vitepress dev docs",
-        "docs:preview": "vitepress preview docs",
+        "dev": "HOST=${VITE_DEV_HOST:-lw4fm5.test} CERT=${VITE_DEV_CERT:-$HOME/.config/Herd/ssl/lw4fm5.test+4.pem} KEY=${VITE_DEV_KEY:-$HOME/.config/Herd/ssl/lw4fm5.test+4-key.pem} bun --bun vite --host $HOST --https --cert $CERT --key $KEY",
         "lint": "bunx prettier --write resources/",
         "playwright:install": "bunx playwright install --with-deps",
         "preview": "vite preview",

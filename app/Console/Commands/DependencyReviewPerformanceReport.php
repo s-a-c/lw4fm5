@@ -17,8 +17,10 @@ use RuntimeException;
  */
 final class DependencyReviewPerformanceReport extends Command
 {
+    // @phpstan-ignore-next-line (Typed constants supported in PHP 8.3+)
     private const string REPORT_DIRECTORY = 'base-platform/dependency-reports';
 
+    // @phpstan-ignore-next-line (Typed constants supported in PHP 8.3+)
     private const string PERFORMANCE_LOG = 'base-platform/dependency-performance.log';
 
     protected $signature = 'platform:dependency-review-performance-report

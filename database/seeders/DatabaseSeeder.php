@@ -15,5 +15,6 @@ final class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(BasePlatformSeeder::class);
+        $this->call(UserSeeder::class);
     }
 }

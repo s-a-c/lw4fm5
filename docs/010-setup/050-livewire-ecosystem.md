@@ -297,7 +297,7 @@ Volt components can be routed directly:
 // In routes/web.php
 use Livewire\Volt\Volt;
 
-Volt::route('settings/profile', 'settings.profile')
+Route::get('settings/profile', 'settings.profile')
     ->name('profile.edit');
 ```
 
