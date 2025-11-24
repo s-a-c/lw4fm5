@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Pest\Browser\Api\AwaitableWebpage;
 use Pest\Browser\Api\PendingAwaitablePage;
+use Pest\Browser\Api\Webpage;
 use PHPUnit\Framework\AssertionFailedError;
 use Tests\TestCase;
 
@@ -69,15 +70,18 @@ expect()->extend('toBeOne', fn () =>
  *
  * This helper filters out "CSP Parser Error" messages which are false positives
  * from the browser's CSP parser when no actual CSP headers are set.
- *
- * @param  PendingAwaitablePage|AwaitableWebpage  $page
- * @return PendingAwaitablePage|AwaitableWebpage
  */
-function assertNoJavaScriptErrorsExceptCspParser($page)
+function assertNoJavaScriptErrorsExceptCspParser(PendingAwaitablePage|AwaitableWebpage|Webpage $page): PendingAwaitablePage|AwaitableWebpage|Webpage
 {
     try {
         $page->assertNoJavaScriptErrors();
-    } catch (AssertionFailedError $e) {
+    } catch (Throwable $e) {
+        // Only handle AssertionFailedError exceptions
+        $assertionFailedErrorClass = 'PHPUnit\Framework\AssertionFailedError';
+        if ($e::class !== $assertionFailedErrorClass) {
+            throw $e;
+        }
+
         $message = $e->getMessage();
 
         // Check if the error is only CSP parser errors
@@ -91,6 +95,7 @@ function assertNoJavaScriptErrorsExceptCspParser($page)
 
             // If there are real errors, throw them
             if ($realErrors !== []) {
+                /** @phpstan-ignore-next-line */
                 throw new AssertionFailedError(
                     "Expected no JavaScript errors on the page, but found:\n".
                     implode("\n", array_map(fn (string $error): string => "- {$error}", $realErrors))

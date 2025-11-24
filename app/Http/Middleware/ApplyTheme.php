@@ -21,7 +21,7 @@ final class ApplyTheme
         $user = Auth::user();
 
         // Always use default settings if no user is authenticated
-        $settings = $user?->settings ?? new UserSettingsData();
+        $settings = ($user !== null && $user->settings !== null) ? $user->settings : new UserSettingsData();
 
         if ($user !== null) {
             // 1. Register PHP Colors (for Filament Rings/Focus states)
