@@ -178,6 +178,5 @@ See the full documentation file for detailed troubleshooting steps.
 
 ---
 
-**Last Updated**: 2025-01-XX  
+**Last Updated**: 2025-01-XX
 **Maintainer**: Development Team
-

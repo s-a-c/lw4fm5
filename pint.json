@@ -1,7 +1,8 @@
 {
     "preset": "laravel",
     "notPath": [
-        "tmp"
+        "tmp",
+        "tests.starter-kit-browser"
     ],
     "rules": {
         "array_push": true,
