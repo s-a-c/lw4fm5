@@ -28,7 +28,7 @@
         "pusher-js": "^8.4.0",
         "tailwindcss": "^4.1.17",
         "vite": "^7.2.4",
-        "vitest": "^4.0.13"
+        "vitest": "^4.0.14"
     },
     "engines": {
         "bun": ">=1.1.0",
