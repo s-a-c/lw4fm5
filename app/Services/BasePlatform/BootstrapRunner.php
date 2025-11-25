@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services\BasePlatform;
 
 use App\Contracts\BasePlatform\BootstrapRunnerContract;
+use App\Data\BootstrapRunData;
+use App\Enums\BootstrapStatus;
 use App\Support\BasePlatformMetrics;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Process;
@@ -15,7 +17,7 @@ final readonly class BootstrapRunner implements BootstrapRunnerContract
         private BootstrapRecovery $recovery,
     ) {}
 
-    public function run(string $profile, bool $forceClean): BootstrapRun
+    public function run(string $profile, bool $forceClean): BootstrapRunData
     {
         $supportedRaw = Config::get('base-platform.profiles.supported', []);
         $supported = is_array($supportedRaw) ? $supportedRaw : [];
@@ -50,9 +52,9 @@ final readonly class BootstrapRunner implements BootstrapRunnerContract
 
         $outputStr = $result->output();
 
-        return new BootstrapRun(
+        return new BootstrapRunData(
             profile: $profile,
-            status: BootstrapRun::STATUS_SUCCESS,
+            status: BootstrapStatus::Success,
             durationMinutes: round($durationMinutes, 2),
             notes: [
                 'output' => mb_trim($outputStr),

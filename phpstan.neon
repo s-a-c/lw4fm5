@@ -48,13 +48,37 @@ parameters:
             message: '#Dynamic call to static method Illuminate\\Contracts\\Auth\\Guard::check\(\)#'
             paths:
                 - tests/**/*.php
+        -
+            message: '#Dynamic call to static method Illuminate\\Database\\Eloquent\\Builder.*::(first|getBindings|toSql)\(\)\.#'
+            paths:
+                - tests/**/*.php
         # Internal class access for testing - Fixed with @phpstan-ignore-next-line
         # Removed: BootstrapRecoveryGuidance access now uses targeted annotations
+        # Pest browser configuration (internal class access)
+        -
+            message: '#Call to method timeout\(\) of internal class Pest\\Browser\\Configuration from outside its root namespace Pest\.#'
+            paths:
+                - tests/Pest.php
+        # MoonShine dynamic calls (third-party library patterns)
+        -
+            message: '#Dynamic call to static method Illuminate\\Database\\Eloquent\\Builder.*::select\(\)\.#'
+            paths:
+                - app/MoonShine/**/*.php
         # Pest helper function issues - Fixed with annotations
         # Removed: freezeTime() and $this issues resolved with proper annotations
         # Pest Laravel helper functions (globally available)
         -
             message: '#Function (assertAuthenticated|assertGuest|assertDatabaseHas|skip) not found\.#'
+            paths:
+                - tests/**/*.php
+        # Pest TestCase trait methods (provided by Pest Laravel plugin)
+        -
+            message: '#Call to an undefined method PHPUnit\\Framework\\TestCase::(get|post|actingAs|assertOk|assertRedirect|assertSee|assertDontSee|assertViewHas|assertSessionHasNoErrors)\(\)\.#'
+            paths:
+                - tests/**/*.php
+        # Pest Expectation chaining (dynamic API)
+        -
+            message: '#Call to an undefined method Pest\\Expectation.*::(assertOk|assertRedirect|assertSee|assertDontSee|assertViewHas|assertSessionHasNoErrors)\(\)\.#'
             paths:
                 - tests/**/*.php
         # Pest plugin arch (preset and expect methods) - Fixed with @phpstan-ignore-next-line
@@ -125,11 +149,8 @@ parameters:
         # Removed: AlpineComponent access now uses targeted annotations
         # Type coverage warnings (informational, not blocking)
         -
-            message: '#Out of .+ possible param types, only .+ - .+ % actually have it#'
+            message: '#Out of .+ possible (param|property) types, only .+ - .+ % actually have it#'
             paths:
                 - tests/**/*.php
         # Impossible type checks in tests (intentional test cases)
-        -
-            message: '#Call to function is_string\(\) with array\{\} will always evaluate to false#'
-            paths:
-                - tests/**/*.php
+        # Removed: Pattern no longer matches any errors

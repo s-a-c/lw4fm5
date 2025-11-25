@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 
 test('reset password link screen can be rendered', function (): void {
-    visit(route('password.request'))
-        ->assertSee('Forgot password')
-        ->assertSee('Enter your email to receive a password reset link')
-        ->assertNoConsoleLogs()
-        ->assertNoJavaScriptErrors();
+    assertNoJavaScriptErrorsExceptCspParser(
+        visit(route('password.request'))
+            ->assertSee('Forgot password')
+            ->assertSee('Enter your email to receive a password reset link')
+    );
 });
 
 test('test reset password link can be requested', function (): void {
@@ -20,12 +20,12 @@ test('test reset password link can be requested', function (): void {
 
     Notification::fake();
 
-    visit(route('password.request'))
-        ->fill('email', $user->email)
-        ->press('@email-password-reset-link-button')
-        ->assertSee('We have emailed your password reset link.')
-        ->assertNoConsoleLogs()
-        ->assertNoJavaScriptErrors();
+    assertNoJavaScriptErrorsExceptCspParser(
+        visit(route('password.request'))
+            ->fill('email', $user->email)
+            ->press('@email-password-reset-link-button')
+            ->assertSee('We have emailed your password reset link.')
+    );
 
     Notification::assertSentTo($user, ResetPassword::class);
 });
@@ -38,9 +38,9 @@ test('reset password screen can be rendered', function (): void {
     Password::sendResetLink(['email' => $user->email]);
 
     Notification::assertSentTo($user, ResetPassword::class, function ($notification): true {
-        visit(route('password.reset', $notification->token))
-            ->assertNoConsoleLogs()
-            ->assertNoJavaScriptErrors();
+        assertNoJavaScriptErrorsExceptCspParser(
+            visit(route('password.reset', $notification->token))
+        );
 
         return true;
     });

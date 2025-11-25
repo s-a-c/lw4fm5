@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 use App\Console\Commands\RunParityCheck;
 use App\Contracts\BasePlatform\ParityCheckerContract;
+use App\Data\ParityReportData;
+use App\Enums\ParityStatus;
 use App\Models\EnvironmentProfile;
-use App\Services\BasePlatform\ParityReport;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
@@ -41,9 +42,9 @@ it('handles warning status in parity results', function (): void {
 
     /** @var list<string> $issues */
     $issues = ['Warning: Some configuration drift detected'];
-    $report = new ParityReport(
+    $report = new ParityReportData(
         profile: 'native',
-        status: ParityReport::STATUS_WARNING,
+        status: ParityStatus::Warning,
         issues: $issues,
     );
 
@@ -81,9 +82,9 @@ it('handles non-string issues in parity results', function (): void {
         123, // Non-string issue
         ['array' => 'issue'], // Non-string issue
     ];
-    $report = new ParityReport(
+    $report = new ParityReportData(
         profile: 'native',
-        status: ParityReport::STATUS_FAIL,
+        status: ParityStatus::Fail,
         /** @phpstan-ignore-next-line */
         issues: $mixedIssues,
     );
@@ -125,9 +126,9 @@ it('filters profiles by option', function (): void {
 
     /** @var list<string> $emptyIssues */
     $emptyIssues = [];
-    $report = new ParityReport(
+    $report = new ParityReportData(
         profile: 'native',
-        status: ParityReport::STATUS_PASS,
+        status: ParityStatus::Pass,
         issues: $emptyIssues,
     );
 
@@ -175,9 +176,9 @@ it('handles fail status in parity results', function (): void {
 
     /** @var list<string> $criticalIssues */
     $criticalIssues = ['Critical issue'];
-    $report = new ParityReport(
+    $report = new ParityReportData(
         profile: 'native',
-        status: ParityReport::STATUS_FAIL, // Use valid status that matches default case in renderStatusMessage
+        status: ParityStatus::Fail, // Use valid status that matches default case in renderStatusMessage
         issues: $criticalIssues,
     );
 

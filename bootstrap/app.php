@@ -2,20 +2,21 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Env;
-
-if ((Env::get('APP_ENV')) === 'local') {
-    error_reporting(error_reporting() & ~E_DEPRECATED & ~E_USER_DEPRECATED);
-}
-
+use App\Http\Middleware\ApplyTheme;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Process;
 use Laravel\Sanctum\Http\Middleware\CheckAbilities;
 use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
+use Spatie\Csp\AddCspHeaders;
+
+if ((Env::get('APP_ENV')) === 'local') {
+    error_reporting(error_reporting() & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+}
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -59,6 +60,13 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware
+            ->web(append: [
+                ApplyTheme::class,
+                AddCspHeaders::class,
+            ])
+            ->validateCsrfTokens(except: [
+                'csp-report',
+            ])
             ->alias([
                 'abilities' => CheckAbilities::class,
                 'ability' => CheckForAnyAbility::class,

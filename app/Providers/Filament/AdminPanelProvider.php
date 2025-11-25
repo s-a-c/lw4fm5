@@ -2,12 +2,9 @@
 
 declare(strict_types=1);
 
-/**
- * Compliant with [AI-GUIDELINES.md](../../.ai/AI-GUIDELINES.md) v0921d4cfab198af1451ef177b6e47657b5d3ab0292f77bf232496291dee47183
- */
-
 namespace App\Providers\Filament;
 
+use App\Http\Middleware\ApplyTheme;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -30,12 +27,24 @@ final class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->default()
             ->id('admin')
             ->path('admin')
+
+            // -----------------------------------------------------------
+            // 1. LOAD THEME ENGINE CSS
+            // -----------------------------------------------------------
+            // This loads the CSS file containing the "Zinc Bridge" and
+            // the Catppuccin/Kanagawa definitions.
+            ->viteTheme('resources/css/app.css')
+
+            // FALLBACK COLORS:
+            // These act as defaults before the user authenticates.
+            // The Middleware will hook in and overwrite these later.
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Indigo,
+                'gray' => Color::Zinc,
             ])
+
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\Filament\Admin\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\Filament\Admin\Pages')
             ->pages([
@@ -59,6 +68,14 @@ final class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+
+                // -------------------------------------------------------
+                // 2. REGISTER THEME MIDDLEWARE
+                // -------------------------------------------------------
+                // This injects the data-theme, data-flavor, and data-accent
+                // attributes into the HTML tag and registers the semantic
+                // PHP colors (Primary, Danger, etc.) for this request.
+                ApplyTheme::class,
             ]);
     }
 }

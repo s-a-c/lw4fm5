@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
+use App\Data\BootstrapRunData;
 use App\Services\BasePlatform\BootstrapRecovery;
-use App\Services\BasePlatform\BootstrapRun;
 use App\Services\BasePlatform\BootstrapRunner;
 use App\Services\BasePlatform\BootstrapRunnerException;
 use App\Services\BasePlatform\UnsupportedProfileException;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Process;
 
-it('runs the bootstrap script successfully and returns a BootstrapRun', function (): void {
+it('runs the bootstrap script successfully and returns a BootstrapRunData', function (): void {
     Config::set('base-platform.profiles.supported', ['native']);
 
     $command = base_path('scripts/platform/bootstrap.sh');
@@ -34,7 +34,7 @@ it('throws UnsupportedProfileException for an unsupported profile', function ():
 
     $runner = new BootstrapRunner(new BootstrapRecovery());
 
-    expect(fn (): BootstrapRun => $runner->run('native', false))->toThrow(UnsupportedProfileException::class);
+    expect(fn (): BootstrapRunData => $runner->run('native', false))->toThrow(UnsupportedProfileException::class);
 });
 
 it('throws BootstrapRunnerException when the process fails', function (): void {
@@ -48,5 +48,5 @@ it('throws BootstrapRunnerException when the process fails', function (): void {
 
     $runner = new BootstrapRunner(new BootstrapRecovery());
 
-    expect(fn (): BootstrapRun => $runner->run('native', true))->toThrow(BootstrapRunnerException::class);
+    expect(fn (): BootstrapRunData => $runner->run('native', true))->toThrow(BootstrapRunnerException::class);
 });

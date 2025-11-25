@@ -3,8 +3,9 @@
 declare(strict_types=1);
 
 use App\Contracts\BasePlatform\EnvironmentProfileValidatorContract;
+use App\Data\ProfileValidationResultData;
+use App\Enums\ValidationStatus;
 use App\Models\EnvironmentProfile;
-use App\Services\BasePlatform\ProfileValidationResult;
 use Illuminate\Support\Str;
 use Mockery\MockInterface;
 
@@ -36,9 +37,9 @@ it('validates only the native profile when requested', function (): void {
         ->once()
         ->with(['native'])
         ->andReturn([
-            new ProfileValidationResult(
+            new ProfileValidationResultData(
                 profile: 'native',
-                status: ProfileValidationResult::STATUS_PASS,
+                status: ValidationStatus::Pass,
                 issues: []
             ),
         ]);

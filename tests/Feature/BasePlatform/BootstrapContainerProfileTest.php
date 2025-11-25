@@ -3,8 +3,9 @@
 declare(strict_types=1);
 
 use App\Contracts\BasePlatform\EnvironmentProfileValidatorContract;
+use App\Data\ProfileValidationResultData;
+use App\Enums\ValidationStatus;
 use App\Models\EnvironmentProfile;
-use App\Services\BasePlatform\ProfileValidationResult;
 use Illuminate\Support\Str;
 use Mockery\MockInterface;
 
@@ -36,9 +37,9 @@ it('validates the container profile exclusively when requested', function (): vo
         ->once()
         ->with(['container'])
         ->andReturn([
-            new ProfileValidationResult(
+            new ProfileValidationResultData(
                 profile: 'container',
-                status: ProfileValidationResult::STATUS_WARNING,
+                status: ValidationStatus::Warning,
                 issues: ['queue worker lag detected'],
             ),
         ]);

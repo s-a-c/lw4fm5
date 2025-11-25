@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -30,6 +31,15 @@ final class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Ensure themeFlavor is always available for Flux components
+        // Use composer to force it into every view scope
+        View::composer('*', function (\Illuminate\Contracts\View\View $view): void {
+            $data = $view->getData();
+            if (! isset($data['themeFlavor'])) {
+                $view->with('themeFlavor', 'mocha');
+            }
+        });
+
         $this->configureCarbon();
         $this->configureCommands();
         $this->configureModels();

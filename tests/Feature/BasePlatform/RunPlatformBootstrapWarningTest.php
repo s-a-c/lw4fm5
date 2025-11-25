@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 use App\Console\Commands\RunPlatformBootstrap;
 use App\Contracts\BasePlatform\BootstrapRunnerContract;
-use App\Services\BasePlatform\BootstrapRun;
+use App\Data\BootstrapRunData;
+use App\Enums\BootstrapStatus;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Mockery\MockInterface;
@@ -17,9 +18,9 @@ it('renders a warning message when the bootstrap completes with warnings', funct
     $mock->shouldReceive('run')
         ->once()
         ->with('native', false)
-        ->andReturn(new BootstrapRun(
+        ->andReturn(new BootstrapRunData(
             profile: 'native',
-            status: BootstrapRun::STATUS_WARNING,
+            status: BootstrapStatus::Warning,
             durationMinutes: 1.25,
             notes: ['notice' => 'cached deps used'],
         ));

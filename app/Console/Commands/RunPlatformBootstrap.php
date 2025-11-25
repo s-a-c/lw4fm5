@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Contracts\BasePlatform\BootstrapRunnerContract;
-use App\Services\BasePlatform\BootstrapRecoveryGuidance;
-use App\Services\BasePlatform\BootstrapRun;
+use App\Data\BootstrapRecoveryGuidanceData;
+use App\Data\BootstrapRunData;
 use App\Services\BasePlatform\BootstrapRunnerException;
 use App\Services\BasePlatform\UnsupportedProfileException;
 use Illuminate\Console\Command;
@@ -53,7 +53,7 @@ final class RunPlatformBootstrap extends Command
         return self::SUCCESS;
     }
 
-    private function renderSuccessMessage(BootstrapRun $run): void
+    private function renderSuccessMessage(BootstrapRunData $run): void
     {
         $message = sprintf(
             'Bootstrap complete for %s in %0.2f minutes.',
@@ -68,7 +68,7 @@ final class RunPlatformBootstrap extends Command
         }
     }
 
-    private function outputGuidance(BootstrapRecoveryGuidance $guidance): void
+    private function outputGuidance(BootstrapRecoveryGuidanceData $guidance): void
     {
         $this->components->warn($guidance->title);
         $this->line("Documentation: <info>{$guidance->documentation}</info>");

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Contracts\BasePlatform\EnvironmentProfileValidatorContract;
+use App\Data\ProfileValidationResultData;
 use App\Models\EnvironmentProfile;
-use App\Services\BasePlatform\ProfileValidationResult;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
 
@@ -36,7 +36,7 @@ final class ValidateEnvironmentProfiles extends Command
 
         $results = $this->validator->validate($profiles);
 
-        collect($results)->each(function (ProfileValidationResult $result): void {
+        collect($results)->each(function (ProfileValidationResultData $result): void {
             $message = sprintf('Validation complete for %s', $result->profile);
 
             if ($result->isFail()) {

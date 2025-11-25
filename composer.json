@@ -23,6 +23,7 @@
         }
     },
     "require": {
+        "php": "^8.4",
         "ably/ably-php": "^1.1",
         "ably/laravel-broadcaster": "^1.0",
         "askedio/laravel-soft-cascade": "^12.0",
@@ -43,18 +44,22 @@
         "livewire/flux": "^2.6",
         "livewire/flux-pro": "^2.6",
         "livewire/livewire": "^4.0",
-        "livewire/volt": "dev-main",
+        "livewire/volt": "^1.10",
         "monolog/monolog": "^3.0",
-        "php": "^8.4",
+        "moonshine/moonshine": "^4.0",
         "runtime/frankenphp-symfony": "^0.2.0",
         "spatie/laravel-activitylog": "^4.10",
         "spatie/laravel-analytics": "^5.6",
         "spatie/laravel-backup": "^9.3",
+        "spatie/laravel-csp": "^3.21",
+        "spatie/laravel-data": "^4.18",
         "spatie/laravel-deleted-models": "^1.1",
         "spatie/laravel-event-sourcing": "^7.12",
         "spatie/laravel-health": "^1.34",
         "spatie/laravel-markdown": "^2.7",
         "spatie/laravel-medialibrary": "^11.17",
+        "spatie/laravel-model-states": "^2.12",
+        "spatie/laravel-model-status": "^1.18",
         "spatie/laravel-schedule-monitor": "^4.1",
         "spatie/laravel-settings": "^3.5",
         "typesense/typesense-php": "^5.2.0-RC4"
@@ -106,6 +111,9 @@
             "vendor/league/flysystem/src/Local/*",
             "vendor/laravel/pint/app/Providers/*"
         ],
+        "files": [
+            "app/helpers.php"
+        ],
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
@@ -124,8 +132,8 @@
             "bunx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"bun run dev\" --names=server,queue,logs,vite --kill-others"
         ],
         "lint": [
-            "rector",
-            "pint --parallel",
+            "php -d memory_limit=1G vendor/bin/rector",
+            "php -d memory_limit=1G vendor/bin/pint --parallel",
             "bun run lint"
         ],
         "post-autoload-dump": [
@@ -159,15 +167,15 @@
         ],
         "test": [
             "@php artisan config:clear --ansi",
+            "@test:lint",
             "@test:type-coverage",
             "@test:coverage",
             "@test:unit",
-            "@test:lint",
             "@test:types",
             "@security:audit"
         ],
         "test:browser": [
-            "php -d error_reporting=\"E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED\" -d memory_limit=1G vendor/bin/pest --testsuite=Browser"
+            "php -d error_reporting=\"E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED\" -d memory_limit=1G vendor/bin/pest --testsuite=Browser --parallel --processes=4"
         ],
         "test:coverage": [
             "@test:coverage:pcov",
@@ -177,13 +185,13 @@
         "test:coverage:xdebug": "php -d error_reporting=\"E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED\" -d memory_limit=1G -d xdebug.mode=coverage -d pcov.enabled=0 -r \"if (!extension_loaded('xdebug') || ini_get('xdebug.mode') !== 'coverage') { echo chr(27) . '[0;35m[php-coverage:xdebug]' . chr(27) . '[0m xdebug driver not available' . PHP_EOL; exit(0); } if (extension_loaded('pcov')) { echo chr(27) . '[0;35m[php-coverage:xdebug]' . chr(27) . '[0m Warning: pcov is loaded, Pest will prefer pcov over xdebug. Consider disabling pcov extension for xdebug coverage.' . PHP_EOL; }\" && vendor/bin/pest --coverage --min=100 2>&1 | php -r \"while(\\$line = fgets(STDIN)) { echo chr(27) . '[0;35m[php-coverage:xdebug]' . chr(27) . '[0m ' . \\$line; }\" || php -r \"echo chr(27) . '[0;35m[php-coverage:xdebug]' . chr(27) . '[0m xdebug driver not available' . PHP_EOL;\" || true",
         "test:coverage:js": "bun run test:coverage 2>&1 | php -r \"while(\\$line = fgets(STDIN)) { echo chr(27) . '[0;36m[js-coverage]' . chr(27) . '[0m ' . \\$line; }\" || true",
         "test:lint": [
-            "pint --parallel --test",
-            "rector --dry-run",
+            "php -d memory_limit=1G vendor/bin/pint --parallel --test",
+            "php -d memory_limit=1G vendor/bin/rector --dry-run",
             "bun run test:lint"
         ],
-        "test:mutation": "php -d error_reporting=\"E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED\" -d memory_limit=1G vendor/bin/infection --min-msi=90 --threads=4",
+        "test:mutation": "php -d error_reporting=\"E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED\" -d memory_limit=1G vendor/bin/infection --min-msi=90 --threads=4 --formatter=progress --show-mutations --force-progress",
         "test:type-coverage": "php -d error_reporting=\"E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED\" -d memory_limit=1G vendor/bin/pest --type-coverage --min=100",
-        "test:types": "phpstan --memory-limit=512M",
+        "test:types": "php -d memory_limit=1G vendor/bin/phpstan analyse --memory-limit=1G",
         "test:unit": "php -d error_reporting=\"E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED\" -d memory_limit=1G -d xdebug.mode=coverage vendor/bin/pest --testsuite=Unit,Feature --coverage --min=100",
         "update:requirements": [
             "composer bump",
@@ -215,21 +223,15 @@
         },
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "process-timeout": 1200,
+        "process-timeout": 1800,
         "sort-packages": true
     },
     "extra": {
         "composer-exit-on-patch-failure": true,
         "laravel": {
-            "dont-discover": []
-        },
-        "patches": {
-            "filament/filament": {
-                "Fix Livewire v4 ComponentRegistry compatibility": "patches/filament-filament/livewire-v4-compatibility.patch"
-            },
-            "laravel/framework": {
-                "Use PDO\\\\Mysql::ATTR_SSL_CA when available under PHP 8.5": "patches/laravel-framework/pdo-mysql-ssl-attr.patch"
-            }
+            "dont-discover": [
+                "moonshine/moonshine"
+            ]
         }
     },
     "minimum-stability": "dev",

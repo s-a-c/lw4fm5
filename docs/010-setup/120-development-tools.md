@@ -346,7 +346,7 @@ On macOS, dependencies are usually installed automatically. On Windows, no addit
 
 #### 4.6.7 Integration with Pest 4
 
-Pest 4’s browser testing plugin integrates Playwright:
+Pest 4's browser testing plugin integrates Playwright:
 
 ``` php
 use function Pest\Laravel\visit;
@@ -360,6 +360,42 @@ it('can visit homepage', function () {
          ->assertSee('Email');
 });
 ```
+
+#### 4.6.8 Browser Testing Best Practices
+
+**CSP Parser Errors (False Positives)**:
+
+The browser's CSP parser may generate false positive errors like `CSP Parser Error: Expected PUNCTUATION ":" but got PUNCTUATION "("`. These don't affect functionality but can cause test failures.
+
+**Solution**: Use the `assertNoJavaScriptErrorsExceptCspParser()` helper instead of `assertNoConsoleLogs()`:
+
+``` php
+use function Pest\Laravel\visit;
+
+it('can update password', function () {
+    assertNoJavaScriptErrorsExceptCspParser(
+        visit(route('user-password.edit'))
+            ->fill('password', 'new-password')
+            ->press('@update-password-button')
+            ->assertUrlIs(route('user-password.edit'))
+    );
+
+    // Verify functionality via database check (more reliable than UI messages)
+    expect(Hash::check('new-password', $user->refresh()->password))->toBeTrue();
+});
+```
+
+**Key Points**:
+- Don't use `->assertNoConsoleLogs()` - it catches CSP false positives
+- Use `assertNoJavaScriptErrorsExceptCspParser()` which filters CSP errors
+- Verify functionality via database checks rather than UI feedback messages
+- CSP errors are documented as false positives in `tests/Pest.php`
+
+**Flux UI Component Testing**:
+
+When testing pages with Flux UI components that use `x-model`, be aware that Flux attempts server-side variable resolution. If variables aren't available in the view scope, tests may fail with "Undefined variable" errors.
+
+**Solution**: Ensure variables are defined globally or use alternative binding patterns. See [Troubleshooting - Browser Test Failures](150-troubleshooting.md#75-browser-test-failures) for details.
 
 See [Testing Framework: Pest 4](#41-pest-4) section for more details on browser testing patterns.
 

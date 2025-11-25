@@ -12,11 +12,10 @@ use Laravel\Telescope\IncomingEntry;
 use Laravel\Telescope\Telescope;
 use Mockery as m;
 use Mockery\MockInterface;
-use ReflectionClass;
 
 it('boots TelescopeServiceProvider', function (): void {
     $provider = App::getProvider(TelescopeServiceProvider::class);
-    assert($provider !== null);
+    expect($provider)->not->toBeNull();
     expect($provider)->not->toBeNull();
 });
 
@@ -98,8 +97,8 @@ it('executes filter logic with IncomingEntry objects', function (): void {
     $filters = $filterUsingProperty->getValue();
 
     // Execute the filter callback (line 27) with mock entries
-    assert($filters !== null && (is_array($filters) ? count($filters) > 0 : true));
-    expect($filters)->not->toBeEmpty();
+    expect($filters)->toBeArray();
+    expect(count($filters))->toBeGreaterThan(0);
     $filterCallback = end($filters);
 
     // Test line 27: Execute the filter callback which calls shouldRecordEntry

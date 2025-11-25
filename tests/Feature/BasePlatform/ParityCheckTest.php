@@ -3,9 +3,10 @@
 declare(strict_types=1);
 
 use App\Contracts\BasePlatform\ParityCheckerContract;
+use App\Data\ParityReportData;
+use App\Enums\ParityStatus;
 use App\Models\EnvironmentProfile;
 use App\Models\ParityResult;
-use App\Services\BasePlatform\ParityReport;
 use Illuminate\Support\Str;
 use Mockery\MockInterface;
 
@@ -28,9 +29,9 @@ it('records a passing parity report for a specific profile', function (): void {
         ->once()
         ->with(['native'])
         ->andReturn([
-            new ParityReport(
+            new ParityReportData(
                 profile: 'native',
-                status: ParityReport::STATUS_PASS,
+                status: ParityStatus::Pass,
                 issues: []
             ),
         ]);

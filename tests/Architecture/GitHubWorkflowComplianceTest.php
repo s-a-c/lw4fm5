@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\File;
-use SplFileInfo;
 
 it('uses Bun as the JavaScript runtime across GitHub workflows', function (): void {
     $workflowPath = base_path('.github/workflows');

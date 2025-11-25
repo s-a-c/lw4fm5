@@ -1,3 +1,5 @@
+/** @format */
+
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';

@@ -16,7 +16,7 @@ use Mockery\MockInterface;
 
 it('boots SupportCustomizationServiceProvider', function (): void {
     $provider = App::getProvider(SupportCustomizationServiceProvider::class);
-    assert($provider !== null);
+    expect($provider)->not->toBeNull();
     expect($provider)->not->toBeNull();
 });
 
@@ -54,7 +54,7 @@ it('configures Filament assets on serving event', function (): void {
     $method->invoke($provider); // This executes the same code as line 30
 
     $providerCheck = App::getProvider(SupportCustomizationServiceProvider::class);
-    assert($providerCheck !== null);
+    expect($providerCheck)->not->toBeNull();
     expect($providerCheck)->not->toBeNull();
 });
 
@@ -163,7 +163,7 @@ it('applies async attribute to scripts', function (): void {
     $method->invoke($provider);
 
     $providerCheck = App::getProvider(SupportCustomizationServiceProvider::class);
-    assert($providerCheck !== null);
+    expect($providerCheck)->not->toBeNull();
     expect($providerCheck)->not->toBeNull();
 });
 
@@ -192,7 +192,7 @@ it('mutates scripts based on identifier match', function (): void {
     $method->invoke($provider);
 
     $providerCheck = App::getProvider(SupportCustomizationServiceProvider::class);
-    assert($providerCheck !== null);
+    expect($providerCheck)->not->toBeNull();
     expect($providerCheck)->not->toBeNull();
 });
 

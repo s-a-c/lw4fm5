@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Contracts\BasePlatform\ComposerAuditRunnerContract;
+use App\Data\DependencyRecordData;
 use App\Services\BasePlatform\DependencyCatalogue;
-use App\Services\BasePlatform\DependencyRecord;
 use App\Support\BasePlatformMetrics;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
@@ -121,7 +121,7 @@ final class DependencyReviewReport extends Command
         if ($overdue->isNotEmpty()) {
             $this->components->warn(sprintf(
                 'Overdue dependencies detected: %s',
-                $overdue->map(fn (DependencyRecord $entry): string => $entry->name)->implode(', ')
+                $overdue->map(fn (DependencyRecordData $entry): string => $entry->name)->implode(', ')
             ));
         }
 

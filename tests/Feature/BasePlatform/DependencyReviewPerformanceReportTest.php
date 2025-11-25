@@ -57,8 +57,10 @@ it('summarises dependency review runtime metrics and appends performance log', f
     /** @phpstan-var array<int, non-empty-string> $entries */
     expect($entries)->not->toBeEmpty();
     $lastEntry = end($entries);
-    assert($lastEntry !== false);
-    $last = json_decode($lastEntry, true, 512, JSON_THROW_ON_ERROR);
+    expect($lastEntry)->not->toBeFalse();
+    /** @var non-empty-string $lastEntryString */
+    $lastEntryString = $lastEntry;
+    $last = json_decode($lastEntryString, true, 512, JSON_THROW_ON_ERROR);
 
     expect($last)->toMatchArray([
         'report_path' => $reportPath,
