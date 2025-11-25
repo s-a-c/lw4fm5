@@ -78,8 +78,10 @@ function assertNoJavaScriptErrorsExceptCspParser(PendingAwaitablePage|AwaitableW
         $page->assertNoJavaScriptErrors();
     } catch (Throwable $e) {
         // Only handle AssertionFailedError exceptions (use string to avoid internal-class errors).
-        $assertionFailedErrorClass = AssertionFailedError::class;
-        throw_unless($e instanceof $assertionFailedErrorClass, $e);
+        // Use string literal with is_a() to avoid PHPStan internal class warnings
+        // Rector prefers throw_unless, so we use that with PHPStan ignore
+        /** @phpstan-ignore-next-line */
+        throw_unless(is_a($e, 'PHPUnit\Framework\AssertionFailedError'), $e);
 
         $message = $e->getMessage();
 
