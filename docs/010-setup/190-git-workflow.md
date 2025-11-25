@@ -110,7 +110,29 @@ jj new
 
 ### 3.2 Commit Message Format
 
-Follow conventional commits with detailed description. See the workflow guide for examples.
+Follow conventional commits with detailed description. Example formats:
+
+```
+feat: add user authentication flow
+
+Implements OAuth2 authentication with Google and GitHub providers.
+Adds user session management and token refresh logic.
+
+fix: resolve crash on startup when config missing
+
+Handles missing configuration gracefully by providing default values
+and logging warnings instead of crashing the application.
+
+docs: update README with setup instructions
+
+Adds comprehensive setup guide including environment variables,
+database migrations, and dependency installation steps.
+
+refactor: simplify data processing logic
+
+Extracts complex data transformation into separate service class
+for better testability and maintainability.
+```
 
 ## 4 Sync with Git Develop Branch
 
@@ -138,7 +160,7 @@ Monitor GitHub Actions to ensure all workflows complete successfully.
 gh run list --branch develop --limit 5
 ```
 
-Or check in web UI at: `https://github.com/s-a-c/lw4fm5/actions`
+Or check in web UI at: `https://github.com/<owner>/<repo>/actions`
 
 ## 6 Create PR to Main
 
@@ -152,31 +174,143 @@ gh pr create --base main --head develop --title "..." --body "..."
 
 ## 7 PR Review Process
 
-Review your PR and address any feedback.
+Review your PR and address any feedback from reviewers or automated tools.
+
+### 7.1 Self-Review Checklist
+
+Before requesting review, verify:
+- [ ] All CI checks are passing
+- [ ] Code follows project conventions
+- [ ] Tests are included and passing
+- [ ] Documentation is updated (if needed)
+- [ ] No sensitive data or secrets in changes
+- [ ] Commit messages are clear and descriptive
+
+### 7.2 Address Review Comments
+
+When reviewers provide feedback:
+1. Read all comments carefully
+2. Ask for clarification if needed
+3. Make changes locally
+4. Commit fixes and push updates
+5. Respond to comments explaining your changes
 
 ## 8 Fix Issues Locally
 
-Make changes, commit with jj, and push to update the PR.
+If issues are found during review, fix them locally and push updates:
+
+### 8.1 Make Changes
+
+```bash
+# Make necessary changes to files
+# Test locally to ensure fixes work
+composer ci:local
+```
+
+### 8.2 Commit and Push
+
+```bash
+# Commit fixes with jj
+jj new -m "fix: address review feedback
+
+- Fixed linting issues
+- Updated documentation
+- Added missing test cases"
+
+# Sync to git and push
+jj git export
+git push origin develop
+```
+
+The PR will automatically update with your new commits.
 
 ## 9 Merge Successful PR
 
-Once all checks pass, merge into main via GitHub UI or CLI.
+Once all checks pass and reviews are approved, merge the PR:
+
+### 9.1 Using GitHub UI
+
+1. Navigate to the PR page
+2. Click "Merge pull request"
+3. Choose merge type (squash and merge, merge commit, or rebase and merge)
+4. Confirm the merge
+
+### 9.2 Using GitHub CLI
+
+```bash
+gh pr merge <PR_NUMBER> --squash
+# or
+gh pr merge <PR_NUMBER> --merge
+# or
+gh pr merge <PR_NUMBER> --rebase
+```
+
+### 9.3 After Merge
+
+- The PR will be automatically closed
+- The branch can be deleted (if configured)
+- Main branch will be updated with your changes
 
 ## 10 Sync Local Branches
 
 After PR is merged, sync your local main and develop branches:
 
 ```bash
-git fetch origin
+# Update main branch with merged changes
 git checkout main && git pull origin main
+
+# Update develop branch (should already be up to date, but sync to be safe)
 git checkout develop && git pull origin develop
+
+# If using jj, sync jj with git
+jj git fetch
+jj git pull
 ```
 
 ## 11 Troubleshooting
 
-See the full documentation file for detailed troubleshooting steps.
+Common issues and solutions:
+
+### 11.1 Pre-Push Hooks Fail
+
+If pre-push hooks fail:
+- Fix the reported issues (linting, tests, etc.)
+- Run `composer ci:local` to verify locally
+- Commit fixes and try pushing again
+
+### 11.2 Workflow Failures
+
+If GitHub Actions workflows fail:
+- Check the workflow logs for specific errors
+- Reproduce the issue locally if possible
+- Fix the issue and push updates
+- Workflows will re-run automatically
+
+### 11.3 Merge Conflicts
+
+If merge conflicts occur:
+- Fetch latest changes: `git fetch origin`
+- Rebase your branch: `git rebase origin/main`
+- Resolve conflicts manually
+- Continue rebase: `git rebase --continue`
+- Force push (if needed): `git push origin develop --force-with-lease`
+
+### 11.4 jj/Git Sync Issues
+
+If jj and git are out of sync:
+- Export jj changes: `jj git export`
+- Check git status: `git status`
+- If needed, reset and re-export: `jj git export --reset`
+
+### 11.5 Branch Protection Rules
+
+If you can't push directly to main:
+- This is expected - use PR workflow
+- Create PR from develop to main
+- Get required approvals
+- Merge via PR (not direct push)
 
 ---
 
-**Last Updated**: 2025-01-XX
+**Last Updated**: 2025-11-25
 **Maintainer**: Development Team
