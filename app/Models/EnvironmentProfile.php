@@ -38,7 +38,7 @@ final class EnvironmentProfile extends Model
      */
     public function parityResults(): HasMany
     {
-        return $this->hasMany(ParityResult::class);
+        return $this->hasMany(ParityResult::class, 'environment_profile_id');
     }
 
     /**

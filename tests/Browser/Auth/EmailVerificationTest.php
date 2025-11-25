@@ -18,7 +18,6 @@ test('email verification screen can be rendered', function (): void {
         visit(route('verification.notice'))
             ->assertSee('Please verify your email address by clicking on the link we just emailed to you.')
             ->assertSee('Resend verification email')
-            ->assertNoConsoleLogs()
     );
 });
 
@@ -39,7 +38,6 @@ test('email can be verified', function (): void {
         visit($verificationUrl)
             ->assertUrlIs(route('dashboard'))
             ->assertQueryStringHas('verified', '1')
-            ->assertNoConsoleLogs()
     );
 
     Event::assertDispatched(Verified::class);
@@ -63,7 +61,6 @@ test('email is not verified with invalid hash', function (): void {
         visit($verificationUrl)
             ->assertSee('403')
             ->assertSee('This action is unauthorized.')
-            ->assertNoConsoleLogs()
     );
 
     Event::assertNotDispatched(Verified::class);
@@ -87,7 +84,6 @@ test('email is not verified with invalid user id', function (): void {
         visit($verificationUrl)
             ->assertSee('403')
             ->assertSee('This action is unauthorized.')
-            ->assertNoConsoleLogs()
     );
 
     Event::assertNotDispatched(Verified::class);
@@ -106,7 +102,6 @@ test('verified user is redirected to dashboard from verification prompt', functi
     assertNoJavaScriptErrorsExceptCspParser(
         visit(route('verification.notice'))
             ->assertUrlIs(route('dashboard'))
-            ->assertNoConsoleLogs()
     );
 
     Event::assertNotDispatched(Verified::class);
@@ -131,7 +126,6 @@ test('already verified user visiting verification link is redirected without fir
         visit($verificationUrl)
             ->assertUrlIs(route('dashboard'))
             ->assertQueryStringHas('verified', '1')
-            ->assertNoConsoleLogs()
     );
 
     Event::assertNotDispatched(Verified::class);

@@ -265,6 +265,7 @@ it('defaults lastReviewedAt to now when value is not a string', function (): voi
     $record = $catalogue->entries()->first();
 
     expect($record)->not->toBeNull();
+    /** @var DependencyRecordData $record */
     expect($record->lastReviewedAt->toDateTimeString())->toBe('2025-11-09 00:00:00');
 });
 

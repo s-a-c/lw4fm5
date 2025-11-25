@@ -13,7 +13,6 @@ use Mockery\MockInterface;
 it('handles BootstrapRunnerException with guidance', function (): void {
     Config::set('base-platform.profiles.supported', ['native']);
 
-    /** @phpstan-ignore-next-line */
     $guidance = new BootstrapRecoveryGuidanceData(
         title: 'Bootstrap failed',
         documentation: 'https://example.com/docs',

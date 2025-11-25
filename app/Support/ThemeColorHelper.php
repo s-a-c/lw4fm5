@@ -19,7 +19,6 @@ final class ThemeColorHelper
         // Resolve the specific hex code for the selected accent/theme combo
         $primaryHex = self::resolveAccentHex($settings);
 
-        /** @var array<string, array<int|string, int|string>|string> */
         return [
             'primary' => Color::hex($primaryHex),
             // You can implement custom logic for danger/success per theme here if desired

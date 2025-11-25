@@ -10,10 +10,10 @@ use Illuminate\Testing\TestResponse;
 
 test('reset password link screen can be rendered', function (): void {
     /** @phpstan-var Tests\TestCase $this */
-    /** @phpstan-var TestResponse<Response> $response */
+    /** @var TestResponse<Response> $response */
     $response = $this->get(route('password.request'));
 
-    expect($response)->assertOk();
+    $response->assertOk();
 });
 
 test('reset password link can be requested', function (): void {
@@ -37,10 +37,10 @@ test('reset password screen can be rendered', function (): void {
 
     Notification::assertSentTo($user, ResetPassword::class, function ($notification): true {
         /** @phpstan-var Tests\TestCase $this */
-        /** @phpstan-var TestResponse<Response> $response */
+        /** @var TestResponse<Response> $response */
         $response = $this->get(route('password.reset', $notification->token));
 
-        expect($response)->assertOk();
+        $response->assertOk();
 
         return true;
     });
@@ -56,7 +56,7 @@ test('password can be reset with valid token', function (): void {
 
     Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user): true {
         /** @phpstan-var Tests\TestCase $this */
-        /** @phpstan-var TestResponse<Response> $response */
+        /** @var TestResponse<Response> $response */
         $response = $this->post(route('password.update'), [
             'token' => $notification->token,
             'email' => $user->email,
@@ -64,9 +64,8 @@ test('password can be reset with valid token', function (): void {
             'password_confirmation' => 'NewPassword123!@#',
         ]);
 
-        expect($response)
-            ->assertSessionHasNoErrors()
-            ->assertRedirect(route('login', absolute: false));
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect(route('login', absolute: false));
 
         return true;
     });

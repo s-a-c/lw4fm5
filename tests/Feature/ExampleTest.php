@@ -7,8 +7,8 @@ use Illuminate\Testing\TestResponse;
 
 test('returns a successful response', function (): void {
     /** @phpstan-var Tests\TestCase $this */
-    /** @phpstan-var TestResponse<Response> $response */
+    /** @var TestResponse<Response> $response */
     $response = $this->get(route('home'));
 
-    expect($response)->assertOk();
+    $response->assertOk();
 });

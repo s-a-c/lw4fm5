@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use App\Data\UserSettingsData;
+use App\Models\User;
 use App\Support\ThemeColorHelper;
 use Closure;
 use Filament\Support\Facades\FilamentColor;
 use Filament\Support\Facades\FilamentView;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Blade;
 
 final class ApplyTheme
 {
     public function handle(Request $request, Closure $next): mixed
     {
-        /** @var \App\Models\User|null $user */
+        /** @var User|null $user */
         $user = Auth::user();
 
         // Always use default settings if no user is authenticated

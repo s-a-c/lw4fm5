@@ -42,7 +42,7 @@ final class FilamentPanelProvider extends PanelProvider
             // The Middleware will hook in and overwrite these later.
             ->colors([
                 'primary' => Color::Amber,
-                'gray'    => Color::Zinc,
+                'gray' => Color::Zinc,
             ])
 
             ->discoverResources(in: app_path('Filament/Filament/Resources'), for: 'App\Filament\Filament\Resources')

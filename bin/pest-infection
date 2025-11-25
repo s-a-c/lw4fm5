@@ -1,0 +1,58 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+$incomingArgs = $_SERVER['argv'];
+array_shift($incomingArgs);
+
+if ($incomingArgs === ['--version']) {
+    fwrite(STDOUT, "PHPUnit 12.4.1 by Sebastian Bergmann and contributors.\n");
+
+    return;
+}
+
+$logJunitPath = null;
+$forwardArgs = [];
+
+for ($index = 0; $index < count($incomingArgs); $index++) {
+    $argument = $incomingArgs[$index];
+
+    if (str_starts_with($argument, '--log-junit=')) {
+        $logJunitPath = substr($argument, strlen('--log-junit='));
+    } elseif ($argument === '--log-junit' && isset($incomingArgs[$index + 1])) {
+        $logJunitPath = $incomingArgs[$index + 1];
+        $forwardArgs[] = $argument;
+        $forwardArgs[] = $incomingArgs[$index + 1];
+        $index++;
+
+        continue;
+    }
+
+    $forwardArgs[] = $argument;
+}
+
+$binary = __DIR__.'/../vendor/bin/pest';
+$command = escapeshellarg($binary);
+
+foreach ($forwardArgs as $argument) {
+    $command .= ' '.escapeshellarg($argument);
+}
+
+passthru($command, $exitCode);
+
+if ($logJunitPath !== null && is_file($logJunitPath)) {
+    $junit = file_get_contents($logJunitPath);
+
+    if ($junit !== false) {
+        $junit = str_replace(
+            ['name="Tests\\', 'class="Tests\\'],
+            ['name="P\\Tests\\', 'class="P\\Tests\\'],
+            $junit,
+        );
+
+        file_put_contents($logJunitPath, $junit);
+    }
+}
+
+exit($exitCode);

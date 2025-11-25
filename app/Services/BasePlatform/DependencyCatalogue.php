@@ -115,9 +115,7 @@ final readonly class DependencyCatalogue
 
         $classification = $entry['classification'] ?? '';
         $classificationStr = is_string($classification) ? $classification : '';
-        if ($classificationStr === '') {
-            throw new InvalidArgumentException('Dependency entry classification cannot be empty');
-        }
+        throw_if($classificationStr === '', InvalidArgumentException::class, 'Dependency entry classification cannot be empty');
         try {
             DependencyClassification::from($classificationStr);
         } catch (ValueError $e) {
@@ -129,9 +127,7 @@ final readonly class DependencyCatalogue
 
         $reviewCadence = $entry['reviewCadence'] ?? '';
         $reviewCadenceStr = is_string($reviewCadence) ? $reviewCadence : '';
-        if ($reviewCadenceStr === '') {
-            throw new InvalidArgumentException('Dependency entry reviewCadence cannot be empty');
-        }
+        throw_if($reviewCadenceStr === '', InvalidArgumentException::class, 'Dependency entry reviewCadence cannot be empty');
         try {
             ReviewCadence::from($reviewCadenceStr);
         } catch (ValueError $e) {
@@ -143,9 +139,7 @@ final readonly class DependencyCatalogue
 
         $riskLevel = $entry['riskLevel'] ?? '';
         $riskLevelStr = is_string($riskLevel) ? $riskLevel : '';
-        if ($riskLevelStr === '') {
-            throw new InvalidArgumentException('Dependency entry riskLevel cannot be empty');
-        }
+        throw_if($riskLevelStr === '', InvalidArgumentException::class, 'Dependency entry riskLevel cannot be empty');
         try {
             RiskLevel::from($riskLevelStr);
         } catch (ValueError $e) {

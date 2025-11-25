@@ -46,6 +46,7 @@ return RectorConfig::configure()
         CarbonToDateFacadeRector::class => [
             __DIR__.'/app/Services/BasePlatform/DependencyCatalogue.php',
             __DIR__.'/app/Console/Commands/DependencyReviewReport.php',
+            __DIR__.'/app/Data/DependencyRecordData.php',
             __DIR__.'/tests/Unit/BasePlatform/DependencyCatalogueTest.php',
         ],
     ])

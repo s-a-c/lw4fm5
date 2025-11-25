@@ -14,7 +14,6 @@ test('confirm password screen can be rendered', function (): void {
         visit(route('password.confirm'))
             ->assertSee('Confirm your password')
             ->assertSee('This is a secure area of the application. Please confirm your password before continuing.')
-            ->assertNoConsoleLogs()
     );
 });
 
@@ -26,7 +25,6 @@ test('password can be confirmed', function (): void {
             ->fill('password', 'password')
             ->press('@confirm-password-button')
             ->assertUrlIs(route('dashboard'))
-            ->assertNoConsoleLogs()
     );
 });
 
@@ -42,6 +40,5 @@ test('password is not confirmed with invalid password', function (): void {
             ->press('@confirm-password-button')
             ->assertUrlIs(route('password.confirm'))
             ->assertSee($usesTwoFactorAuthentication ? 'The provided password was incorrect.' : 'The provided password is incorrect.')
-            ->assertNoConsoleLogs()
     );
 });

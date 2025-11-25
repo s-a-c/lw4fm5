@@ -42,9 +42,7 @@ final class MoonShineUserIndexPage extends IndexPage
 
             Text::make(__('moonshine::ui.resource.name'), 'name'),
 
-            Image::make(__('moonshine::ui.resource.avatar'), 'avatar')->modifyRawValue(fn (
-                ?string $raw
-            ): string => $raw ?? ''),
+            Image::make(__('moonshine::ui.resource.avatar'), 'avatar')->modifyRawValue(fn (mixed $raw, mixed $value, Image $field): string => is_string($raw) ? $raw : ''),
 
             Date::make(__('moonshine::ui.resource.created_at'), 'created_at')
                 ->format('d.m.Y')
@@ -63,17 +61,18 @@ final class MoonShineUserIndexPage extends IndexPage
                 'moonshineUserRole',
                 formatted: static fn (MoonshineUserRole $model) => $model->name,
                 resource: MoonShineUserRoleResource::class,
-            )->valuesQuery(static fn (Builder $q) => $q->select(['id', 'name'])),
+            )->valuesQuery(static fn (Builder $q): Builder => $q->select(['id', 'name'])),
 
             Email::make('E-mail', 'email'),
         ];
     }
 
-    /**
-     * @param  TableBuilder  $component
-     */
-    protected function modifyListComponent(ComponentContract $component): TableBuilder
+    protected function modifyListComponent(ComponentContract $component): ComponentContract
     {
+        if (! ($component instanceof TableBuilder)) {
+            return $component;
+        }
+
         return $component->columnSelection();
     }
 }

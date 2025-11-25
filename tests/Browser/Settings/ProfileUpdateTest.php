@@ -82,7 +82,7 @@ test('user can delete their account', function (): void {
             assertGuest();
             expect($user->fresh())->toBeNull();
         }
-    } catch (\Exception $e) {
+    } catch (Exception) {
         // Modal didn't open - functionality verified via feature tests
         // Just verify button exists and is clickable
         expect($user->fresh())->not->toBeNull();
@@ -116,7 +116,7 @@ test('correct password must be provided to delete account', function (): void {
             assertAuthenticated();
             expect($user->fresh())->not->toBeNull();
         }
-    } catch (\Exception $e) {
+    } catch (Exception) {
         // Modal didn't open - functionality verified via feature tests
         expect($user->fresh())->not->toBeNull();
     }

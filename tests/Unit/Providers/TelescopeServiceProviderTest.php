@@ -97,8 +97,8 @@ it('executes filter logic with IncomingEntry objects', function (): void {
     $filters = $filterUsingProperty->getValue();
 
     // Execute the filter callback (line 27) with mock entries
-    expect($filters)->toBeArray()->not->toBeEmpty();
-    expect($filters)->not->toBeEmpty();
+    expect($filters)->toBeArray();
+    expect(count($filters))->toBeGreaterThan(0);
     $filterCallback = end($filters);
 
     // Test line 27: Execute the filter callback which calls shouldRecordEntry

@@ -13,10 +13,10 @@ test('email verification screen can be rendered', function (): void {
     /** @phpstan-var Tests\TestCase $this */
     $user = User::factory()->unverified()->create();
 
-    /** @phpstan-var TestResponse<Response> $response */
+    /** @var TestResponse<Response> $response */
     $response = $this->actingAs($user)->get(route('verification.notice'));
 
-    expect($response)->assertOk();
+    $response->assertOk();
 });
 
 test('email can be verified', function (): void {
@@ -37,7 +37,7 @@ test('email can be verified', function (): void {
     Event::assertDispatched(Verified::class);
 
     expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
-    expect($response)->assertRedirect(route('dashboard', absolute: false).'?verified=1');
+    $response->assertRedirect(route('dashboard', absolute: false).'?verified=1');
 });
 
 test('email is not verified with invalid hash', function (): void {
@@ -71,10 +71,9 @@ test('already verified user visiting verification link is redirected without fir
         ['id' => $user->id, 'hash' => sha1((string) $user->email)]
     );
 
-    /** @phpstan-var TestResponse<Response> $response */
+    /** @var TestResponse<Response> $response */
     $response = $this->actingAs($user)->get($verificationUrl);
-    expect($response)
-        ->assertRedirect(route('dashboard', absolute: false).'?verified=1');
+    $response->assertRedirect(route('dashboard', absolute: false).'?verified=1');
 
     $freshUser = $user->fresh();
     expect($freshUser)->not->toBeNull();

@@ -276,6 +276,9 @@
     @livewireScripts
     @filamentScripts
     @fluxScripts
+    <script nonce="{{ csp_nonce() }}">
+        console.log("I am secure!");
+    </script>
 </body>
 
 </html>

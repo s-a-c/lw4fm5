@@ -58,7 +58,9 @@ it('summarises dependency review runtime metrics and appends performance log', f
     expect($entries)->not->toBeEmpty();
     $lastEntry = end($entries);
     expect($lastEntry)->not->toBeFalse();
-    $last = json_decode($lastEntry, true, 512, JSON_THROW_ON_ERROR);
+    /** @var non-empty-string $lastEntryString */
+    $lastEntryString = $lastEntry;
+    $last = json_decode($lastEntryString, true, 512, JSON_THROW_ON_ERROR);
 
     expect($last)->toMatchArray([
         'report_path' => $reportPath,

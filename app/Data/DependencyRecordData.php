@@ -30,12 +30,21 @@ final class DependencyRecordData extends Data
     {
         $date = $this->lastReviewedAt instanceof Carbon
             ? $this->lastReviewedAt
-            : Carbon::parse($this->lastReviewedAt->toDateTimeString());
+            : Date::parse($this->lastReviewedAt->toDateTimeString());
 
-        return match ($this->reviewCadence) {
+        $result = match ($this->reviewCadence) {
             ReviewCadence::Monthly => $date->copy()->addMonthNoOverflow()->endOfDay(),
             ReviewCadence::Quarterly => $date->copy()->addMonthsNoOverflow(3)->endOfDay(),
         };
+
+        // Ensure we always return Carbon, not CarbonImmutable
+        // Date::parse() returns CarbonImmutable when Date::use() is set, so convert explicitly
+        if ($result instanceof CarbonImmutable) {
+            return new Carbon($result->toDateTimeString());
+        }
+
+        /** @var Carbon $result */
+        return $result;
     }
 
     public function isOverdue(Carbon|CarbonImmutable $reference): bool

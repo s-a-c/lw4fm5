@@ -13,10 +13,10 @@ test('two factor challenge redirects to login when not authenticated', function 
         skip('Two-factor authentication is not enabled.');
     }
 
-    /** @phpstan-var TestResponse<Response> $response */
+    /** @var TestResponse<Response> $response */
     $response = $this->get(route('two-factor.login'));
 
-    expect($response)->assertRedirect(route('login'));
+    $response->assertRedirect(route('login'));
 });
 
 test('two factor challenge can be rendered', function (): void {
@@ -32,10 +32,10 @@ test('two factor challenge can be rendered', function (): void {
 
     $user = User::factory()->create();
 
-    /** @phpstan-var TestResponse<Response> $response */
+    /** @var TestResponse<Response> $response */
     $response = $this->post(route('login.store'), [
         'email' => $user->email,
         'password' => 'password',
     ]);
-    expect($response)->assertRedirect(route('two-factor.login'));
+    $response->assertRedirect(route('two-factor.login'));
 });

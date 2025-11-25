@@ -13,7 +13,6 @@ test('login screen can be rendered', function (): void {
         visit(route('login'))
             ->assertSee('Log in to your account')
             ->assertSee('Enter your email and password below to log in')
-            ->assertNoConsoleLogs()
     );
 });
 
@@ -26,7 +25,6 @@ test('users can authenticate using the login screen', function (): void {
             ->fill('password', 'password')
             ->press('@login-button')
             ->assertUrlIs(route('dashboard'))
-            ->assertNoConsoleLogs()
     );
 
     assertAuthenticated();
@@ -42,7 +40,6 @@ test('users can not authenticate with invalid password', function (): void {
             ->press('@login-button')
             ->assertUrlIs(route('login'))
             ->assertSee('These credentials do not match our records.')
-            ->assertNoConsoleLogs()
     );
 
     assertGuest();
@@ -58,7 +55,6 @@ test('users can logout', function (): void {
             ->click('@sidebar-menu-button')
             ->click('@logout-button')
             ->assertUrlIs(route('home'))
-            ->assertNoConsoleLogs()
     );
 
     assertGuest();

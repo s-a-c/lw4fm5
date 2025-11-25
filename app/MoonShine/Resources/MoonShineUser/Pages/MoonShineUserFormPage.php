@@ -7,6 +7,7 @@ namespace App\MoonShine\Resources\MoonShineUser\Pages;
 use App\MoonShine\Resources\MoonShineUser\MoonShineUserResource;
 use App\MoonShine\Resources\MoonShineUserRole\MoonShineUserRoleResource;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password as PasswordRule;
 use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
@@ -28,6 +29,7 @@ use MoonShine\UI\Fields\Image;
 use MoonShine\UI\Fields\Password;
 use MoonShine\UI\Fields\PasswordRepeat;
 use MoonShine\UI\Fields\Text;
+use Stringable;
 
 /**
  * @extends FormPage<MoonShineUserResource, MoonShineUser>
@@ -52,7 +54,7 @@ final class MoonShineUserFormPage extends FormPage
                             resource: MoonShineUserRoleResource::class,
                         )
                             ->creatable()
-                            ->valuesQuery(static fn (Builder $q) => $q->select(['id', 'name'])),
+                            ->valuesQuery(static fn (Builder $q): Builder => $q->select(['id', 'name'])),
 
                         Flex::make([
                             Text::make(__('moonshine::ui.resource.name'), 'name')
@@ -88,9 +90,13 @@ final class MoonShineUserFormPage extends FormPage
         ];
     }
 
+    /**
+     * @return array<string, array<ValidationRule|string|Stringable>|string>
+     */
     protected function rules(DataWrapperContract $item): array
     {
-        return [
+        /** @var array<string, array<ValidationRule|string|Stringable>|string> $rules */
+        $rules = [
             'name' => 'required',
             'moonshine_user_role_id' => 'required',
             'email' => [
@@ -107,5 +113,7 @@ final class MoonShineUserFormPage extends FormPage
                 'confirmed',
             ],
         ];
+
+        return $rules;
     }
 }

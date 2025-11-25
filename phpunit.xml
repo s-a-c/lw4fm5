@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12.0/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true"
+         executionOrder="depends,defects"
+         resolveDependencies="true"
 >
     <testsuites>
         <testsuite name="Architecture">
@@ -22,9 +24,14 @@
         <include>
             <directory>app</directory>
         </include>
+        <exclude>
+            <directory>app/MoonShine</directory>
+        </exclude>
     </source>
+    <coverage/>
     <php>
         <!-- <env name="APP_BASE_PATH" value="./vendor/orchestra/testbench-core/laravel"/> -->
+        <ini name="memory_limit" value="1G"/>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_KEY" value="AckfSECXIvnK5r28GVIWUAxmbBSjTsmF"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>

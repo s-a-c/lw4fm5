@@ -1,147 +1,150 @@
-/* ==========================================
-KANAGAWA THEME EXTRAS
-========================================== */
+/**
+ * ==========================================
+ * KANAGAWA THEME EXTRAS
+ * ==========================================
+ *
+ * @format
+ */
+
 /* Logo Animation Styles (Kanagawa Palette) */
 :root {
-    /* Sumi Ink & Fuji White are base/text, these are accents */
-    --kg-red: #c34043;
-    /* Autumn Red */
-    --kg-orange: #ffa066;
-    /* Surimi Orange */
-    --kg-yellow: #c0a36e;
-    /* Carp Yellow */
-    --kg-green: #76946a;
-    /* Autumn Green */
-    --kg-blue: #7e9cd8;
-    /* Spring Blue */
-    --kg-purple: #957fb8;
-    /* Oni Violet */
-    --animation-duration: 3s;
+  /* Sumi Ink & Fuji White are base/text, these are accents */
+  --kg-red: #c34043;
+  /* Autumn Red */
+  --kg-orange: #ffa066;
+  /* Surimi Orange */
+  --kg-yellow: #c0a36e;
+  /* Carp Yellow */
+  --kg-green: #76946a;
+  /* Autumn Green */
+  --kg-blue: #7e9cd8;
+  /* Spring Blue */
+  --kg-purple: #957fb8;
+  /* Oni Violet */
+  --animation-duration: 3s;
 }
 
 @keyframes kanagawa-rainbow {
+  0%,
+  16.6%,
+  100% {
+    fill: var(--kg-purple);
+  }
 
-    0%,
-    16.6%,
-    100% {
-        fill: var(--kg-purple);
-    }
+  16.7%,
+  33.0% {
+    fill: var(--kg-blue);
+  }
 
-    16.7%,
-    33.0% {
-        fill: var(--kg-blue);
-    }
+  33.1%,
+  49.9% {
+    fill: var(--kg-green);
+  }
 
-    33.1%,
-    49.9% {
-        fill: var(--kg-green);
-    }
+  50.0%,
+  66.5% {
+    fill: var(--kg-yellow);
+  }
 
-    50.0%,
-    66.5% {
-        fill: var(--kg-yellow);
-    }
+  66.6%,
+  83.2% {
+    fill: var(--kg-orange);
+  }
 
-    66.6%,
-    83.2% {
-        fill: var(--kg-orange);
-    }
-
-    83.3%,
-    99.9% {
-        fill: var(--kg-red);
-    }
+  83.3%,
+  99.9% {
+    fill: var(--kg-red);
+  }
 }
 
 /* Apply this class to your SVG to trigger the animation */
 .is-animated-kg {
-    animation: var(--animation-duration) kanagawa-rainbow infinite running;
+  animation: var(--animation-duration) kanagawa-rainbow infinite running;
 }
 
 /* Staggered animation delays for logo parts */
 #kg-part-1 {
-    animation-delay: calc((var(--animation-duration) / 6 * 0) * -1);
+  animation-delay: calc((var(--animation-duration) / 6 * 0) * -1);
 }
 
 #kg-part-2 {
-    animation-delay: calc((var(--animation-duration) / 6 * 1) * -1);
+  animation-delay: calc((var(--animation-duration) / 6 * 1) * -1);
 }
 
 #kg-part-3 {
-    animation-delay: calc((var(--animation-duration) / 6 * 2) * -1);
+  animation-delay: calc((var(--animation-duration) / 6 * 2) * -1);
 }
 
 #kg-part-4 {
-    animation-delay: calc((var(--animation-duration) / 6 * 3) * -1);
+  animation-delay: calc((var(--animation-duration) / 6 * 3) * -1);
 }
 
 #kg-part-5 {
-    animation-delay: calc((var(--animation-duration) / 6 * 4) * -1);
+  animation-delay: calc((var(--animation-duration) / 6 * 4) * -1);
 }
 
 #kg-part-6 {
-    animation-delay: calc((var(--animation-duration) / 6 * 5) * -1);
+  animation-delay: calc((var(--animation-duration) / 6 * 5) * -1);
 }
 
 /* Custom Gradient Utilities for Kanagawa
 (Mirrors the manual definitions in catppuccin.css)
 */
 @layer utilities {
+  /* --- Blue Gradients --- */
+  .from-kg-blue {
+    --tw-gradient-from: var(--kg-blue);
+    --tw-gradient-to: color-mix(in srgb, var(--kg-blue), transparent);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  }
 
-    /* --- Blue Gradients --- */
-    .from-kg-blue {
-        --tw-gradient-from: var(--kg-blue);
-        --tw-gradient-to: color-mix(in srgb, var(--kg-blue), transparent);
-        --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-    }
+  .to-kg-blue {
+    --tw-gradient-to: var(--kg-blue);
+  }
 
-    .to-kg-blue {
-        --tw-gradient-to: var(--kg-blue);
-    }
+  /* --- Red Gradients --- */
+  .from-kg-red {
+    --tw-gradient-from: var(--kg-red);
+    --tw-gradient-to: color-mix(in srgb, var(--kg-red), transparent);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  }
 
-    /* --- Red Gradients --- */
-    .from-kg-red {
-        --tw-gradient-from: var(--kg-red);
-        --tw-gradient-to: color-mix(in srgb, var(--kg-red), transparent);
-        --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-    }
+  .to-kg-red {
+    --tw-gradient-to: var(--kg-red);
+  }
 
-    .to-kg-red {
-        --tw-gradient-to: var(--kg-red);
-    }
+  /* --- Green Gradients --- */
+  .from-kg-green {
+    --tw-gradient-from: var(--kg-green);
+    --tw-gradient-to: color-mix(in srgb, var(--kg-green), transparent);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  }
 
-    /* --- Green Gradients --- */
-    .from-kg-green {
-        --tw-gradient-from: var(--kg-green);
-        --tw-gradient-to: color-mix(in srgb, var(--kg-green), transparent);
-        --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-    }
+  .to-kg-green {
+    --tw-gradient-to: var(--kg-green);
+  }
 
-    .to-kg-green {
-        --tw-gradient-to: var(--kg-green);
-    }
+  /* --- Yellow Gradients --- */
+  .from-kg-yellow {
+    --tw-gradient-from: var(--kg-yellow);
+    --tw-gradient-to: color-mix(in srgb, var(--kg-yellow), transparent);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  }
 
-    /* --- Yellow Gradients --- */
-    .from-kg-yellow {
-        --tw-gradient-from: var(--kg-yellow);
-        --tw-gradient-to: color-mix(in srgb, var(--kg-yellow), transparent);
-        --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-    }
+  .to-kg-yellow {
+    --tw-gradient-to: var(--kg-yellow);
+  }
 
-    .to-kg-yellow {
-        --tw-gradient-to: var(--kg-yellow);
-    }
+  /* --- Background/Surface Gradients --- */
+  /* Useful for fades into the background */
+  .from-kg-sumi {
+    --tw-gradient-from: #1f1f28;
+    /* Wave Base */
+    --tw-gradient-to: transparent;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  }
 
-    /* --- Background/Surface Gradients --- */
-    /* Useful for fades into the background */
-    .from-kg-sumi {
-        --tw-gradient-from: #1f1f28;
-        /* Wave Base */
-        --tw-gradient-to: transparent;
-        --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-    }
-
-    .to-kg-sumi {
-        --tw-gradient-to: #1f1f28;
-    }
+  .to-kg-sumi {
+    --tw-gradient-to: #1f1f28;
+  }
 }

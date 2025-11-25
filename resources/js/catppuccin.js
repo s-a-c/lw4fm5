@@ -7,6 +7,8 @@
  * - Macchiato (dark blue)
  * - Mocha (darkest)
  * - Auto (follows system preference)
+ *
+ * @format
  */
 
 document.addEventListener('DOMContentLoaded', () => {

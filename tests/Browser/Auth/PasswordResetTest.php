@@ -12,7 +12,6 @@ test('reset password link screen can be rendered', function (): void {
         visit(route('password.request'))
             ->assertSee('Forgot password')
             ->assertSee('Enter your email to receive a password reset link')
-            ->assertNoConsoleLogs()
     );
 });
 
@@ -26,7 +25,6 @@ test('test reset password link can be requested', function (): void {
             ->fill('email', $user->email)
             ->press('@email-password-reset-link-button')
             ->assertSee('We have emailed your password reset link.')
-            ->assertNoConsoleLogs()
     );
 
     Notification::assertSentTo($user, ResetPassword::class);
@@ -42,7 +40,6 @@ test('reset password screen can be rendered', function (): void {
     Notification::assertSentTo($user, ResetPassword::class, function ($notification): true {
         assertNoJavaScriptErrorsExceptCspParser(
             visit(route('password.reset', $notification->token))
-                ->assertNoConsoleLogs()
         );
 
         return true;

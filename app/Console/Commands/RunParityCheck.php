@@ -40,15 +40,16 @@ final class RunParityCheck extends Command
         ParityReportData::persistMany($reports)->each(function (ParityResult $result): void {
             $message = $this->renderStatusMessage($result);
 
-            $status = $result->status;
+            /** @var ParityStatus $status */
+            $status = $result->getAttribute('status') ?? ParityStatus::Pass;
             match ($status) {
                 ParityStatus::Pass => $this->components->info($message),
                 ParityStatus::Warning => $this->components->warn($message),
                 default => $this->components->error($message),
             };
 
-            $issues = $result->issues ?? [];
-            if (is_array($issues)) {
+            $issues = $result->getAttribute('issues') ?? [];
+            if (is_array($issues) && $issues !== []) {
                 collect($issues)->each(function (mixed $issue): void {
                     if (is_string($issue)) {
                         $this->line(" - {$issue}");
@@ -87,9 +88,10 @@ final class RunParityCheck extends Command
     private function renderStatusMessage(ParityResult $result): string
     {
         $environmentProfile = $result->environmentProfile;
-        $profile = $environmentProfile->name ?? 'unknown';
+        $profile = ($environmentProfile !== null) ? $environmentProfile->name : 'unknown';
 
-        $status = $result->status;
+        /** @var ParityStatus $status */
+        $status = $result->getAttribute('status') ?? ParityStatus::Pass;
 
         return match ($status) {
             ParityStatus::Pass => "Parity check passed for {$profile}",
