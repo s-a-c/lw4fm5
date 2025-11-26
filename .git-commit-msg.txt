@@ -1,0 +1,97 @@
+feat: Complete Theming Engine specification, plan, and tasks
+
+Comprehensive specification, implementation plan, and task breakdown for the
+Theming Engine feature (006-theming-engine).
+
+## Specification (spec.md)
+- 3 user stories with detailed acceptance criteria
+- 120 functional requirements (FR-001 through FR-120) covering:
+  * Core functionality (theme/flavor/accent selection, live preview, auto-save)
+  * Accessibility (WCAG AA compliance, keyboard navigation, screen readers)
+  * Security (XSS/CSRF protection, input validation, audit logging)
+  * Performance (p95 < 200ms target, client-side DOM updates)
+  * Database integrity (validation, corruption handling, transactions)
+  * Observability (Telescope/Horizon integration, telemetry, dashboards)
+  * Testing (90% coverage minimum, TDD workflow)
+  * UX (silent auto-save, toast notifications, mobile responsiveness)
+  * Maintainability (code organization, documentation, dependency management)
+- 15 success criteria (SC-001 through SC-015)
+- Clarifications from 3 sessions covering:
+  * Concurrent update strategy (last write wins)
+  * Auto-save timing (300ms debounce)
+  * Rate limiting (10 requests/60s per user)
+  * Retry strategy (5 retries with exponential backoff)
+  * Validation timing (on every access)
+  * Performance targets (same for all load conditions)
+  * Data retention (until account deletion)
+
+## Implementation Plan (plan.md)
+- Technical context (PHP 8.4.15, Laravel 12, Livewire 4, Filament 5)
+- Architecture decisions (hybrid server/client-side injection)
+- Data model definitions (UserSettingsData, ThemeData DTO)
+- 6 implementation phases with dependencies
+- Concrete definitions for all "MUST DEFINE" requirements:
+  * Data model & integrity (JSON structure, enum serialization, validation)
+  * Performance (percentiles, measurement points, targets)
+  * Observability (event structure, log levels, dashboards, alerts)
+  * UX (toast notifications, interactions, loading states)
+  * Security (resource limits, testing, audit logging)
+
+## Tasks (tasks.md)
+- 77 implementation tasks across 6 phases:
+  * Phase 1: Setup & Data Structures (3 tasks)
+  * Phase 2: Foundation - Server-Side Injection (7 tasks)
+  * Phase 3: User Story 1 - Personalize Appearance (13 tasks)
+  * Phase 4: User Story 2 - Validation & Fallback (5 tasks)
+  * Phase 5: User Story 3 - Public Theme Preview (5 tasks)
+  * Phase 6: Polish & Performance (44 tasks)
+- 100% requirement coverage (all 120 FRs have associated tasks)
+- TDD workflow enforced (tests before implementation)
+
+## Quality Assurance
+- 10 domain-specific checklists:
+  * accessibility.md (31 items)
+  * security.md (32 items)
+  * ux.md (53 items)
+  * database-integrity.md (48 items)
+  * maintainability.md (68 items)
+  * observability.md (59 items)
+  * performance.md (58 items)
+  * testability.md (67 items)
+  * junior-developer.md (70 items)
+  * hacker.md (70 items)
+- comprehensive.md (consolidated checklist, 37 items)
+- requirements-quality.md and formal.md (superseded, marked)
+
+## Gap Analysis
+- gap-analysis.md: Initial analysis identifying 60 missing requirements
+- gap-analysis-v2.md: Second pass identifying 171 additional requirements,
+  consolidated into 60 new/updated requirements (FR-061 through FR-120)
+
+## Contracts & Documentation
+- contracts/livewire-component.md: Livewire appearance settings component
+- contracts/view-composer.md: Server-side theme injection
+- contracts/javascript-api.md: Client-side theme management API
+- contracts/theme-data-dto.md: ThemeData DTO specification
+- data-model.md: Data entities, relationships, validation rules
+- research.md: Technical decisions and rationale
+- quickstart.md: Implementation checklist and code patterns
+- analysis-package-versions.md: Package version verification and assumptions
+
+## Key Features
+- Hybrid theme injection: Server-side for initial load, client-side for live updates
+- Global theme application: All pages including Filament admin and Fortify auth
+- Silent auto-correction: Invalid combinations reset to defaults on every access
+- Public preview page: Unauthenticated theme demonstration with session storage
+- Comprehensive testing: Unit, feature, browser, performance, security, accessibility
+- Full observability: Telescope events, Horizon metrics, structured logging
+- Accessibility first: WCAG AA compliance, keyboard navigation, screen reader support
+
+## Statistics
+- Total requirements: 120
+- Total tasks: 77
+- Requirement coverage: 100%
+- Documentation files: 31
+- Lines added: ~5,000
+
+All artifacts are consistent, complete, and ready for implementation.

@@ -1,0 +1,274 @@
+# Feature Specification: Theming Engine
+
+**Feature Branch**: `006-theming-engine`
+**Created**: 2025-11-25
+**Status**: Draft
+**Input**: User description: "complete the implementation of a Theming Engine"
+
+## Clarifications
+
+### Session 2025-11-25
+
+- Q: Should theme changes be visible immediately as the user selects options (live preview), or only after clicking a "Save" button? → A: Immediate live preview with auto-save (changes apply and persist as user selects)
+- Q: Should the user's theme preference apply to all pages in the application, or are there exceptions (e.g., Filament admin panels, authentication pages, public pages)? → A: All pages including Filament admin panels and auth pages
+- Q: What should happen if a user's saved settings contain an invalid theme/flavor/accent combination (e.g., due to data corruption, enum changes, or a bug)? → A: Validate on every access and reset to default theme if invalid (silent auto-correction)
+- Q: Should theme data attributes (data-theme, data-flavor, data-accent) be set server-side in the HTML element on initial page load, or is the current client-side JavaScript approach sufficient? → A: Hybrid: Server-side for initial load (data attributes in HTML element), client-side for live updates (instant preview without reload)
+- Q: How should the theme system apply CSS variables? Should it use data attributes with CSS attribute selectors, dynamically inject CSS variable values, or use CSS classes? → A: Use data attributes with CSS attribute selectors (e.g., `[data-theme="catppuccin"][data-flavor="mocha"]`), with consideration for integration with Livewire Flux and Filament color schemes and theme systems
+- Q: When visitors change themes on the demo page, should those changes persist (e.g., in session storage) for their visit, or should they be temporary (only visible while on the demo page, reset on navigation)? → A: Temporary changes (session storage for demo page only, reset on navigation away)
+- Q: Should the theme preview page reuse the same compiled CSS/JS assets as the main application? → A: Yes. Preview relies on the production bundles for parity; only the session-scoped controller logic differs, and cache headers should prevent cross-page leakage.
+- Q: What strategy should be used for concurrent theme updates when a user changes themes in multiple browser tabs simultaneously? → A: Last write wins - the most recent save overwrites previous saves. This is simple, predictable, and aligns with auto-save behavior.
+- Q: What exact timing strategy should be used for auto-save triggers when users change theme preferences? → A: Debounced (300ms) - wait 300ms after the last change before saving. This reduces database writes while maintaining near-instant responsiveness.
+- Q: What rate limiting thresholds should be applied to the auto-save endpoint to prevent DoS abuse? → A: Sliding window rate limiting (10 requests per 60 seconds per user). This prevents burst attacks while allowing steady usage and theme experimentation.
+- Q: What retry strategy should be used when auto-save operations fail? → A: 5 retries with exponential backoff (delays: 1s, 2s, 4s, 8s, 16s). This provides better reliability for transient failures while maintaining reasonable total wait time.
+- Q: What duration should toast notifications display for theme change confirmations? → A: 3 seconds - standard duration that provides balanced visibility without being intrusive.
+- Q: When exactly should default theme values be initialized when `users.settings` is null? → A: On first access (lazy initialization) - initialize defaults when the `settings` property is first accessed. This is efficient and aligns with Laravel model patterns.
+- Q: What maximum JSON column size limit should be enforced for `users.settings` and how should oversized payloads be handled? → A: 64KB (65,535 bytes) limit, reject oversized payloads (do not truncate). This is the standard MySQL JSON column maximum and prevents data loss by rejecting rather than truncating.
+- Q: What behavior should be used for rapid successive theme changes to prevent UI jank and excessive database writes? → A: Debounced (300ms, same as auto-save) - apply UI changes after 300ms debounce, matching auto-save timing. This provides consistent behavior, reduces UI jank, and prevents excessive database writes.
+- Q: What is the scope of performance targets - client-side DOM updates only, or including server-side processing? → A: Client-side DOM updates only - measure only the time from user click to visual feedback (DOM attribute updates, CSS application). This focuses on user-perceived performance and aligns with the p95 < 200ms target in SC-002.
+- Q: What exact performance measurement point should be used for theme change latency? → A: From user click to visual feedback completion - measure end-to-end from click until user sees the visual change (includes DOM update, CSS application, and browser paint). This is the most comprehensive measurement and aligns with SC-002.
+- Q: What user feedback should be provided when auto-save succeeds? → A: Silent (no feedback) - no visual feedback when auto-save succeeds. This provides clean UX and avoids notification fatigue. Users can verify persistence by refreshing the page.
+- Q: What should happen when validation fails during save? → A: Prevent save, log error, notify user - block invalid saves, log for debugging, and show user-friendly error message. This provides complete error handling and aligns with FR-044 (user notification on failures).
+- Q: What data retention policy should be applied to user theme preferences? → A: Retain until account deletion - delete theme preferences when user account is deleted. This is simple and aligns with user data lifecycle management.
+- Q: What performance targets should be defined under different load conditions (normal load, high load, network latency)? → A: Same target (p95 < 200ms) for all conditions - maintain the same performance target regardless of load. This keeps acceptance criteria simple and consistent. The system should meet the target under normal and high load; if it doesn't, it's a performance issue to address.
+- Q: When should theme combination validation occur (on every access, on save only, on first access with caching)? → A: Validate on every access - validate theme combinations every time settings are read (View Composer, Livewire mount, etc.). This ensures data integrity and handles edge cases (corruption, enum changes, migrations). The performance impact is minimal since validation is lightweight.
+
+## User Scenarios & Testing *(mandatory)*
+
+### User Story 1 - Personalize Application Appearance (Priority: P1)
+
+As a User, I want to customize the visual theme of the application (Color Scheme, Flavor, Accent) so that it matches my personal preference or accessibility needs.
+
+**Why this priority**: Core value proposition of the theming engine; allows user personalization which is the primary goal.
+
+**Independent Test**: Can be tested by navigating to settings, changing the theme/flavor/accent, and observing the UI changes immediately and after page reload.
+
+**Acceptance Scenarios**:
+
+1. **Given** a logged-in user, **When** they navigate to the appearance settings page, **Then** they see options to select Theme (e.g., Catppuccin, Kanagawa), Flavor (e.g., Mocha, Wave), and Accent color.
+2. **Given** a user on the appearance settings page, **When** they select a new Theme, **Then** the available Flavor options update to match the selected Theme.
+3. **Given** a user on the appearance settings page, **When** they select a new Theme, Flavor, or Accent, **Then** the application visual style updates immediately (live preview) AND the choices are automatically persisted to the database without requiring a save action.
+4. **Given** a user has saved a custom theme, **When** they log out and log back in, **Then** their custom theme is preserved.
+5. **Given** a user with a custom theme, **When** they navigate to any page (main application, Filament admin panels, authentication pages), **Then** their selected theme is applied consistently across all pages with correct data attributes in the HTML element on initial load. This MUST be verified through testing that includes:
+   - Filament panel views (admin dashboard, resource pages, etc.)
+   - Fortify authentication pages (login, register, password reset, etc.)
+   - Main application Folio pages
+6. **Given** a user with a custom theme, **When** they change their theme preference on the appearance settings page, **Then** the data attributes update immediately via JavaScript (live preview) without requiring a page reload.
+
+---
+
+### User Story 2 - System Default Fallback (Priority: P2)
+
+As a User (or New User), I want the application to look good by default without me having to configure anything, so that I have a consistent experience from the start.
+
+**Why this priority**: Ensures a polished experience for new users or those who haven't customized settings.
+
+**Independent Test**: Create a new user account (or clear settings) and verify the default theme (e.g., Catppuccin Mocha) is applied.
+
+**Acceptance Scenarios**:
+
+1. **Given** a new user account with no saved settings, **When** they log in, **Then** the default theme (`Theme::Catppuccin` with `ThemeFlavor::Mocha` and `ThemeAccent::Primary`) is applied.
+2. **Given** a user with corrupted or invalid settings (e.g., invalid theme/flavor combination), **When** the page loads, **Then** the system validates the settings, silently resets to the default theme (`Theme::Catppuccin`, `ThemeFlavor::Mocha`, `ThemeAccent::Primary`), and persists the corrected settings without showing an error message.
+
+---
+
+### User Story 3 - Public Theme Preview (Priority: P2)
+
+As a Visitor (unauthenticated user), I want to explore and preview all available themes (Catppuccin and Kanagawa) on a public theme preview page without needing to create an account, so that I can see how the theming system works before signing up.
+
+**Why this priority**: Enables marketing/showcase value and allows potential users to experience the theming capabilities without barriers.
+
+**Independent Test**: Navigate to the theme preview page as an unauthenticated visitor, change themes/flavors, and verify changes are visible immediately but do not persist when navigating away.
+
+**Acceptance Scenarios**:
+
+1. **Given** an unauthenticated visitor, **When** they navigate to the theme preview page (`/themes/preview`), **Then** they can access it without login and see theme switching controls for both Catppuccin and Kanagawa themes.
+2. **Given** a visitor on the theme preview page, **When** they select different themes, flavors, or accents, **Then** the page visual style updates immediately (live preview) using session storage.
+3. **Given** a visitor changes themes on the theme preview page, **When** they navigate away from the preview page, **Then** the theme changes are reset and do not affect other pages or persist beyond the preview page session.
+
+---
+
+## Requirements *(mandatory)*
+
+### Functional Requirements
+
+- **FR-001**: System MUST allow users to select a "Theme" from available options (Catppuccin, Kanagawa).
+- **FR-002**: System MUST allow users to select a "Flavor" appropriate for the selected Theme.
+- **FR-003**: System MUST allow users to select an "Accent" color.
+- **FR-004**: System MUST automatically persist user theme preferences to the `users` database table (via `settings` JSON column) immediately when selections change (auto-save, no explicit save action required).
+- **FR-005**: System MUST inject the user's selected theme preferences (theme, flavor, accent) into the application view layer globally, including all pages:
+  - Main application pages (all Folio pages)
+  - Filament admin panels (all Filament panel views)
+  - Authentication pages (all Fortify auth views: login, register, password reset, etc.)
+  - Public pages (all Folio pages accessible without authentication, including the theme preview page)
+
+  This MUST use a hybrid approach: server-side injection of data attributes (`data-theme`, `data-flavor`, `data-accent`) in the HTML `<html>` element on initial page load, plus client-side JavaScript updates for instant live preview when user changes selections.
+- **FR-006**: The frontend MUST dynamically update CSS based on the injected theme preferences to change the visual appearance (backgrounds, text colors, accents). CSS must respond to both server-injected data attributes (initial load) and client-side attribute updates (live preview). The implementation MUST use CSS attribute selectors only (e.g., `[data-theme="catppuccin"][data-flavor="mocha"]`), not CSS classes or dynamically injected CSS variables. CSS custom properties (variables) are defined statically in CSS files and selected by data attributes. The implementation MUST properly integrate with Livewire Flux and Filament color schemes and theme systems, ensuring compatibility with Flux's 'zinc' color palette and Filament's 'gray' color palette mappings.
+- **FR-007**: The "Appearance" settings UI MUST be reactive (update available Flavors when Theme changes).
+- **FR-008**: System MUST default to `Theme::Catppuccin` with `ThemeFlavor::Mocha` and `ThemeAccent::Primary` (explicit defaults: enum values `'catppuccin'`, `'mocha'`, `'primary'`) if no user preference is found.
+- **FR-009**: System MUST validate theme/flavor/accent combinations **on every access** (whenever settings are read: View Composer, Livewire mount, direct model access, etc.) and silently reset to default theme (`Theme::Catppuccin`, `ThemeFlavor::Mocha`, `ThemeAccent::Primary`) if invalid combinations are detected (auto-correction without user notification). This ensures data integrity and handles edge cases (corruption, enum changes, migrations). The performance impact is minimal since validation is lightweight.
+- **FR-010**: System MUST provide a public theme preview page (accessible without authentication) that allows visitors to preview all available themes (Catppuccin and Kanagawa), flavors, and accents. The preview page MUST be located at `resources/views/pages/themes/preview.blade.php`, accessible via Folio route (URL path: `/themes/preview`), with no authentication middleware required.
+- **FR-011**: The theme preview page MUST allow theme switching with immediate live preview, storing selections in session storage (not database) for the duration of the preview page visit only.
+- **FR-012**: Theme changes on the theme preview page MUST be temporary and MUST NOT persist when visitors navigate away from the preview page or affect other pages in the application.
+- **FR-013**: System MUST follow Test-Driven Development (TDD) workflow: tests MUST be written before implementation, tests MUST fail initially, then implementation makes tests pass. All features MUST have comprehensive test coverage (unit, feature, and browser tests as appropriate).
+- **FR-014**: System MUST emit observability signals for theme events (validation corrections, preview interactions, performance metrics) using Laravel Telescope (request/log tracing) and Horizon (queue metrics). Telemetry MUST differentiate between authenticated and preview flows and include sufficient context (user id or anonymous session id, theme combination, correction reason).
+
+#### Security Requirements
+
+- **FR-015**: System MUST require authentication for the Livewire appearance settings component. Unauthenticated access attempts MUST be handled with redirect to login or 403 Forbidden response.
+- **FR-016**: System MUST ensure users can only modify their own theme settings. Cross-user access MUST be prevented through proper authorization checks.
+- **FR-017**: System MUST validate theme/flavor/accent combinations and enum values BEFORE database persistence (not just on load). Invalid data MUST be rejected at the input boundary.
+- **FR-018**: System MUST explicitly encode all theme data attributes (`data-theme`, `data-flavor`, `data-accent`) to prevent XSS attacks. Laravel's automatic escaping MUST be verified and documented.
+- **FR-019**: System MUST explicitly require CSRF token validation on all theme preference update requests. Livewire's automatic CSRF handling MUST be verified and documented.
+- **FR-020**: System MUST implement **sliding window rate limiting** on the auto-save endpoint: **10 requests per 60 seconds per user**. This prevents burst attacks and DoS abuse while allowing steady usage and theme experimentation.
+- **FR-031**: System MUST ensure error messages do not leak sensitive information (database structure, enum values, internal paths, stack traces). Error messages MUST be user-friendly and non-technical.
+- **FR-050**: System MUST perform vulnerability scanning and dependency auditing for theme-related packages. Security vulnerabilities MUST be addressed promptly.
+- **FR-051**: System MUST ensure Filament panel and Fortify authentication page theme injection does not bypass security mechanisms (CSRF, authentication, authorization).
+- **FR-059**: System MUST handle malformed input scenarios (malformed JSON, oversized payloads, type mismatches, SQL injection attempts in JSON). Invalid input MUST be rejected safely.
+
+#### Accessibility Requirements
+
+- **FR-021**: System MUST ensure all theme/flavor/accent combinations meet WCAG AA contrast requirements (4.5:1 for normal text, 3:1 for large text). All combinations MUST be validated for contrast compliance.
+- **FR-022**: System MUST provide full keyboard navigation for all theme selection controls (Tab order, Enter/Space activation, focus management).
+- **FR-023**: System MUST provide ARIA labels for all theme selection controls and live region announcements for theme changes (e.g., "Theme changed to Catppuccin Mocha"). Theme change confirmations and success messages MUST be announced to screen readers via live regions, not just visual toasts.
+- **FR-024**: System MUST maintain focus visibility when themes change dynamically (live preview). Focus MUST remain on the control that triggered the change, and focus indicators (focus rings) with sufficient contrast MUST be visible in all theme combinations.
+- **FR-054**: System MUST respect user motion preferences (`prefers-reduced-motion`) when applying theme transitions. Animations MUST be disabled or reduced for users who prefer reduced motion. Animation duration MUST not exceed 500ms and MUST use ease-in-out or similar smooth easing to avoid triggering vestibular disorders.
+- **FR-055**: System MUST ensure theme information is not conveyed by color alone. Theme names MUST be text labels, not just color swatches.
+- **FR-056**: System MUST ensure error states, validation feedback, and success indicators remain visible and distinguishable in all theme combinations (sufficient contrast, non-color indicators).
+
+#### Database Integrity Requirements
+
+- **FR-025**: System MUST use database transactions for auto-save operations to ensure atomicity (all-or-nothing). Failed saves MUST rollback completely.
+- **FR-026**: System MUST handle concurrent theme updates (user changes theme in multiple tabs) using a **last write wins** strategy. The most recent save overwrites previous saves. This strategy is simple, predictable, and aligns with auto-save behavior.
+- **FR-027**: System MUST detect and handle corrupted database data beyond invalid enum values (malformed JSON, invalid structure, type mismatches, missing fields).
+- **FR-028**: System MUST persist corrected theme settings back to database after validation correction to prevent repeated corrections on every load.
+- **FR-029**: System MUST enforce a **maximum JSON column size limit of 64KB (65,535 bytes)** for `users.settings`. Oversized payloads MUST be **rejected** (not truncated) to prevent data loss. This limit aligns with the standard MySQL JSON column maximum.
+- **FR-030**: System MUST implement **data retention policy: retain until account deletion** - delete theme preferences when user account is deleted. This is simple and aligns with user data lifecycle management. System MUST define data lifecycle management requirements (cleanup of orphaned or invalid data).
+- **FR-052**: System MUST evaluate and document database indexing requirements for `users.settings` JSON column (if needed for query performance).
+- **FR-053**: System MUST define backward compatibility strategy for future `users.settings` schema changes (migration path, data transformation, rollback procedures).
+- **FR-091**: System MUST define explicit requirements for JSON column structure in `users.settings` (required fields: theme, flavor, accent; optional fields: none for theme preferences; nested structure definition). JSON structure MUST be formally documented. The JSON column MUST remain nullable (allowing null for new users). Null values MUST be handled consistently across all code paths. JSON structure MUST be validated before use (ensuring required fields exist, no extra fields cause issues).
+- **FR-092**: System MUST ensure enum serialization produces valid JSON values (string values match enum cases exactly). Serialization MUST be verified to prevent data corruption. System MUST define requirements for handling enum deserialization failures (invalid enum values in JSON, corrupted data). Deserialization failures MUST trigger validation and correction logic.
+- **FR-093**: System MUST enforce relationship integrity between Theme and ThemeFlavor (flavors MUST belong to their theme, invalid combinations MUST be rejected). Relationship integrity MUST be validated at application level. System MUST define requirements for handling theme/flavor relationship changes (what happens if enum relationships change after data is persisted). Relationship changes MUST have migration strategy. System MUST ensure ThemeAccent remains independent of Theme/Flavor (no referential constraints needed).
+- **FR-094**: System MUST initialize default theme values **on first access** (lazy initialization): when the `settings` property is first accessed and is null, initialize with default values (`Theme::Catppuccin`, `ThemeFlavor::Mocha`, `ThemeAccent::Primary`). Default initialization MUST be consistent and documented. Default values MUST be consistent across all code paths (booted(), View Composer, Livewire component). System MUST handle partial null values in JSON (e.g., theme set but flavor null) by applying defaults to missing fields consistently.
+- **FR-095**: System MUST use a **debounced auto-save strategy with 300ms delay**: wait 300ms after the last property change before triggering the save operation. Auto-save trigger behavior MUST be consistent across all theme preference changes. This strategy optimizes database writes while maintaining near-instant responsiveness. System MUST implement **5 retries with exponential backoff** (delays: 1s, 2s, 4s, 8s, 16s) for database save failures before notifying the user (as specified in FR-044).
+- **FR-096**: System MUST ensure data consistency between database and in-memory state (User model, Livewire component, View Composer). All components MUST see consistent theme state. System MUST define requirements for handling state synchronization when theme changes occur (ensuring all components see updated state). State synchronization MUST be reliable and immediate. System MUST ensure data consistency when user settings are updated via multiple paths (Livewire component, direct model update, migration). All update paths MUST produce consistent results.
+- **FR-097**: System MUST handle validation failures during save by **preventing save, logging error, and notifying user**: block invalid saves, log for debugging, and show user-friendly error message. This provides complete error handling and aligns with FR-044 (user notification on failures). Validation failures MUST be handled consistently. Validation rules MUST be consistent across all entry points (Livewire component, View Composer, direct model updates). All entry points MUST use same validation logic.
+- **FR-098**: System MUST explicitly state that no database migrations are required for this feature (uses existing `users.settings` column). Feature MUST not require schema changes. System MUST define data migration scenarios (if enum values change, how are existing records handled). Enum value changes MUST have migration strategy.
+
+#### Performance Requirements
+
+- **FR-032**: System MUST define performance targets for additional percentiles beyond p95 (p50, p99, max) for comprehensive performance measurement.
+- **FR-033**: System MUST measure performance **from user click to visual feedback completion**: end-to-end measurement from click until user sees the visual change (includes DOM update, CSS application, and browser paint). This comprehensive measurement aligns with SC-002 (p95 < 200ms).
+- **FR-034**: System MUST maintain **same performance target (p95 < 200ms) for all load conditions** (normal load, high load, network latency scenarios). This keeps acceptance criteria simple and consistent. The system should meet the target under normal and high load; if it doesn't, it's a performance issue to address.
+- **FR-035**: System MUST prevent Flash of Unstyled Content (FOUC) by ensuring theme data attributes are present in HTML before CSS applies. Performance requirement: attributes MUST be set within 50ms of page load.
+- **FR-109**: System MUST scope performance targets to **client-side DOM updates only**: measure only the time from user click to visual feedback (DOM attribute updates, CSS application). This focuses on user-perceived performance and aligns with the p95 < 200ms target in SC-002. Performance targets MUST be clearly scoped. Theme change performance MUST be consistent across all theme combinations. Performance MUST be consistent regardless of theme combination.
+- **FR-110**: System MUST define initial page load performance requirements (time to first paint, time to interactive, FOUC prevention). Initial load performance MUST meet defined targets. System MUST define server-side theme injection performance requirements (View Composer overhead, database query time). System MUST define initial load performance requirements when user has no saved settings (default theme application speed). System MUST define initial load performance requirements when user has invalid settings (validation and correction overhead).
+- **FR-111**: System MUST define database write performance requirements during auto-save (latency, throughput, acceptable overhead). Auto-save MUST not significantly impact user experience. System MUST define database query performance requirements when reading user settings (query time, caching requirements). Settings queries MUST be fast and cached appropriately. System MUST define database performance requirements under concurrent theme updates (multiple tabs, simultaneous saves). System MUST define database performance requirements when validation occurs (validation overhead, correction persistence time).
+- **FR-112**: System MUST define JavaScript execution performance requirements (DOM update time, attribute setting overhead). Client-side theme updates MUST be fast. System MUST define CSS application performance requirements (attribute selector matching time, style recalculation overhead). CSS application MUST be fast and efficient. System MUST define browser rendering performance requirements (repaint time, reflow prevention, layout shift avoidance). Theme changes MUST not cause layout shifts or jank.
+- **FR-113**: System MUST define client-side performance targets for different devices (mobile, tablet, desktop performance targets). Performance MUST be acceptable on all device types. System MUST define client-side performance requirements for different browsers (Chrome, Firefox, Safari compatibility and performance). Performance MUST be acceptable across major browsers.
+- **FR-114**: System MUST define network bandwidth usage requirements (CSS file sizes, JavaScript bundle sizes, asset loading). Asset sizes MUST be optimized. System MUST define scalability requirements (performance under high user load, concurrent theme changes). System MUST scale to handle expected user load. System MUST define resource usage requirements when adding new themes (should performance degrade, acceptable overhead). System MUST define performance requirements under concurrent user load (multiple users changing themes simultaneously).
+- **FR-115**: System MUST define performance degradation scenario requirements (what happens when system is under stress). Performance degradation MUST be handled gracefully. System MUST define graceful performance degradation requirements (should features degrade gracefully or fail fast). Performance issues MUST be handled appropriately.
+- **FR-116**: System MUST define performance testing methodology requirements (load testing, stress testing, benchmark testing). Performance testing MUST use appropriate methodologies. System MUST define performance test scenario requirements (what scenarios must be tested - normal load, high load, edge cases). System MUST define performance test environment requirements (should tests run in production-like environments).
+- **FR-117**: System MUST define performance monitoring implementation requirements (what tools, what metrics, how often). Performance MUST be monitored systematically. System MUST define performance data collection and storage requirements (where performance data is stored, retention policies). System MUST define performance dashboard requirements (what dashboards, what metrics displayed, real-time vs. historical). System MUST define performance alerting requirements (when to alert on performance degradation, thresholds, notification channels).
+- **FR-118**: System MUST define performance optimization guideline requirements (when to optimize, acceptable trade-offs). Performance optimization MUST follow defined guidelines. System MUST define caching requirements (should theme data be cached, cache invalidation strategy). System MUST define lazy loading requirements (should theme assets be lazy loaded, deferred loading). System MUST define code splitting requirements (should theme code be split into separate bundles). System MUST define performance optimization priority requirements (what optimizations are most important).
+- **FR-119**: System MUST define preview page load performance requirements (initial load time, theme switching latency). Preview page MUST load quickly. System MUST define preview page performance requirements when using session storage (sessionStorage read/write overhead). System MUST define preview page performance requirements under different network conditions (slow network, offline mode). System MUST define preview page performance consistency requirements (should performance match authenticated settings page).
+- **FR-120**: System MUST define performance acceptance criteria for different operations (theme change, page load, validation). Each operation MUST have defined performance criteria. System MUST define performance acceptance criteria under different conditions (normal load, high load). System MUST define performance regression acceptance requirements (how much performance degradation is acceptable). Performance regressions MUST have defined thresholds.
+
+#### Observability Requirements
+
+- **FR-036**: System MUST define explicit event data structure for telemetry (required fields, optional fields, field types, format). System MUST define event timestamp and timezone handling requirements (when events are recorded, timezone consistency). System MUST define event correlation requirements (how to link related events, trace IDs, request IDs). System MUST define event sampling or rate limiting requirements (should all events be tracked or sampled). Event tracking MUST not impact application performance.
+- **FR-037**: System MUST anonymize user data in telemetry (PII exclusion, data masking rules). Telemetry MUST comply with GDPR/privacy requirements (user consent, right to deletion). System MUST ensure sensitive data is not logged (passwords, tokens, personal information). Logging MUST exclude sensitive user data.
+- **FR-038**: System MUST define log level requirements (info, warning, error, debug) for different theme events and error conditions. System MUST define log format and structure requirements (JSON, structured logging, field names, consistency). System MUST define log aggregation and storage requirements (where logs are stored, aggregation service, search capabilities). System MUST define log rotation and archival requirements (retention, archival policies, access to historical logs).
+- **FR-039**: System MUST define data retention policies for observability data (how long logs/metrics are kept, archival policies, deletion schedules).
+- **FR-099**: System MUST define specific requirements for what Telescope should capture (request/log tracing, specific events, performance markers). Telescope configuration MUST be explicitly defined. System MUST define Telescope dashboard configuration requirements (what dashboards are needed, what metrics displayed). System MUST define Telescope data retention policies (how long to keep logs, storage limits). System MUST define Telescope filtering and search capabilities (how to query theme events, filter by user/session). System MUST define Telescope performance impact requirements (should observability affect application performance, acceptable overhead).
+- **FR-100**: System MUST define Horizon configuration requirements (when should it be configured, what metrics surfaced). Horizon MUST be configured if queues are used for theme operations. System MUST define Horizon queue metrics requirements (what queue metrics are relevant for theming, when are queues used). System MUST define Horizon dashboard setup requirements (what dashboards, what metrics displayed). System MUST define requirements for handling Horizon when no queues are used (is Horizon optional, should it be disabled).
+- **FR-101**: System MUST define performance metric collection requirements (p95 latency, what other metrics, measurement points). Performance metrics MUST be collected systematically. System MUST define performance instrumentation implementation requirements (custom events, timing calls, where to instrument). System MUST define requirements for making performance data queryable (Telescope dashboards, API endpoints, export capabilities). System MUST define performance regression detection requirements (alerts, thresholds, notification mechanisms).
+- **FR-102**: System MUST define requirements for recording invalid theme combinations (what was invalid, what was corrected to). Invalid combinations MUST be logged for analysis and debugging. System MUST define requirements for tracking correction frequency (how often corrections occur, per user, globally). System MUST define requirements for alerting on high correction rates (thresholds, notification mechanisms).
+- **FR-103**: System MUST define requirements for tracking preview page interactions (what interactions are tracked, theme changes, navigation). System MUST define requirements for tracking preview page usage patterns (how many visitors, theme preferences, session duration). System MUST define requirements for correlating preview interactions with conversions (do preview visitors sign up, link preview to authenticated usage). System MUST define requirements for tracking preview page performance (load times, interaction latency, error rates).
+- **FR-104**: System MUST define requirements for error context in logs (stack traces, request context, user context). Error logs MUST include sufficient context for debugging without exposing sensitive data. System MUST define error alerting requirements (when to alert, severity levels, notification channels). System MUST define requirements for tracking error rates and trends (error frequency, error types, resolution tracking).
+- **FR-105**: System MUST define observability dashboard requirements (what dashboards are needed, what metrics displayed). Observability dashboards MUST be configured for theme monitoring. System MUST define requirements for real-time vs. historical metrics (live dashboards, historical analysis, time ranges). System MUST define dashboard access control requirements (who can view dashboards, authentication, authorization).
+- **FR-106**: System MUST define alert conditions (when to alert, thresholds, conditions). Alert conditions MUST be explicitly defined. System MUST define alert channel requirements (email, Slack, PagerDuty, notification mechanisms). System MUST define alert severity level requirements (critical, warning, info, how to classify). System MUST define alert deduplication and rate limiting requirements (prevent alert storms, grouping similar alerts).
+- **FR-107**: System MUST define requirements for testing observability implementation (how to verify events are captured, metrics recorded). Observability MUST be testable. System MUST define observability acceptance criteria (what constitutes successful observability implementation). System MUST define observability regression testing requirements (ensuring observability doesn't break when code changes).
+- **FR-108**: System MUST define Telescope and Horizon setup and configuration requirements (installation, configuration steps, environment setup). Telescope and Horizon MUST be properly configured. System MUST define observability requirements for different environments (development, staging, production - same or different configs). System MUST define observability feature flag requirements (can observability be disabled, environment-specific toggles). System MUST define observability performance overhead requirements (acceptable impact on application performance, resource usage).
+
+#### Testing Requirements
+
+- **FR-040**: System MUST achieve minimum 90% test coverage for all theme-related code. Coverage MUST be measured and enforced.
+- **FR-041**: System MUST include integration tests for theme application to Filament panels and Fortify authentication pages. Tests MUST verify theme data attributes are present and themes apply correctly.
+- **FR-042**: System MUST include performance tests that measure p95 latency for theme changes and verify p95 < 200ms target is met.
+- **FR-043**: System MUST include tests for edge cases: invalid theme combinations, corrupted data, concurrent updates, null/empty states, rapid successive changes.
+
+#### User Experience Requirements
+
+- **FR-044**: System MUST provide user feedback when auto-save fails (error message, retry mechanism, graceful degradation). Users MUST be notified of save failures. System MUST implement **5 retries with exponential backoff** (delays: 1s, 2s, 4s, 8s, 16s) before notifying the user of failure. This provides better reliability for transient failures while maintaining reasonable total wait time.
+- **FR-045**: System MUST define toast notification requirements: content, timing (duration: **3 seconds**), positioning, accessibility (screen reader announcements, keyboard dismissible, sufficient contrast). Toast notifications MUST be consistent across all pages (consistent styling, positioning, duration) and MUST not rely solely on visual indicators. The 3-second duration provides balanced visibility without being intrusive.
+- **FR-046**: System MUST use **debounced behavior (300ms, same as auto-save)** for rapid successive theme changes. UI changes MUST be applied after 300ms debounce, matching the auto-save timing. This strategy prevents UI jank and excessive database writes while maintaining consistent behavior.
+- **FR-078**: System MUST define visual design and consistency requirements for theme application (color schemes, typography, spacing, visual hierarchy). Themes MUST maintain consistent visual design principles across all combinations. Visual consistency MUST be maintained across all application surfaces (Folio pages, Filament panels, Fortify auth pages). Visual hierarchy MUST be maintained when themes change (headings, body text, interactive elements remain distinguishable).
+- **FR-079**: System MUST define interaction requirements for appearance settings UI (how users select theme/flavor/accent - dropdowns, radio buttons, cards, or other controls). Interaction patterns MUST be consistent and intuitive. Theme selection controls MUST be intuitive and discoverable (clear labels, visual previews, logical grouping). Settings page MUST be easily discoverable from main navigation or user menu.
+- **FR-080**: System MUST define preview page user flow and layout requirements (how visitors discover it, what they can do, how it differs from authenticated settings). Preview page MUST be discoverable and clearly communicate its purpose. Preview page MUST have clear, intuitive layout that matches authenticated settings UI where appropriate. System MUST provide visual indication that preview page changes are temporary (e.g., "Preview Mode" banner, different styling, clear messaging).
+- **FR-081**: System MUST define live preview visual requirements: "immediate live preview" means instant color changes, smooth transitions, no flicker. Live preview updates MUST be smooth and performant (no jank, no layout shifts during theme changes). Theme transitions MUST use hardware-accelerated CSS transitions when possible. Users MUST receive clear visual indication that theme change was successful (e.g., subtle animation, color transition, visual confirmation).
+- **FR-082**: System MUST provide **silent auto-save feedback** (no visual feedback when auto-save succeeds). This provides clean UX and avoids notification fatigue. Users MUST understand their preferences are saved automatically (no confusion about needing to click "Save"). UI MUST clearly communicate that changes are saved automatically through design patterns (e.g., no "Save" button visible, or button disabled/removed to indicate auto-save).
+- **FR-083**: System MUST define initial page load and loading state requirements (server-side injection prevents FOUC, but loading states may be needed for slow connections). Loading states when theme preferences are being fetched MUST prevent layout shift and provide user feedback (skeleton, spinner, or immediate render).
+- **FR-084**: System MUST ensure theme selection UI works on mobile devices (touch targets minimum 44x44px, layout adapts to small screens, spacing appropriate for touch). Settings page and preview page MUST be fully usable on all device sizes (mobile, tablet, desktop). Mobile experience MUST be fully functional and accessible.
+- **FR-085**: System MUST define visual hierarchy and layout requirements for theme selection controls (which is most prominent - Theme, Flavor, or Accent). Controls MUST be visually organized and easy to scan (grouping, alignment, visual relationships). System MUST provide theme previews or swatches (color samples, visual examples of each theme) so users can preview themes before selecting them.
+- **FR-086**: System MUST define state transition requirements when theme changes (smooth color transitions, fade effects, or instant swap). Transitions MUST be visually pleasing and not jarring. Theme state MUST persist correctly across page navigation (no flicker, no reset to default). Theme preferences MUST remain consistent during user session.
+- **FR-087**: System MUST ensure theme appearance is consistent between Filament admin panels and main application pages, and between Fortify authentication pages and main application. Preview page theme switching MUST match the visual behavior of authenticated settings (same color changes, same transitions).
+- **FR-088**: System MUST define perceived performance requirements for theme changes (should transitions be instant or animated, what feels "fast"). Theme changes MUST feel responsive even if network latency is high (optimistic updates, client-side first). Users MUST receive visual feedback during theme change operations (loading indicators, progress, or instant visual update).
+- **FR-089**: System MUST define UX requirements for edge cases: when user has no saved preferences (default theme applied, clear indication of default state), when theme data is corrupted (silent correction, but UI should reflect correction visually), and when concurrent theme changes occur (user changes theme while another tab is open). With the last write wins strategy, the most recent change will persist across all tabs on next page load; tabs do not need real-time synchronization during the session.
+- **FR-090**: System MUST define UX success metrics beyond latency (user satisfaction, error rates, task completion time). UX requirements MUST have measurable success criteria.
+
+#### Maintainability Requirements
+
+- **FR-047**: System MUST follow defined code organization structure: theme services in `app/Services/Theme/`, tests mirror source structure, consistent naming conventions.
+- **FR-048**: System MUST maintain inline code documentation (PHPDoc blocks) and API documentation for theme-related contracts (View Composer, Livewire component, JavaScript API).
+- **FR-049**: System MUST keep theme-related dependencies (Livewire, Flux, Filament) up-to-date with security patches. Dependency updates MUST be tested for compatibility.
+
+#### Security Edge Cases & System Limits
+
+- **FR-057**: System MUST handle race conditions in theme updates (simultaneous saves from multiple tabs) using the **last write wins** strategy. See FR-026 for detailed specification. This strategy prevents data loss and ensures consistency by allowing the most recent change to persist.
+- **FR-058**: System MUST define limits and handling for resource exhaustion scenarios (memory limits, CPU limits, database connection limits, JSON payload size limits).
+- **FR-060**: System MUST ensure preview page session storage does not leak between users or sessions. Session storage MUST be isolated per browser session. If cookies are involved, they MUST use secure, HttpOnly cookies, or use sessionStorage API with proper isolation to prevent access from other origins.
+- **FR-061**: System MUST use semantic HTML for theme selection UI (proper form elements, fieldset/legend grouping for related controls, appropriate input types).
+- **FR-062**: System MUST ensure theme data attributes (`data-theme`, `data-flavor`, `data-accent`) do not interfere with assistive technology parsing. Data attributes MUST be used only for styling, not for semantic meaning.
+- **FR-063**: System MUST use clear, non-technical language for theme labels (e.g., "Dark Mode" vs "Mocha Flavor") to support users with cognitive disabilities. Technical terms MUST be accompanied by plain-language descriptions. System MUST provide theme descriptions or visual previews (beyond color names) to help users make informed theme choices.
+- **FR-064**: System MUST ensure Filament and Flux components maintain accessibility when themed (component focus states, ARIA attributes, keyboard navigation). Theme changes MUST not break component accessibility features.
+- **FR-065**: System MUST ensure authentication pages (Fortify) remain accessible when themed (contrast requirements met, focus indicators visible, form labels readable). Theme application MUST not degrade accessibility of authentication forms.
+- **FR-066**: System MUST include accessibility testing requirements (automated tools like axe-core, manual testing, screen reader testing with NVDA/JAWS/VoiceOver). All theme combinations MUST pass accessibility validation.
+- **FR-067**: System MUST document accessibility features and limitations of each theme combination. Documentation MUST include contrast ratios, keyboard navigation support, and screen reader compatibility for each combination.
+- **FR-068**: System MUST provide accessible error messages when theme validation fails (screen reader announcements via live regions, visible text, sufficient contrast). Error messages MUST be announced to assistive technology users.
+- **FR-069**: System MUST ensure the default theme (Catppuccin Mocha) meets accessibility standards out of the box (WCAG AA contrast, keyboard navigation, screen reader support). Default theme MUST be fully accessible without user configuration.
+- **FR-070**: System MUST ensure graceful degradation when CSS or JavaScript fails (theme still readable, no broken layouts, content remains accessible). Application MUST function with themes even if JavaScript is disabled.
+- **FR-071**: System MUST validate that CSS attribute selectors cannot be exploited (preventing injection of malicious attribute values that could break CSS parsing or cause XSS). Attribute values MUST be validated against allowed enum values before rendering.
+- **FR-072**: System MUST ensure JavaScript updates to DOM attributes are safe (no eval, no innerHTML manipulation, use safe DOM methods like `setAttribute` or `dataset`). All client-side theme updates MUST use safe DOM manipulation methods.
+- **FR-073**: System MUST ensure user settings data (theme preferences) are not exposed in application logs or error messages. Logging of user preferences MUST be disabled or anonymized. Validation failures MUST be logged securely without exposing user data (log event type and correction action, not actual theme values or user identifiers).
+- **FR-074**: System MUST prevent session fixation attacks when users transition from preview page to authenticated state. Session regeneration MUST occur on authentication to prevent session hijacking.
+- **FR-075**: System MUST include security testing requirements (penetration testing for XSS/CSRF, vulnerability scanning, security code review). Security tests MUST verify all security requirements are met.
+- **FR-076**: System MUST define security acceptance criteria (e.g., "All inputs validated, all outputs encoded, no XSS vulnerabilities, CSRF protection verified"). Security requirements MUST have measurable acceptance criteria.
+- **FR-077**: System MUST implement audit logging of security-relevant events (failed validations, unauthorized access attempts, rate limit violations). Security audit logs MUST be separate from application logs and retained per compliance requirements. Theme preference changes MUST be traceable for security incident investigation (log user id, timestamp, previous value, new value, source IP). If cookies are involved, they MUST use secure, HttpOnly cookies, or use sessionStorage API with proper isolation to prevent access from other origins.
+
+### Key Entities
+
+- **User**: Stores the `settings` (JSON) which includes theme preferences.
+- **UserSettingsData**: Data transfer object that structures the theme, flavor, and accent settings.
+- **Theme Enum**: Defines available top-level themes.
+- **ThemeFlavor Enum**: Defines variations for each theme.
+- **ThemeAccent Enum**: Defines available accent colors.
+
+## Success Criteria *(mandatory)*
+
+### Measurable Outcomes
+
+- **SC-001**: Users can successfully change their theme preference with immediate visual feedback (no save action required).
+- **SC-002**: Theme changes are reflected in the UI with p95 latency < 200ms after user selection (immediate live preview with auto-save).
+- **SC-003**: 100% of defined themes and flavors render correctly without missing CSS variables (no broken styles).
+- **SC-004**: Application loads successfully for users with no settings or invalid settings (fallback works with silent auto-correction).
+- **SC-005**: Unauthenticated visitors can access the theme preview page (`/themes/preview`) and preview all available themes without login.
+- **SC-006**: Theme changes on the theme preview page are visible immediately and reset when navigating away (temporary session storage only).
+- **SC-007**: All theme/flavor/accent combinations pass WCAG AA contrast validation (4.5:1 for normal text, 3:1 for large text).
+- **SC-008**: All theme selection controls are fully keyboard navigable and accessible to screen readers (ARIA labels present, live regions announce changes).
+- **SC-009**: Theme data attributes are set within 50ms of page load to prevent Flash of Unstyled Content (FOUC).
+- **SC-010**: All theme-related code achieves minimum 90% test coverage (measured and enforced).
+- **SC-011**: Integration tests verify theme application to Filament panels and Fortify authentication pages (data attributes present, themes apply correctly).
+- **SC-012**: Performance tests verify p95 latency < 200ms for theme changes (measured from user click to visual feedback).
+- **SC-013**: All security requirements are met: authentication enforced, authorization checks prevent cross-user access, XSS/CSRF protection verified, rate limiting active.
+- **SC-014**: Database integrity requirements are met: transactions ensure atomicity, concurrent updates handled correctly, corrupted data detected and corrected, corrections persisted.
+- **SC-015**: Observability requirements are met: event structure defined, privacy safeguards in place, log levels defined, data retention policies documented.
