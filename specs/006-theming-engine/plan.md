@@ -41,6 +41,8 @@ Complete the implementation of a Theming Engine that allows users to customize t
 - Default theme values: `Theme::Catppuccin`, `ThemeFlavor::Mocha`, `ThemeAccent::Primary` (explicit defaults, no ambiguity)
 - Flavor selector hidden when theme has only one flavor option
 - Accent defaults to "Primary" when theme is selected (or first available if "Primary" doesn't exist)
+- `ThemeAccentMapper` service failures must fallback to default theme with error logging
+- Session expiration during auto-save: complete save if user still authenticated, otherwise discard silently
 
 **Scale/Scope**:
 
@@ -98,6 +100,7 @@ After Phase 1 design, all gates remain satisfied:
   - Invalid combinations auto-corrected silently on every access
   - Validation errors during save: prevent save, log error, notify user
   - No cross-user access (user-specific settings)
+  - Session expiration handling: complete save if authenticated, otherwise discard silently
 - ✅ **Performance**:
   - Server-side injection prevents FOUC
   - Client-side updates <200ms via direct DOM manipulation
@@ -163,6 +166,8 @@ tests/
 │   │   ├── ThemeValidationTest.php   # NEW: Test invalid theme combination handling
 │   │   ├── ThemeGlobalApplicationTest.php  # NEW: Test theme applies globally (includes Filament panels and auth pages)
 │   │   ├── ThemeAccentMapperTest.php  # NEW: Test theme-specific accent validation
+│   │   ├── ThemeServiceFailureTest.php  # NEW: Test ThemeAccentMapper service failure handling
+│   │   ├── ThemeSessionExpirationTest.php  # NEW: Test session expiration during auto-save
 │   │   └── ThemePerformanceTest.php  # NEW: Test p95 latency < 200ms for theme changes (optional)
 │   └── ThemePreview/
 │       └── ThemePreviewPageTest.php  # NEW: Test public theme preview page functionality
@@ -207,6 +212,7 @@ These defaults apply when:
 - User settings are null
 - Invalid theme/flavor/accent combination detected (auto-correction)
 - User selects a new theme (accent defaults to "Primary", or first available if "Primary" doesn't exist)
+- `ThemeAccentMapper` service fails or throws exceptions (fallback with error logging)
 
 ### 5.2. Theme Preview Page Route Specification
 
@@ -237,6 +243,7 @@ These defaults apply when:
   - PHP `ThemeAccentMapper` service provides type-safe accent validation, runtime queries for available accents per theme, and helper methods for CSS variable name generation
 - Accent selector updates reactively when theme changes (similar to flavor selector)
 - Accent defaults to "Primary" when theme is selected (or first available if "Primary" doesn't exist)
+- **Service Failure Handling**: When `ThemeAccentMapper` service fails or throws exceptions, the system MUST fallback to default theme (`Theme::Catppuccin`, `ThemeFlavor::Mocha`, `ThemeAccent::Primary`), log the error for debugging, and continue application execution without exposing the error to users. This ensures graceful degradation and prevents service failures from breaking theme application.
 
 ### 5.5. UI Selector Behavior
 
@@ -250,6 +257,12 @@ These defaults apply when:
 
 - Updates reactively when theme changes (shows only accents valid for selected theme)
 - Follows same pattern as flavor selector (can be hidden if theme has only one accent, though this is unlikely)
+
+**Reset to Default Control** (from clarifications):
+
+- A "Reset to Default" button/control MUST be provided that resets theme to `Theme::Catppuccin`, `ThemeFlavor::Mocha`, `ThemeAccent::Primary`
+- The reset control MUST be conditionally visible: displayed only when the user's current theme selection differs from the default theme, hidden when the user's selection matches the default
+- This provides clear visual feedback about the current state and avoids unnecessary UI clutter when already at default
 
 ### 5.6. CSS Implementation Details
 
@@ -286,6 +299,14 @@ CSS custom properties (variables) are defined statically in CSS files, selected 
 
 - **Retain until account deletion**: Theme preferences are deleted when user account is deleted. This is simple and aligns with user data lifecycle management.
 
+**Service Failure Handling** (from Session clarifications):
+
+- **ThemeAccentMapper service failures**: When the `ThemeAccentMapper` service fails or throws exceptions, the system MUST fallback to default theme (`Theme::Catppuccin`, `ThemeFlavor::Mocha`, `ThemeAccent::Primary`), log the error for debugging, and continue application execution without exposing the error to users. This ensures graceful degradation and prevents service failures from breaking theme application.
+
+**Session Expiration Handling** (from Session clarifications):
+
+- **During auto-save**: If session expires during auto-save, the system MUST attempt to complete the save if the user is still authenticated. If authentication has expired, the save MUST be discarded silently and the user MUST be required to re-authenticate on next interaction. This prevents user confusion from partial saves and ensures data integrity.
+
 ### 5.8. Performance Targets
 
 **Performance Consistency** (from Session clarifications):
@@ -318,6 +339,7 @@ CSS custom properties (variables) are defined statically in CSS files, selected 
    - Test: Verify theme-specific accent validation
    - Test: Verify available accents per theme
    - Test: Verify CSS variable name generation
+   - Test: Verify service failure handling (fallback to default theme, error logging)
    - Location: `tests/Unit/Services/Theme/ThemeAccentMapperTest.php` and `tests/Feature/Theme/ThemeAccentMapperTest.php`
 
 2. **Filament Panel Theme Application**:
@@ -343,6 +365,23 @@ CSS custom properties (variables) are defined statically in CSS files, selected 
    - Test: Verify session storage behavior
    - Test: Verify theme changes reset on navigation
    - Location: `tests/Feature/ThemePreview/ThemePreviewPageTest.php`
+
+6. **Service Failure Handling Testing**:
+   - Test: Verify ThemeAccentMapper service failure fallback behavior
+   - Test: Verify error logging when service fails
+   - Test: Verify graceful degradation (no user-facing errors)
+   - Location: `tests/Feature/Theme/ThemeServiceFailureTest.php`
+
+7. **Session Expiration Testing**:
+   - Test: Verify auto-save completes if user still authenticated after session expiration
+   - Test: Verify auto-save discards silently if authentication expired
+   - Test: Verify re-authentication required on next interaction
+   - Location: `tests/Feature/Theme/ThemeSessionExpirationTest.php`
+
+8. **Reset to Default Control Testing**:
+   - Test: Verify reset control visibility (hidden when at default, visible when changed)
+   - Test: Verify reset control functionality (resets to default theme)
+   - Location: `tests/Feature/Theme/ThemePersistenceTest.php` (or new test file)
 
 -----
 
@@ -383,6 +422,9 @@ All analysis recommendations and user requirements have been incorporated into t
 - `ThemeData` DTO class specified for type-safe theme injection
 - **Theme-Specific Accents**: Each theme defines its own accent options, mapped via `ThemeAccentMapper` service
 - **UI Behavior**: Flavor selector hidden when only one option exists; accent selector updates reactively
+- **Reset to Default Control**: Conditionally visible (hidden when at default, visible when changed)
+- **Service Failure Handling**: ThemeAccentMapper failures fallback to default theme with error logging
+- **Session Expiration Handling**: Complete save if authenticated, otherwise discard silently
 - **Session Clarifications (2025-11-25)**:
   - Validation timing: Validate on every access (whenever settings are read), not just on load
   - Auto-save feedback: Silent (no feedback) on success
@@ -392,6 +434,9 @@ All analysis recommendations and user requirements have been incorporated into t
   - Accent colors: Theme-specific with hybrid CSS + PHP service approach
   - Flavor selector: Hidden when only one option exists
   - Default accent: "Primary" with fallback to first available
+  - Reset control: Conditionally visible based on current selection vs default
+  - Service failure: Fallback to default theme with error logging
+  - Session expiration: Complete save if authenticated, otherwise discard silently
 
 -----
 

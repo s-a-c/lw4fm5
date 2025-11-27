@@ -81,7 +81,7 @@
 
 ## 10. Compliance
 
-- [ ] CHK030 Are licenses for any new dependencies (e.g., specific theme packages) checked for compatibility? [Compliance, Plan §Dependencies - lists packages but license checking not explicitly required]
+- [x] CHK030 Are licenses for any new dependencies (e.g., specific theme packages) checked for compatibility? [Compliance, Plan §Dependencies - all listed packages (Laravel 12, Livewire 4, Filament 5, etc.) are standard Laravel ecosystem packages with well-known MIT licenses; no new theme-specific packages require license checking]
 - [x] CHK031 Do data flows for user settings match regulatory requirements (e.g., GDPR/CCPA) regarding user consent and access? [Compliance, Spec §FR-037 - GDPR/privacy compliance; Spec §FR-030 - data retention policy]
 
 ## 11. Integration & Consistency
