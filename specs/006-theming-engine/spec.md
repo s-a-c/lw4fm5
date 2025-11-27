@@ -9,6 +9,7 @@
 
 ### Session 2025-11-25
 
+- Q: How many themes should the system support? → A: 15 themes total: 10 global developer themes (Catppuccin, Tokyo Night, Dracula, Kanagawa, Gruvbox, Nord, Rosé Pine, One Dark Pro, Monokai Pro, Solarized) and 5 UK authentic design system themes (GOV.UK, Transport for London, NHS Digital, Financial Times, The Guardian). Themes are organized by category for user selection.
 - Q: Should theme changes be visible immediately as the user selects options (live preview), or only after clicking a "Save" button? → A: Immediate live preview with auto-save (changes apply and persist as user selects)
 - Q: Should the user's theme preference apply to all pages in the application, or are there exceptions (e.g., Filament admin panels, authentication pages, public pages)? → A: All pages including Filament admin panels and auth pages
 - Q: What should happen if a user's saved settings contain an invalid theme/flavor/accent combination (e.g., due to data corruption, enum changes, or a bug)? → A: Validate on every access and reset to default theme if invalid (silent auto-correction)
@@ -31,6 +32,10 @@
 - Q: What data retention policy should be applied to user theme preferences? → A: Retain until account deletion - delete theme preferences when user account is deleted. This is simple and aligns with user data lifecycle management.
 - Q: What performance targets should be defined under different load conditions (normal load, high load, network latency)? → A: Same target (p95 < 200ms) for all conditions - maintain the same performance target regardless of load. This keeps acceptance criteria simple and consistent. The system should meet the target under normal and high load; if it doesn't, it's a performance issue to address.
 - Q: When should theme combination validation occur (on every access, on save only, on first access with caching)? → A: Validate on every access - validate theme combinations every time settings are read (View Composer, Livewire mount, etc.). This ensures data integrity and handles edge cases (corruption, enum changes, migrations). The performance impact is minimal since validation is lightweight.
+- Q: What accent color options should be available for users to select? Are accent colors theme-specific or universal? → A: Theme-specific accent colors - each theme defines its own set of accent color options. Accent colors MUST be mapped to component framework color systems (Flux uses 'zinc' palette, Filament uses 'gray' palette). The available accent options MUST update reactively when the user selects a different theme, similar to how flavors update when theme changes.
+- Q: How should the accent-to-framework mapping be implemented? Should each theme define its own mapping configuration, or should there be a centralized mapping service? → A: Hybrid approach (CSS variables for colors, PHP service for validation) - CSS files define accent color variables using CSS custom properties (e.g., `--accent-flux-zinc-500`, `--accent-filament-gray-500`) selected by data attributes. A PHP service/class (`ThemeAccentMapper` or similar) provides type-safe accent validation, runtime queries for available accents per theme, and helper methods for CSS variable name generation. This approach provides type safety and easier UI reactivity while keeping CSS in control of color application.
+- Q: When a theme has only one flavor option, how should the flavor selector appear in the UI? → A: Hide flavor selector when only one option exists - If a theme has only one flavor, don't show the flavor selector at all. The selector appears only when the selected theme has multiple flavors. This reduces UI clutter, avoids confusion, and clearly indicates that the theme doesn't have flavor variations.
+- Q: When a user selects a new theme (or when default theme is applied), what accent color should be selected by default? → A: Use "Primary" accent as universal default - All themes default to "Primary" accent when first selected. The system validates that "Primary" exists for the selected theme, and if not, selects the first available accent for that theme. This provides consistency across themes, simplifies the data model, and aligns with the existing spec that uses `ThemeAccent::Primary` as the default.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -44,8 +49,8 @@ As a User, I want to customize the visual theme of the application (Color Scheme
 
 **Acceptance Scenarios**:
 
-1. **Given** a logged-in user, **When** they navigate to the appearance settings page, **Then** they see options to select Theme (e.g., Catppuccin, Kanagawa), Flavor (e.g., Mocha, Wave), and Accent color.
-2. **Given** a user on the appearance settings page, **When** they select a new Theme, **Then** the available Flavor options update to match the selected Theme.
+1. **Given** a logged-in user, **When** they navigate to the appearance settings page, **Then** they see options to select Theme from 15 available themes (Catppuccin, Tokyo Night, Dracula, Kanagawa, Gruvbox, Nord, Rosé Pine, One Dark Pro, Monokai Pro, Solarized, GOV.UK, Transport for London, NHS Digital, Financial Times, The Guardian), Flavor (where applicable, e.g., Mocha, Wave, Dark, Light), and Accent color.
+2. **Given** a user on the appearance settings page, **When** they select a new Theme, **Then** the available Flavor options update to match the selected Theme, and the available Accent color options update to show only accents valid for the selected theme.
 3. **Given** a user on the appearance settings page, **When** they select a new Theme, Flavor, or Accent, **Then** the application visual style updates immediately (live preview) AND the choices are automatically persisted to the database without requiring a save action.
 4. **Given** a user has saved a custom theme, **When** they log out and log back in, **Then** their custom theme is preserved.
 5. **Given** a user with a custom theme, **When** they navigate to any page (main application, Filament admin panels, authentication pages), **Then** their selected theme is applied consistently across all pages with correct data attributes in the HTML element on initial load. This MUST be verified through testing that includes:
@@ -73,7 +78,7 @@ As a User (or New User), I want the application to look good by default without 
 
 ### User Story 3 - Public Theme Preview (Priority: P2)
 
-As a Visitor (unauthenticated user), I want to explore and preview all available themes (Catppuccin and Kanagawa) on a public theme preview page without needing to create an account, so that I can see how the theming system works before signing up.
+As a Visitor (unauthenticated user), I want to explore and preview all available themes (15 themes: 10 global developer themes and 5 UK authentic design system themes) on a public theme preview page without needing to create an account, so that I can see how the theming system works before signing up.
 
 **Why this priority**: Enables marketing/showcase value and allows potential users to experience the theming capabilities without barriers.
 
@@ -81,7 +86,7 @@ As a Visitor (unauthenticated user), I want to explore and preview all available
 
 **Acceptance Scenarios**:
 
-1. **Given** an unauthenticated visitor, **When** they navigate to the theme preview page (`/themes/preview`), **Then** they can access it without login and see theme switching controls for both Catppuccin and Kanagawa themes.
+1. **Given** an unauthenticated visitor, **When** they navigate to the theme preview page (`/themes/preview`), **Then** they can access it without login and see theme switching controls for all 15 available themes (Catppuccin, Tokyo Night, Dracula, Kanagawa, Gruvbox, Nord, Rosé Pine, One Dark Pro, Monokai Pro, Solarized, GOV.UK, Transport for London, NHS Digital, Financial Times, The Guardian).
 2. **Given** a visitor on the theme preview page, **When** they select different themes, flavors, or accents, **Then** the page visual style updates immediately (live preview) using session storage.
 3. **Given** a visitor changes themes on the theme preview page, **When** they navigate away from the preview page, **Then** the theme changes are reset and do not affect other pages or persist beyond the preview page session.
 
@@ -91,9 +96,22 @@ As a Visitor (unauthenticated user), I want to explore and preview all available
 
 ### Functional Requirements
 
-- **FR-001**: System MUST allow users to select a "Theme" from available options (Catppuccin, Kanagawa).
-- **FR-002**: System MUST allow users to select a "Flavor" appropriate for the selected Theme.
-- **FR-003**: System MUST allow users to select an "Accent" color.
+- **FR-001**: System MUST allow users to select a "Theme" from 15 available theme families:
+  - **Global Developer Themes (10)**: Catppuccin, Tokyo Night, Dracula, Kanagawa, Gruvbox, Nord, Rosé Pine, One Dark Pro, Monokai Pro, Solarized
+  - **UK Authentic Design System Themes (5)**: GOV.UK, Transport for London, NHS Digital, Financial Times, The Guardian
+- **FR-002**: System MUST allow users to select a "Flavor" appropriate for the selected Theme. Flavors vary by theme:
+  - **Catppuccin**: Latte (light), Frappé (dark), Macchiato (dark), Mocha (dark)
+  - **Tokyo Night**: Night (dark), Day (light)
+  - **Kanagawa**: Wave (dark), Lotus (light)
+  - **Gruvbox**: Dark, Light
+  - **Solarized**: Dark, Light
+  - **Dracula**: Single flavor (dark)
+  - **Nord**: Single flavor (dark)
+  - **Rosé Pine**: Single flavor (dark)
+  - **One Dark Pro**: Single flavor (dark)
+  - **Monokai Pro**: Single flavor (dark)
+  - **UK Authentic Themes** (GOV.UK, Transport for London, NHS Digital, Financial Times, The Guardian): Single flavor each (all light mode)
+- **FR-003**: System MUST allow users to select an "Accent" color from theme-specific accent options. Each theme defines its own set of available accent colors based on its unique color palette. Accent color options differ per theme: for example, Catppuccin themes may offer accent colors like "Primary", "Sapphire", "Blue", "Teal", "Green", "Yellow", "Peach", "Red", "Pink", "Mauve", "Flamingo", "Rosewater" (matching Catppuccin's color palette), while GOV.UK themes may offer different accent options aligned with the GOV.UK Design System color palette (e.g., "Primary", "Secondary", "Focus", "Error", "Success"). The `ThemeAccentMapper` service provides runtime queries for available accents per theme, ensuring only valid accent options are presented to users. Accent color options MUST update reactively when the user selects a different theme (similar to flavor options). Accent colors MUST be mapped to component framework color systems (Flux 'zinc' palette and Filament 'gray' palette) using a hybrid approach: CSS files define accent color variables (e.g., `--accent-flux-zinc-500`, `--accent-filament-gray-500`) selected by data attributes, and a PHP service (`ThemeAccentMapper` or similar) provides type-safe accent validation, runtime queries for available accents per theme, and helper methods for CSS variable name generation.
 - **FR-004**: System MUST automatically persist user theme preferences to the `users` database table (via `settings` JSON column) immediately when selections change (auto-save, no explicit save action required).
 - **FR-005**: System MUST inject the user's selected theme preferences (theme, flavor, accent) into the application view layer globally, including all pages:
   - Main application pages (all Folio pages)
@@ -102,11 +120,11 @@ As a Visitor (unauthenticated user), I want to explore and preview all available
   - Public pages (all Folio pages accessible without authentication, including the theme preview page)
 
   This MUST use a hybrid approach: server-side injection of data attributes (`data-theme`, `data-flavor`, `data-accent`) in the HTML `<html>` element on initial page load, plus client-side JavaScript updates for instant live preview when user changes selections.
-- **FR-006**: The frontend MUST dynamically update CSS based on the injected theme preferences to change the visual appearance (backgrounds, text colors, accents). CSS must respond to both server-injected data attributes (initial load) and client-side attribute updates (live preview). The implementation MUST use CSS attribute selectors only (e.g., `[data-theme="catppuccin"][data-flavor="mocha"]`), not CSS classes or dynamically injected CSS variables. CSS custom properties (variables) are defined statically in CSS files and selected by data attributes. The implementation MUST properly integrate with Livewire Flux and Filament color schemes and theme systems, ensuring compatibility with Flux's 'zinc' color palette and Filament's 'gray' color palette mappings.
-- **FR-007**: The "Appearance" settings UI MUST be reactive (update available Flavors when Theme changes).
-- **FR-008**: System MUST default to `Theme::Catppuccin` with `ThemeFlavor::Mocha` and `ThemeAccent::Primary` (explicit defaults: enum values `'catppuccin'`, `'mocha'`, `'primary'`) if no user preference is found.
+- **FR-006**: The frontend MUST dynamically update CSS based on the injected theme preferences to change the visual appearance (backgrounds, text colors, accents). CSS must respond to both server-injected data attributes (initial load) and client-side attribute updates (live preview). The implementation MUST use CSS attribute selectors only (e.g., `[data-theme="catppuccin"][data-flavor="mocha"][data-accent="primary"]`), not CSS classes or dynamically injected CSS variables. CSS custom properties (variables) are defined statically in CSS files and selected by data attributes. Accent colors MUST be defined as CSS variables (e.g., `--accent-flux-zinc-500`, `--accent-filament-gray-500`) in theme CSS files, and components reference these variables directly. The implementation MUST properly integrate with Livewire Flux and Filament color schemes and theme systems, ensuring compatibility with Flux's 'zinc' color palette and Filament's 'gray' color palette mappings. A PHP service (`ThemeAccentMapper` or similar) MUST provide type-safe accent validation and runtime queries for available accents per theme. System MUST handle missing CSS gracefully when a theme exists in enum but CSS definitions are missing: fallback to default theme (`Theme::Catppuccin`, `ThemeFlavor::Mocha`, `ThemeAccent::Primary`), log error for debugging, and prevent broken styling. This ensures graceful degradation and prevents visual breakage when CSS files are incomplete or missing.
+- **FR-007**: The "Appearance" settings UI MUST be reactive (update available Flavors when Theme changes). When a theme has only one flavor option, the flavor selector MUST be hidden entirely (not shown). The flavor selector appears only when the selected theme has multiple flavors. The UI MUST also update available Accent color options when Theme changes, showing only accent colors valid for the selected theme. When a theme is selected, the accent MUST default to "Primary" (or first available accent if "Primary" doesn't exist for that theme).
+- **FR-008**: System MUST default to `Theme::Catppuccin` with `ThemeFlavor::Mocha` and `ThemeAccent::Primary` (explicit defaults: enum values `'catppuccin'`, `'mocha'`, `'primary'`) if no user preference is found. When a user selects a new theme, the system MUST default to `ThemeAccent::Primary` for that theme. If "Primary" accent does not exist for the selected theme, the system MUST select the first available accent option for that theme.
 - **FR-009**: System MUST validate theme/flavor/accent combinations **on every access** (whenever settings are read: View Composer, Livewire mount, direct model access, etc.) and silently reset to default theme (`Theme::Catppuccin`, `ThemeFlavor::Mocha`, `ThemeAccent::Primary`) if invalid combinations are detected (auto-correction without user notification). This ensures data integrity and handles edge cases (corruption, enum changes, migrations). The performance impact is minimal since validation is lightweight.
-- **FR-010**: System MUST provide a public theme preview page (accessible without authentication) that allows visitors to preview all available themes (Catppuccin and Kanagawa), flavors, and accents. The preview page MUST be located at `resources/views/pages/themes/preview.blade.php`, accessible via Folio route (URL path: `/themes/preview`), with no authentication middleware required.
+- **FR-010**: System MUST provide a public theme preview page (accessible without authentication) that allows visitors to preview all 15 available themes, their flavors, and accents. The preview page MUST be located at `resources/views/pages/themes/preview.blade.php`, accessible via Folio route (URL path: `/themes/preview`), with no authentication middleware required. The preview page MUST display all themes organized by category (Global Developer Themes and UK Authentic Design System Themes).
 - **FR-011**: The theme preview page MUST allow theme switching with immediate live preview, storing selections in session storage (not database) for the duration of the preview page visit only.
 - **FR-012**: Theme changes on the theme preview page MUST be temporary and MUST NOT persist when visitors navigate away from the preview page or affect other pages in the application.
 - **FR-013**: System MUST follow Test-Driven Development (TDD) workflow: tests MUST be written before implementation, tests MUST fail initially, then implementation makes tests pass. All features MUST have comprehensive test coverage (unit, feature, and browser tests as appropriate).
@@ -123,7 +141,16 @@ As a Visitor (unauthenticated user), I want to explore and preview all available
 - **FR-031**: System MUST ensure error messages do not leak sensitive information (database structure, enum values, internal paths, stack traces). Error messages MUST be user-friendly and non-technical.
 - **FR-050**: System MUST perform vulnerability scanning and dependency auditing for theme-related packages. Security vulnerabilities MUST be addressed promptly.
 - **FR-051**: System MUST ensure Filament panel and Fortify authentication page theme injection does not bypass security mechanisms (CSRF, authentication, authorization).
+- **FR-052**: System MUST evaluate and document database indexing requirements for `users.settings` JSON column (if needed for query performance).
+- **FR-053**: System MUST define backward compatibility strategy for future `users.settings` schema changes (migration path, data transformation, rollback procedures).
+- **FR-054**: System MUST respect user motion preferences (`prefers-reduced-motion`) when applying theme transitions. Animations MUST be disabled or reduced for users who prefer reduced motion. Animation duration MUST not exceed 500ms and MUST use ease-in-out or similar smooth easing to avoid triggering vestibular disorders.
+- **FR-055**: System MUST ensure theme information is not conveyed by color alone. Theme names MUST be text labels, not just color swatches.
+- **FR-056**: System MUST ensure error states, validation feedback, and success indicators remain visible and distinguishable in all theme combinations (sufficient contrast, non-color indicators).
+- **FR-057**: System MUST handle race conditions in theme updates (simultaneous saves from multiple tabs) using the **last write wins** strategy. See FR-026 for detailed specification. This strategy prevents data loss and ensures consistency by allowing the most recent change to persist.
+- **FR-058**: System MUST define limits and handling for resource exhaustion scenarios (memory limits, CPU limits, database connection limits, JSON payload size limits).
 - **FR-059**: System MUST handle malformed input scenarios (malformed JSON, oversized payloads, type mismatches, SQL injection attempts in JSON). Invalid input MUST be rejected safely.
+- **FR-060**: System MUST ensure preview page session storage does not leak between users or sessions. Session storage MUST be isolated per browser session. If cookies are involved, they MUST use secure, HttpOnly cookies, or use sessionStorage API with proper isolation to prevent access from other origins.
+- **FR-061**: System MUST NOT hardcode secrets (API keys, tokens, credentials, passwords) in theme-related code or configuration files. The current theming engine implementation does not require any secrets. If secrets are required in the future (e.g., for external API integration, third-party theme services, or analytics services), they MUST be stored securely using environment variables, Laravel's configuration system (`config/` files with `env()` calls), or dedicated secret management services (e.g., Laravel Vault, AWS Secrets Manager, HashiCorp Vault). Secrets MUST NOT be committed to version control. This requirement ensures security best practices are followed if the theming engine is extended with external integrations.
 
 #### Accessibility Requirements
 
@@ -147,7 +174,7 @@ As a Visitor (unauthenticated user), I want to explore and preview all available
 - **FR-053**: System MUST define backward compatibility strategy for future `users.settings` schema changes (migration path, data transformation, rollback procedures).
 - **FR-091**: System MUST define explicit requirements for JSON column structure in `users.settings` (required fields: theme, flavor, accent; optional fields: none for theme preferences; nested structure definition). JSON structure MUST be formally documented. The JSON column MUST remain nullable (allowing null for new users). Null values MUST be handled consistently across all code paths. JSON structure MUST be validated before use (ensuring required fields exist, no extra fields cause issues).
 - **FR-092**: System MUST ensure enum serialization produces valid JSON values (string values match enum cases exactly). Serialization MUST be verified to prevent data corruption. System MUST define requirements for handling enum deserialization failures (invalid enum values in JSON, corrupted data). Deserialization failures MUST trigger validation and correction logic.
-- **FR-093**: System MUST enforce relationship integrity between Theme and ThemeFlavor (flavors MUST belong to their theme, invalid combinations MUST be rejected). Relationship integrity MUST be validated at application level. System MUST define requirements for handling theme/flavor relationship changes (what happens if enum relationships change after data is persisted). Relationship changes MUST have migration strategy. System MUST ensure ThemeAccent remains independent of Theme/Flavor (no referential constraints needed).
+- **FR-093**: System MUST enforce relationship integrity between Theme and ThemeFlavor (flavors MUST belong to their theme, invalid combinations MUST be rejected). Relationship integrity MUST be validated at application level. System MUST enforce relationship integrity between Theme and ThemeAccent (accents MUST belong to their theme, invalid combinations MUST be rejected). Accent colors are theme-specific, and the system MUST validate that selected accent colors are valid for the selected theme. System MUST define requirements for handling theme/flavor/accent relationship changes (what happens if enum relationships change after data is persisted). Relationship changes MUST have migration strategy.
 - **FR-094**: System MUST initialize default theme values **on first access** (lazy initialization): when the `settings` property is first accessed and is null, initialize with default values (`Theme::Catppuccin`, `ThemeFlavor::Mocha`, `ThemeAccent::Primary`). Default initialization MUST be consistent and documented. Default values MUST be consistent across all code paths (booted(), View Composer, Livewire component). System MUST handle partial null values in JSON (e.g., theme set but flavor null) by applying defaults to missing fields consistently.
 - **FR-095**: System MUST use a **debounced auto-save strategy with 300ms delay**: wait 300ms after the last property change before triggering the save operation. Auto-save trigger behavior MUST be consistent across all theme preference changes. This strategy optimizes database writes while maintaining near-instant responsiveness. System MUST implement **5 retries with exponential backoff** (delays: 1s, 2s, 4s, 8s, 16s) for database save failures before notifying the user (as specified in FR-044).
 - **FR-096**: System MUST ensure data consistency between database and in-memory state (User model, Livewire component, View Composer). All components MUST see consistent theme state. System MUST define requirements for handling state synchronization when theme changes occur (ensuring all components see updated state). State synchronization MUST be reliable and immediate. System MUST ensure data consistency when user settings are updated via multiple paths (Livewire component, direct model update, migration). All update paths MUST produce consistent results.
@@ -203,7 +230,8 @@ As a Visitor (unauthenticated user), I want to explore and preview all available
 - **FR-045**: System MUST define toast notification requirements: content, timing (duration: **3 seconds**), positioning, accessibility (screen reader announcements, keyboard dismissible, sufficient contrast). Toast notifications MUST be consistent across all pages (consistent styling, positioning, duration) and MUST not rely solely on visual indicators. The 3-second duration provides balanced visibility without being intrusive.
 - **FR-046**: System MUST use **debounced behavior (300ms, same as auto-save)** for rapid successive theme changes. UI changes MUST be applied after 300ms debounce, matching the auto-save timing. This strategy prevents UI jank and excessive database writes while maintaining consistent behavior.
 - **FR-078**: System MUST define visual design and consistency requirements for theme application (color schemes, typography, spacing, visual hierarchy). Themes MUST maintain consistent visual design principles across all combinations. Visual consistency MUST be maintained across all application surfaces (Folio pages, Filament panels, Fortify auth pages). Visual hierarchy MUST be maintained when themes change (headings, body text, interactive elements remain distinguishable).
-- **FR-079**: System MUST define interaction requirements for appearance settings UI (how users select theme/flavor/accent - dropdowns, radio buttons, cards, or other controls). Interaction patterns MUST be consistent and intuitive. Theme selection controls MUST be intuitive and discoverable (clear labels, visual previews, logical grouping). Settings page MUST be easily discoverable from main navigation or user menu.
+- **FR-121**: System MUST NOT hardcode secrets (API keys, tokens, credentials, passwords) in theme-related code or configuration files. The current theming engine implementation does not require any secrets. If secrets are required in the future (e.g., for external API integration, third-party theme services, or analytics services), they MUST be stored securely using environment variables, Laravel's configuration system (`config/` files with `env()` calls), or dedicated secret management services (e.g., Laravel Vault, AWS Secrets Manager, HashiCorp Vault). Secrets MUST NOT be committed to version control. This requirement ensures security best practices are followed if the theming engine is extended with external integrations.
+- **FR-079**: System MUST define interaction requirements for appearance settings UI (how users select theme/flavor/accent - dropdowns, radio buttons, cards, or other controls). Interaction patterns MUST be consistent and intuitive. Theme selection controls MUST be intuitive and discoverable (clear labels, visual previews, logical grouping). Settings page MUST be easily discoverable from main navigation or user menu. The flavor selector MUST be conditionally rendered: hidden when the selected theme has only one flavor option, visible when the theme has multiple flavors.
 - **FR-080**: System MUST define preview page user flow and layout requirements (how visitors discover it, what they can do, how it differs from authenticated settings). Preview page MUST be discoverable and clearly communicate its purpose. Preview page MUST have clear, intuitive layout that matches authenticated settings UI where appropriate. System MUST provide visual indication that preview page changes are temporary (e.g., "Preview Mode" banner, different styling, clear messaging).
 - **FR-081**: System MUST define live preview visual requirements: "immediate live preview" means instant color changes, smooth transitions, no flicker. Live preview updates MUST be smooth and performant (no jank, no layout shifts during theme changes). Theme transitions MUST use hardware-accelerated CSS transitions when possible. Users MUST receive clear visual indication that theme change was successful (e.g., subtle animation, color transition, visual confirmation).
 - **FR-082**: System MUST provide **silent auto-save feedback** (no visual feedback when auto-save succeeds). This provides clean UX and avoids notification fatigue. Users MUST understand their preferences are saved automatically (no confusion about needing to click "Save"). UI MUST clearly communicate that changes are saved automatically through design patterns (e.g., no "Save" button visible, or button disabled/removed to indicate auto-save).
@@ -218,7 +246,7 @@ As a Visitor (unauthenticated user), I want to explore and preview all available
 
 #### Maintainability Requirements
 
-- **FR-047**: System MUST follow defined code organization structure: theme services in `app/Services/Theme/`, tests mirror source structure, consistent naming conventions.
+- **FR-047**: System MUST follow defined code organization structure: theme services in `app/Services/Theme/`, tests mirror source structure, consistent naming conventions. The `ThemeAccentMapper` service (or equivalent) MUST be located in `app/Services/Theme/` and MUST provide type-safe accent validation, runtime queries for available accents per theme, and helper methods for CSS variable name generation.
 - **FR-048**: System MUST maintain inline code documentation (PHPDoc blocks) and API documentation for theme-related contracts (View Composer, Livewire component, JavaScript API).
 - **FR-049**: System MUST keep theme-related dependencies (Livewire, Flux, Filament) up-to-date with security patches. Dependency updates MUST be tested for compatibility.
 
@@ -249,9 +277,39 @@ As a Visitor (unauthenticated user), I want to explore and preview all available
 
 - **User**: Stores the `settings` (JSON) which includes theme preferences.
 - **UserSettingsData**: Data transfer object that structures the theme, flavor, and accent settings.
-- **Theme Enum**: Defines available top-level themes.
-- **ThemeFlavor Enum**: Defines variations for each theme.
-- **ThemeAccent Enum**: Defines available accent colors.
+- **Theme Enum**: Defines 15 available top-level theme families:
+  - **Global Developer Themes (10)**: Popular cross-platform color schemes for development tools (VS Code, Neovim, Terminal aesthetics). These themes are widely used by developers globally and prioritize readability, eye strain reduction, and aesthetic appeal for long coding sessions.
+    - Catppuccin, TokyoNight, Dracula, Kanagawa, Gruvbox, Nord, RosePine, OneDarkPro, MonokaiPro, Solarized
+  - **UK Authentic Design System Themes (5)**: Official UK government and public service design systems. These themes are based on established British digital identity standards used by major UK institutions, prioritizing accessibility, trust, and functional design.
+    - GovUk, TransportForLondon, NhsDigital, FinancialTimes, TheGuardian
+
+  **Enum Naming Conventions**:
+  - Enum case names use PascalCase without spaces (e.g., `TokyoNight`, `RosePine`, `OneDarkPro`, `TransportForLondon`)
+  - Display names use natural language with spaces (e.g., "Tokyo Night", "Rosé Pine", "One Dark Pro", "Transport for London")
+  - Data attribute values use kebab-case (e.g., `data-theme="tokyo-night"`, `data-theme="rose-pine"`, `data-theme="one-dark-pro"`, `data-theme="transport-for-london"`)
+
+  **Theme Name Mapping** (Display Name → Enum Case → Data Attribute):
+
+  | Display Name | Enum Case | Data Attribute Value |
+  |--------------|-----------|---------------------|
+  | Catppuccin | `Catppuccin` | `catppuccin` |
+  | Tokyo Night | `TokyoNight` | `tokyo-night` |
+  | Dracula | `Dracula` | `dracula` |
+  | Kanagawa | `Kanagawa` | `kanagawa` |
+  | Gruvbox | `Gruvbox` | `gruvbox` |
+  | Nord | `Nord` | `nord` |
+  | Rosé Pine | `RosePine` | `rose-pine` |
+  | One Dark Pro | `OneDarkPro` | `one-dark-pro` |
+  | Monokai Pro | `MonokaiPro` | `monokai-pro` |
+  | Solarized | `Solarized` | `solarized` |
+  | GOV.UK | `GovUk` | `gov-uk` |
+  | Transport for London | `TransportForLondon` | `transport-for-london` |
+  | NHS Digital | `NhsDigital` | `nhs-digital` |
+  | Financial Times | `FinancialTimes` | `financial-times` |
+  | The Guardian | `TheGuardian` | `the-guardian` |
+
+- **ThemeFlavor Enum**: Defines variations for each theme (e.g., Latte, Frappé, Macchiato, Mocha for Catppuccin; Night, Day for Tokyo Night; Wave, Lotus for Kanagawa; Dark, Light for Gruvbox and Solarized; single flavors for standalone themes).
+- **ThemeAccent Enum**: Defines available accent colors on a per-theme basis. Each theme has its own set of accent color options based on its unique color palette. For example, Catppuccin themes may offer accent colors like "Primary", "Sapphire", "Blue", "Teal", "Green", "Yellow", "Peach", "Red", "Pink", "Mauve", "Flamingo", "Rosewater" (matching Catppuccin's color palette), while GOV.UK themes may offer different accent options aligned with the GOV.UK Design System color palette (e.g., "Primary", "Secondary", "Focus", "Error", "Success"). The `ThemeAccentMapper` service provides runtime queries for available accents per theme, ensuring only valid accent options are presented to users. Accent colors MUST be mapped to component framework color systems (Flux 'zinc' palette and Filament 'gray' palette) to ensure proper integration. The enum structure MUST support theme-specific accent definitions and validation.
 
 ## Success Criteria *(mandatory)*
 
@@ -259,7 +317,7 @@ As a Visitor (unauthenticated user), I want to explore and preview all available
 
 - **SC-001**: Users can successfully change their theme preference with immediate visual feedback (no save action required).
 - **SC-002**: Theme changes are reflected in the UI with p95 latency < 200ms after user selection (immediate live preview with auto-save).
-- **SC-003**: 100% of defined themes and flavors render correctly without missing CSS variables (no broken styles).
+- **SC-003**: 100% of all 15 defined themes and their flavors render correctly without missing CSS variables (no broken styles). All theme combinations (theme + flavor + accent) must display correctly across all application surfaces.
 - **SC-004**: Application loads successfully for users with no settings or invalid settings (fallback works with silent auto-correction).
 - **SC-005**: Unauthenticated visitors can access the theme preview page (`/themes/preview`) and preview all available themes without login.
 - **SC-006**: Theme changes on the theme preview page are visible immediately and reset when navigating away (temporary session storage only).
