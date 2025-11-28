@@ -13,6 +13,9 @@ enum ThemeAccent: string
 
     public function label(): string
     {
-        return ucfirst($this->value);
+        return match ($this) {
+            self::Primary => 'Theme',
+            default => ucfirst($this->value),
+        };
     }
 }

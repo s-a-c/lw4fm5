@@ -1,5 +1,10 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html
+    lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+    data-theme="{{ $themeData->theme->value ?? 'catppuccin' }}"
+    data-flavor="{{ $themeData->flavor->value ?? 'mocha' }}"
+    data-accent="{{ $themeData->accent->value ?? 'primary' }}"
+    @class(['dark' => !($themeData->isLight() ?? false)])
   <head>
     @include('partials.head')
   </head>

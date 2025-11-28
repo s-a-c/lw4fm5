@@ -1,5 +1,33 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+@php
+    $theme = $themeData->theme ?? \App\Enums\Theme::Catppuccin;
+    $isNoneTheme = ($theme === \App\Enums\Theme::None) || ($theme->value === 'none');
+    // For 'none' theme, set flavor and accent to 'none' explicitly
+    $flavorValue = $isNoneTheme ? 'none' : ($themeData->flavor->value ?? 'mocha');
+    $accentValue = $isNoneTheme ? 'none' : ($themeData->accent->value ?? 'primary');
+
+    // DEBUG: Always log in testing for troubleshooting
+    if (app()->environment('testing')) {
+        file_put_contents(storage_path('logs/layout-debug.log'),
+            "Layout Header Render:\n" .
+            "  theme_value: {$theme->value}\n" .
+            "  is_none_strict: " . var_export($theme === \App\Enums\Theme::None, true) . "\n" .
+            "  is_none_value: " . var_export($theme->value === 'none', true) . "\n" .
+            "  isNoneTheme: " . var_export($isNoneTheme, true) . "\n" .
+            "  flavorValue: {$flavorValue}\n" .
+            "  accentValue: {$accentValue}\n" .
+            "  themeData_flavor: {$themeData->flavor->value}\n" .
+            "  themeData_accent: {$themeData->accent->value}\n\n",
+            FILE_APPEND
+        );
+    }
+@endphp
+<html
+    lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+    data-theme="{{ $theme->value }}"
+    data-flavor="{{ $flavorValue }}"
+    data-accent="{{ $accentValue }}"
+    @class(['dark' => !($themeData->isLight() ?? false)])
   <head>
     @include('partials.head')
   </head>

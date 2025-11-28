@@ -1,5 +1,10 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html
+    lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+    data-theme="{{ $themeData->theme->value ?? 'catppuccin' }}"
+    data-flavor="{{ $themeData->flavor->value ?? 'mocha' }}"
+    data-accent="{{ $themeData->accent->value ?? 'primary' }}"
+    @class(['dark' => !($themeData->isLight() ?? false)])
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -1488,6 +1493,10 @@
         initial-value: 100%;
       }
     </style>
+
+    <!-- Theme Assets -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.theme-script')
   </head>
   <body
     class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] flex p-6 lg:p-8 items-center lg:justify-center min-h-screen flex-col"
@@ -2301,5 +2310,21 @@
     @if (Route::has('login'))
     <div class="h-14.5 hidden lg:block"></div>
     @endif
+
+    <!-- Public Navigation Footer (T022a, FR-080) -->
+    <footer class="mt-16 py-8 border-t border-gray-200 dark:border-gray-800">
+      <div class="container mx-auto px-4">
+        <nav class="flex flex-wrap justify-center gap-6 text-sm">
+          <a href="{{ url('/themes/preview') }}" class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors">
+            {{ __('Try Themes') }}
+          </a>
+          @if (Route::has('login'))
+            <a href="{{ route('login') }}" class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors">
+              {{ __('Log in') }}
+            </a>
+          @endif
+        </nav>
+      </div>
+    </footer>
   </body>
 </html>

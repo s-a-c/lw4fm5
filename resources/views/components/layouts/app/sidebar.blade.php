@@ -1,5 +1,17 @@
 <!DOCTYPE html>
-<html class="dark" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+@php
+    $theme = $themeData->theme ?? \App\Enums\Theme::Catppuccin;
+    $isNoneTheme = ($theme === \App\Enums\Theme::None) || ($theme->value === 'none');
+    // For 'none' theme, set flavor and accent to 'none' explicitly
+    $flavorValue = $isNoneTheme ? 'none' : ($themeData->flavor->value ?? 'mocha');
+    $accentValue = $isNoneTheme ? 'none' : ($themeData->accent->value ?? 'primary');
+@endphp
+<html
+    lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+    data-theme="{{ $theme->value }}"
+    data-flavor="{{ $flavorValue }}"
+    data-accent="{{ $accentValue }}"
+    @class(['dark' => !($themeData->isLight() ?? false)])
 
 <head>
     @include('partials.head')

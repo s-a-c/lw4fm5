@@ -24,6 +24,26 @@ final class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
         $isLocal = $this->app->environment('local');
 
         Telescope::filter(fn (IncomingEntry $entry): bool => $this->shouldRecordEntry($entry, $isLocal));
+
+        // Tag theme events for filtering (T027a, FR-036)
+        Telescope::tag(function (IncomingEntry $entry): array {
+            $tags = [];
+
+            // Check if this is a log entry with theme event type
+            if ($entry->type === 'log') {
+                $content = $entry->content;
+                $message = $content['message'] ?? '';
+                $context = $content['context'] ?? [];
+                $eventType = $context['event_type'] ?? null;
+
+                if (in_array($eventType, ['theme_changed', 'validation_corrected', 'preview_interaction'], true)) {
+                    $tags[] = 'theme:event';
+                    $tags[] = 'theme:'.$eventType;
+                }
+            }
+
+            return $tags;
+        });
     }
 
     /**
@@ -57,7 +77,23 @@ final class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
             return true;
         }
 
-        return $entry->hasMonitoredTag();
+        // Record theme events even in non-local environments (T027a, FR-036)
+        if ($entry->hasMonitoredTag()) {
+            return true;
+        }
+
+        // Check if this is a theme event (tagged with theme:event)
+        if ($entry->type === 'log') {
+            $content = $entry->content;
+            $context = $content['context'] ?? [];
+            $eventType = $context['event_type'] ?? null;
+
+            if (in_array($eventType, ['theme_changed', 'validation_corrected', 'preview_interaction'], true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

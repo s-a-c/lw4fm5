@@ -122,6 +122,16 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        'libsql' => [
+            'driver' => 'libsql',
+            'host' => env('LIBSQL_HOST', '127.0.0.1'),
+            'port' => env('LIBSQL_PORT'),
+            'database' => env('LIBSQL_DATABASE', ':memory:'),
+            'username' => env('LIBSQL_USERNAME'),
+            'password' => env('LIBSQL_PASSWORD'),
+            'prefix' => '',
+        ],
+
     ],
 
     /*

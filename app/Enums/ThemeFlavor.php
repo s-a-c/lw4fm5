@@ -17,6 +17,17 @@ enum ThemeFlavor: string
     case Dragon = 'dragon';
     case Lotus = 'lotus';
 
+    // Tokyo Night
+    case Night = 'night';
+    case Day = 'day';
+
+    // Gruvbox
+    case Dark = 'dark';
+    case Light = 'light';
+
+    // Default (for single-flavor themes)
+    case Default = 'default';
+
     public function label(): string
     {
         return match ($this) {
@@ -27,11 +38,16 @@ enum ThemeFlavor: string
             self::Wave => 'Wave (Default)',
             self::Dragon => 'Dragon (Deep)',
             self::Lotus => 'Lotus (Light)',
+            self::Night => 'Night',
+            self::Day => 'Day',
+            self::Dark => 'Dark',
+            self::Light => 'Light',
+            self::Default => 'Default',
         };
     }
 
     public function isLight(): bool
     {
-        return in_array($this, [self::Latte, self::Lotus], true);
+        return in_array($this, [self::Latte, self::Lotus, self::Day, self::Light], true);
     }
 }

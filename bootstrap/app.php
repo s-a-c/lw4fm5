@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Middleware\ApplyTheme;
+use App\Http\Middleware\RateLimitThemeAutoSave;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -62,6 +63,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware
             ->web(append: [
                 ApplyTheme::class,
+                RateLimitThemeAutoSave::class,
                 AddCspHeaders::class,
             ])
             ->validateCsrfTokens(except: [

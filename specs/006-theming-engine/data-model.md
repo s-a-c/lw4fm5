@@ -300,6 +300,19 @@ if (!in_array($settings->flavor, $availableFlavors)) {
 
 No schema changes required. Uses existing `users.settings` JSON column.
 
+### JSON Column Structure
+
+**Column**: `users.settings` (JSON, nullable)
+
+**Required Fields** (when theme preferences are set):
+- `theme` (string): Theme enum value (e.g., `"catppuccin"`, `"kanagawa"`)
+- `flavor` (string): ThemeFlavor enum value (e.g., `"mocha"`, `"latte"`, `"wave"`)
+- `accent` (string): ThemeAccent enum value (e.g., `"primary"`, `"blue"`, `"red"`, `"green"`)
+
+**Structure**: Flat structure (no nesting). All three fields are at the root level of the JSON object.
+
+**Nullable Column**: The `users.settings` column MUST remain nullable. New users without saved preferences will have `null` in this column, and the system will use default values (`Theme::Catppuccin`, `ThemeFlavor::Mocha`, `ThemeAccent::Primary`).
+
 **Example JSON Structure**:
 ```json
 {
@@ -309,6 +322,48 @@ No schema changes required. Uses existing `users.settings` JSON column.
 }
 ```
 
+**Data Migration Scenarios**:
+
+If enum values change in the future (e.g., a theme is removed, a flavor is renamed, or accent options are modified), the system handles this through validation:
+
+1. **Enum Value Removal**: If an enum case is removed (e.g., `ThemeFlavor::Dragon` is removed), validation on access will detect the invalid value and reset to defaults.
+
+2. **Enum Value Addition**: If new enum cases are added (e.g., new themes or flavors), existing user data remains valid. New options become available for selection.
+
+3. **Enum Value Rename**: If an enum value is renamed (e.g., `"mocha"` → `"mocha-dark"`), existing data with the old value will be invalidated and reset to defaults on next access.
+
+4. **Migration Strategy**: When enum changes occur:
+   - Validation runs on every access (View Composer, Livewire mount, direct model access)
+   - Invalid combinations are auto-corrected to defaults
+   - Corrected settings are persisted silently
+   - No manual data migration scripts are required
+
 ## Migration Requirements
 
-None. Feature uses existing database structure.
+**No database migrations are required for this feature**. The feature uses the existing `users.settings` JSON column. All theme preference data is stored within this existing column structure.
+
+**Important**: This feature does NOT require:
+- New database tables
+- New columns
+- Column modifications
+- Index creation (user ID is already indexed, JSON column indexing not required per FR-052)
+
+## Database Indexing Decision (T028a, FR-052)
+
+**Decision**: No additional indexing required for theme preferences.
+
+**Rationale**:
+- User ID is already indexed (primary key on `users` table)
+- Theme preferences are stored in `users.settings` JSON column
+- All queries filter by `user_id` first, which is already indexed
+- JSON column indexing would not improve query performance for this use case
+- Theme preferences are accessed via user model, not via direct JSON queries
+
+**Query Pattern**:
+```php
+// All theme preference queries follow this pattern:
+$user = User::find($userId); // Uses primary key index
+$settings = $user->settings; // Direct property access, no query needed
+```
+
+**Conclusion**: No additional database indexes are required. The existing primary key index on `users.id` is sufficient for all theme preference access patterns.

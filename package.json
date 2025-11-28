@@ -7,28 +7,28 @@
         "bun-git-hooks": "^0.3.1",
         "bun-plugin-tailwind": "^0.1.2",
         "prettier-plugin-packagejson": "^2.5.19",
-        "rolldown-vite": "^7.2.7"
+        "rolldown-vite": "^7.2.8"
     },
     "devDependencies": {
         "@catppuccin/tailwindcss": "^1.0.0",
         "@tailwindcss/vite": "^4.1.17",
-        "@vitest/browser-playwright": "^4.0.13",
-        "@vitest/coverage-v8": "^4.0.13",
-        "@vitest/ui": "^4.0.13",
+        "@vitest/browser-playwright": "^4.0.14",
+        "@vitest/coverage-v8": "^4.0.14",
+        "@vitest/ui": "^4.0.14",
         "concurrently": "^9.2.1",
         "glob": "^13.0.0",
         "jsdom": "^27.2.0",
         "laravel-echo": "^2.2.6",
         "laravel-vite-plugin": "^2.0.1",
         "npm-check-updates": "^19.1.2",
-        "playwright": "^1.56.1",
-        "prettier": "^3.6.2",
+        "playwright": "^1.57.0",
+        "prettier": "^3.7.0",
         "prettier-plugin-organize-imports": "^4.3.0",
         "prettier-plugin-tailwindcss": "^0.7.1",
         "pusher-js": "^8.4.0",
         "tailwindcss": "^4.1.17",
         "vite": "^7.2.4",
-        "vitest": "^4.0.13"
+        "vitest": "^4.0.14"
     },
     "engines": {
         "bun": ">=1.1.0",

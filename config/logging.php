@@ -50,6 +50,12 @@ return [
     | Available drivers: "single", "daily", "slack", "syslog",
     |                    "errorlog", "monolog", "custom", "stack"
     |
+    | Theme Event Log Levels (T027b, FR-038):
+    | - info: theme changes, preview interactions
+    | - warning: validation corrections, retries
+    | - error: save failures, deserialization failures
+    | - debug: performance markers
+    |
     */
 
     'channels' => [
