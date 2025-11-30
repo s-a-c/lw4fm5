@@ -25,12 +25,12 @@ foreach ([
 }
 
 $accentCases = [
-    'catppuccin blue' => [Theme::Catppuccin, ThemeAccent::Blue, '#89b4fa'],
-    'catppuccin red' => [Theme::Catppuccin, ThemeAccent::Red, '#f38ba8'],
-    'catppuccin green' => [Theme::Catppuccin, ThemeAccent::Green, '#a6e3a1'],
-    'kanagawa blue' => [Theme::Kanagawa, ThemeAccent::Blue, '#7fb4ca'],
-    'kanagawa red' => [Theme::Kanagawa, ThemeAccent::Red, '#c34043'],
-    'kanagawa green' => [Theme::Kanagawa, ThemeAccent::Green, '#76946a'],
+    'catppuccin secondary' => [Theme::Catppuccin, ThemeAccent::Secondary, '#89b4fa'],
+    'catppuccin error' => [Theme::Catppuccin, ThemeAccent::Error, '#f38ba8'],
+    'catppuccin success' => [Theme::Catppuccin, ThemeAccent::Success, '#a6e3a1'],
+    'kanagawa secondary' => [Theme::Kanagawa, ThemeAccent::Secondary, '#7fb4ca'],
+    'kanagawa error' => [Theme::Kanagawa, ThemeAccent::Error, '#c34043'],
+    'kanagawa success' => [Theme::Kanagawa, ThemeAccent::Success, '#76946a'],
 ];
 
 foreach ($accentCases as $label => [$theme, $accent, $expectedHex]) {

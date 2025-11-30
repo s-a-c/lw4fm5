@@ -5,6 +5,7 @@
     data-flavor="{{ $themeData->flavor->value ?? 'mocha' }}"
     data-accent="{{ $themeData->accent->value ?? 'primary' }}"
     @class(['dark' => !($themeData->isLight() ?? false)])
+>
   <head>
     @include('partials.head')
   </head>

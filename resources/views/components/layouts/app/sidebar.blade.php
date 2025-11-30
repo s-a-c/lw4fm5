@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 @php
     $theme = $themeData->theme ?? \App\Enums\Theme::Catppuccin;
-    $isNoneTheme = ($theme === \App\Enums\Theme::None) || ($theme->value === 'none');
-    // For 'none' theme, set flavor and accent to 'none' explicitly
-    $flavorValue = $isNoneTheme ? 'none' : ($themeData->flavor->value ?? 'mocha');
-    $accentValue = $isNoneTheme ? 'none' : ($themeData->accent->value ?? 'primary');
+    $isDefaultTheme = ($theme === \App\Enums\Theme::Default) || ($theme->value === 'default');
+    // Default theme has Light, Dark, System flavors - use the actual flavor value
+    $flavorValue = $themeData->flavor->value ?? 'mocha';
+    // Default theme uses accents like other themes
+    $accentValue = $themeData->accent->value ?? 'primary';
 @endphp
 <html
     lang="{{ str_replace('_', '-', app()->getLocale()) }}"
@@ -12,12 +13,12 @@
     data-flavor="{{ $flavorValue }}"
     data-accent="{{ $accentValue }}"
     @class(['dark' => !($themeData->isLight() ?? false)])
-
+>
 <head>
     @include('partials.head')
 </head>
 
-<body class="min-h-screen bg-white dark:bg-zinc-800">
+<body class="min-h-screen theme-transition" style="background-color: var(--color-zinc-50, rgb(250 250 250));">
 @php
     $user = auth()->user();
     $themeFlavor = $user?->settings->flavor->value ?? 'mocha';
@@ -25,7 +26,8 @@
 <!-- DEBUG: themeFlavor type: {{ isset($themeFlavor) ? gettype($themeFlavor) : 'UNDEFINED' }} -->
 
     <flux:sidebar
-        class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900"
+        class="border-e theme-transition"
+        style="border-color: var(--color-zinc-200, rgb(228 228 231)); background-color: var(--color-zinc-50, rgb(250 250 250));"
         sticky
         stashable
         collapsible="desktop"

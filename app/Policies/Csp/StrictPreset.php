@@ -27,8 +27,6 @@ final class StrictPreset implements Preset
                 Keyword::SELF,
                 Keyword::UNSAFE_INLINE, // Necessary for many JS libraries that inject styles
             ])
-            ->addNonce(Directive::STYLE)
-
             // THE CRITICAL PART: Script Handling
             ->add(Directive::SCRIPT, [
                 Keyword::SELF,
@@ -36,6 +34,12 @@ final class StrictPreset implements Preset
                 Keyword::UNSAFE_INLINE, // Fallback for older browsers (ignored by modern ones if nonce is present)
             ])
             ->addNonce(Directive::SCRIPT);
+
+        // Only require nonce for styles in non-local environments
+        // In local dev, unsafe-inline works without nonce requirement
+        if (! app()->environment('local')) {
+            $policy->addNonce(Directive::STYLE);
+        }
 
         // Configure Stripe and GoogleAnalytics presets
         new Stripe()->configure($policy);

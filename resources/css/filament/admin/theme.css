@@ -1,14 +1,11 @@
-/** @format */
-
-@import '../../../../vendor/filament/filament/resources/css/theme.css';
-
-/*
-Choose between `mocha`, `frappe` or `macchiato` for dark mode, latte is included as the light mode flavour.
-We recommend using `mocha` for dark mode.
-*/
-@import '@catppuccin/tailwindcss/frappe.css';
-@import '@catppuccin/tailwindcss/macchiato.css';
-@import '@catppuccin/tailwindcss/mocha.css';
-
-@source '../../../../app/Filament/Admin/**/*';
-@source '../../../../resources/views/filament/admin/**/*';
+/**
+ * @deprecated This file has been merged into resources/css/app.css
+ *
+ * All Filament-specific CSS (base theme, sources, Zinc Bridge) has been
+ * consolidated into the main app.css file for consistency across both
+ * Filament and non-Filament views.
+ *
+ * Filament panels now use: ->viteTheme('resources/css/app.css')
+ *
+ * This file is kept for reference but is no longer used in the build.
+ */

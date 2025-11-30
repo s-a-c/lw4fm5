@@ -8,6 +8,14 @@
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
 
+    @env('local')
+        <div class="space-y-2">
+            <x-login-link email="admin@example.com" label="Login as admin"/>
+            <x-login-link email="test@example.com" label="Login as regular user"/>
+            <x-login-link email="superadmin@example.com" label="Login as super admin"/>
+        </div>
+    @endenv
+
     <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-6">
       @csrf
 

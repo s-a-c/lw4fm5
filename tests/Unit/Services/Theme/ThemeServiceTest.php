@@ -53,12 +53,12 @@ test('validates accent for theme using ThemeAccentMapper', function (): void {
     $settings = new UserSettingsData(
         theme: Theme::Catppuccin,
         flavor: ThemeFlavor::Mocha,
-        accent: ThemeAccent::Blue, // Valid accent
+        accent: ThemeAccent::Secondary, // Valid accent
     );
 
     $themeData = $this->service->resolveThemeData($settings);
 
-    expect($themeData->accent)->toBe(ThemeAccent::Blue);
+    expect($themeData->accent)->toBe(ThemeAccent::Secondary);
 });
 
 test('resolves default theme data when settings is null', function (): void {
@@ -108,7 +108,7 @@ test('handles ThemeAccentMapper service failure gracefully', function (): void {
     $settings = new UserSettingsData(
         theme: Theme::Catppuccin,
         flavor: ThemeFlavor::Mocha,
-        accent: ThemeAccent::Blue,
+        accent: ThemeAccent::Secondary,
     );
 
     $themeData = $service->resolveThemeData($settings);
@@ -126,19 +126,19 @@ test('falls back to first available accent when validation rejects value', funct
         ->andReturnFalse();
     $mapper->shouldReceive('getAvailableAccents')
         ->once()
-        ->andReturn([ThemeAccent::Green]);
+        ->andReturn([ThemeAccent::Success]);
 
     $service = new ThemeService($mapper);
 
     $settings = new UserSettingsData(
         theme: Theme::Catppuccin,
         flavor: ThemeFlavor::Mocha,
-        accent: ThemeAccent::Red,
+        accent: ThemeAccent::Error,
     );
 
     $themeData = $service->resolveThemeData($settings);
 
-    expect($themeData->accent)->toBe(ThemeAccent::Green);
+    expect($themeData->accent)->toBe(ThemeAccent::Success);
 });
 
 test('validates on every access not just on load', function (): void {

@@ -109,7 +109,7 @@ test('graceful degradation when ThemeAccentMapper service fails (no user-facing 
         'settings' => new UserSettingsData(
             theme: Theme::Kanagawa,
             flavor: ThemeFlavor::Wave,
-            accent: ThemeAccent::Blue,
+            accent: ThemeAccent::Secondary,
         ),
     ]);
 

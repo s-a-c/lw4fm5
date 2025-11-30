@@ -5,6 +5,7 @@
     data-flavor="{{ $themeData->flavor->value ?? 'mocha' }}"
     data-accent="{{ $themeData->accent->value ?? 'primary' }}"
     @class(['dark' => !($themeData->isLight() ?? false)])
+>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Contracts\ThemeAccentMapperInterface;
-use App\Data\ThemeData;
 use App\Data\UserSettingsData;
 use App\Enums\Theme;
 use App\Enums\ThemeAccent;
@@ -66,7 +65,7 @@ new class extends Component
         }
 
         // Use defaults if session is empty or invalid
-        if (!$themeData) {
+        if (! $themeData) {
             $themeData = $this->themeService->resolveThemeData(null);
         }
 
@@ -104,14 +103,14 @@ new class extends Component
         $this->updateSessionAndDom();
     }
 
-    public function render(): \Illuminate\Contracts\View\View
+    public function render(): Illuminate\Contracts\View\View
     {
         // Build theme data structure for JavaScript (all themes with their flavors and accents)
         $themesData = [];
         foreach (Theme::cases() as $themeEnum) {
             $themesData[$themeEnum->value] = [
-                'flavors' => array_map(fn($f) => $f->value, $themeEnum->flavors()),
-                'accents' => array_map(fn($a) => $a->value, $this->accentMapper->getAvailableAccents($themeEnum)),
+                'flavors' => array_map(fn ($f) => $f->value, $themeEnum->flavors()),
+                'accents' => array_map(fn ($a) => $a->value, $this->accentMapper->getAvailableAccents($themeEnum)),
             ];
         }
 
@@ -127,14 +126,14 @@ new class extends Component
         $this->availableAccents = $this->accentMapper->getAvailableAccents($themeEnum);
 
         // If current flavor is not available, use first available
-        $flavorValues = array_map(fn($f) => $f->value, $this->availableFlavors);
-        if (!in_array($this->flavor, $flavorValues, true)) {
+        $flavorValues = array_map(fn ($f) => $f->value, $this->availableFlavors);
+        if (! in_array($this->flavor, $flavorValues, true)) {
             $this->flavor = $flavorValues[0] ?? 'mocha';
         }
 
         // If current accent is not available, use first available
-        $accentValues = array_map(fn($a) => $a->value, $this->availableAccents);
-        if (!in_array($this->accent, $accentValues, true)) {
+        $accentValues = array_map(fn ($a) => $a->value, $this->availableAccents);
+        if (! in_array($this->accent, $accentValues, true)) {
             $this->accent = $accentValues[0] ?? 'primary';
         }
     }
@@ -197,14 +196,14 @@ new class extends Component
     {
         try {
             return Theme::from($value);
-        } catch (\ValueError $e) {
+        } catch (ValueError $e) {
             return Theme::Catppuccin;
         }
     }
 
     private function valueWithinFlavors(string $value): string
     {
-        $flavorValues = array_map(fn($f) => $f->value, $this->availableFlavors);
+        $flavorValues = array_map(fn ($f) => $f->value, $this->availableFlavors);
         if (in_array($value, $flavorValues, true)) {
             return $value;
         }
@@ -214,7 +213,7 @@ new class extends Component
 
     private function valueWithinAccents(string $value): string
     {
-        $accentValues = array_map(fn($a) => $a->value, $this->availableAccents);
+        $accentValues = array_map(fn ($a) => $a->value, $this->availableAccents);
         if (in_array($value, $accentValues, true)) {
             return $value;
         }
@@ -265,21 +264,22 @@ new class extends Component
             </div>
 
             <!-- Flavor Selection (T020b, FR-007, FR-011) -->
-            @if(count($availableFlavors) > 1)
+            @if(count($availableFlavors) > 0)
                 <div>
                     <h2 class="text-xl font-semibold mb-2">Variant</h2>
                     <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Select a flavor for the chosen theme.</p>
 
                     <div class="grid gap-4 sm:grid-cols-4" role="radiogroup" aria-label="Theme variant selection">
                         @foreach($availableFlavors as $flavorEnum)
-                            <label class="flex items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 theme-transition
-                                {{ $flavor === $flavorEnum->value ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 dark:border-gray-700' }}">
+                            <label class="flavor-button flex items-center gap-3 p-4 border rounded-lg cursor-pointer theme-transition
+                                {{ $flavor === $flavorEnum->value ? 'ring-2 ring-offset-2 flavor-selected' : '' }}"
                                 <input
                                     type="radio"
                                     wire:model.live="flavor"
                                     value="{{ $flavorEnum->value }}"
+                                    class="sr-only"
                                 />
-                                <span>{{ $flavorEnum->label() }}</span>
+                                <span class="flavor-button-text">{{ $flavorEnum->label() }}</span>
                             </label>
                         @endforeach
                     </div>
@@ -287,27 +287,54 @@ new class extends Component
             @endif
 
             <!-- Accent Selection (T020b, FR-007, FR-011) -->
-            <div>
-                <h2 class="text-xl font-semibold mb-2">Accent Color</h2>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Pick a primary color for buttons and links.</p>
+            @if(count($availableAccents) > 0)
+                <div>
+                    <h2 class="text-xl font-semibold mb-2">Accent Colors</h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Choose accent colors for different UI elements.</p>
 
-                <div class="flex flex-wrap gap-3" role="radiogroup" aria-label="Accent color selection">
-                    @foreach($availableAccents as $accentEnum)
-                        <label class="flex items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 theme-transition
-                            {{ $accent === $accentEnum->value ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 dark:border-gray-700' }}">
-                            <input
-                                type="radio"
-                                wire:model.live="accent"
-                                value="{{ $accentEnum->value }}"
-                            />
-                            <div class="size-4 rounded-full border border-white/20"
-                                 style="background-color: var(--accent-{{ $accentEnum->value }}, var(--color-accent));"
-                                 aria-hidden="true"></div>
-                            <span>{{ $accentEnum->label() }}</span>
-                        </label>
-                    @endforeach
+                    <div class="grid grid-cols-6 gap-3" role="radiogroup" aria-label="Accent color selection">
+                        @foreach($availableAccents as $accentEnum)
+                            @php
+                                $isSelected = $accent === $accentEnum->value;
+                                // Define CSS variable name for each accent
+                                $cssVar = match($accentEnum) {
+                                    ThemeAccent::Primary => '--accent-primary',
+                                    ThemeAccent::Secondary => '--accent-secondary',
+                                    ThemeAccent::Info => '--accent-info',
+                                    ThemeAccent::Warning => '--accent-warning',
+                                    ThemeAccent::Error => '--accent-error',
+                                    ThemeAccent::Success => '--accent-success',
+                                };
+                                // Define fallback colors for each accent
+                                {{-- $fallbackColor = match($accentEnum) {
+                                    ThemeAccent::Primary => '#cba6f7',
+                                    ThemeAccent::Secondary => '#89b4fa',
+                                    ThemeAccent::Info => '#06b6d4',
+                                    ThemeAccent::Warning => '#eab308',
+                                    ThemeAccent::Error => '#f38ba8',
+                                    ThemeAccent::Success => '#a6e3a1',
+                                }; --}}
+                            @endphp
+                            <label
+                                class="accent-button flex flex-col items-center justify-center gap-2 p-3 border-2 rounded-lg cursor-pointer theme-transition transition-all hover:scale-105 active:scale-95
+                                    {{ $isSelected ? 'ring-2 ring-offset-2 accent-selected' : '' }}"
+                                data-accent-option="{{ $accentEnum->value }}"
+                                data-accent-type="{{ $accentEnum->value }}"
+                                wire:key="accent-{{ $accentEnum->value }}-{{ $accent }}"
+                                <input
+                                    type="radio"
+                                    wire:model.live="accent"
+                                    value="{{ $accentEnum->value }}"
+                                    class="sr-only"
+                                />
+                                <div class="text-center">
+                                    <div class="font-semibold text-sm accent-button-text">{{ $accentEnum->label() }}</div>
+                                </div>
+                            </label>
+                        @endforeach
+                    </div>
                 </div>
-            </div>
+            @endif
         </div>
     </div>
 

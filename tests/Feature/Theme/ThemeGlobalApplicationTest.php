@@ -13,7 +13,7 @@ test('view composer injects themeData with all three attributes for authenticate
         'settings' => new UserSettingsData(
             theme: Theme::Kanagawa,
             flavor: ThemeFlavor::Wave,
-            accent: ThemeAccent::Blue,
+            accent: ThemeAccent::Secondary,
         ),
     ]);
 
@@ -47,7 +47,7 @@ test('view composer injects themeData for user with null settings', function ():
     $response->assertSee('data-accent="primary"', false);
 });
 
-test('view composer applies dark class for dark flavors', function (): void {
+test('view composer applies dark class ThemeGlobalApplicationTest dark flavors', function (): void {
     $user = User::factory()->create([
         'settings' => new UserSettingsData(
             theme: Theme::Catppuccin,
@@ -62,7 +62,7 @@ test('view composer applies dark class for dark flavors', function (): void {
     $response->assertSee('class="dark"', false);
 });
 
-test('view composer removes dark class for light flavors', function (): void {
+test('view composer removes dark class ThemeGlobalApplicationTest light flavors', function (): void {
     $user = User::factory()->create([
         'settings' => new UserSettingsData(
             theme: Theme::Catppuccin,

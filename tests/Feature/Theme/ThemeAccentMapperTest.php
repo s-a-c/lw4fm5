@@ -20,15 +20,15 @@ test('theme-specific accent validation works correctly', function (): void {
 
     // Verify accent validation for Catppuccin theme
     expect($mapper->validateAccent(Theme::Catppuccin, ThemeAccent::Primary))->toBeTrue()
-        ->and($mapper->validateAccent(Theme::Catppuccin, ThemeAccent::Blue))->toBeTrue()
-        ->and($mapper->validateAccent(Theme::Catppuccin, ThemeAccent::Red))->toBeTrue()
-        ->and($mapper->validateAccent(Theme::Catppuccin, ThemeAccent::Green))->toBeTrue();
+        ->and($mapper->validateAccent(Theme::Catppuccin, ThemeAccent::Secondary))->toBeTrue()
+        ->and($mapper->validateAccent(Theme::Catppuccin, ThemeAccent::Error))->toBeTrue()
+        ->and($mapper->validateAccent(Theme::Catppuccin, ThemeAccent::Success))->toBeTrue();
 
     // Verify accent validation for Kanagawa theme
     expect($mapper->validateAccent(Theme::Kanagawa, ThemeAccent::Primary))->toBeTrue()
-        ->and($mapper->validateAccent(Theme::Kanagawa, ThemeAccent::Blue))->toBeTrue()
-        ->and($mapper->validateAccent(Theme::Kanagawa, ThemeAccent::Red))->toBeTrue()
-        ->and($mapper->validateAccent(Theme::Kanagawa, ThemeAccent::Green))->toBeTrue();
+        ->and($mapper->validateAccent(Theme::Kanagawa, ThemeAccent::Secondary))->toBeTrue()
+        ->and($mapper->validateAccent(Theme::Kanagawa, ThemeAccent::Error))->toBeTrue()
+        ->and($mapper->validateAccent(Theme::Kanagawa, ThemeAccent::Success))->toBeTrue();
 });
 
 test('available accents per theme queries return correct results', function (): void {
@@ -41,19 +41,23 @@ test('available accents per theme queries return correct results', function (): 
     $catppuccinAccents = $mapper->getAvailableAccents(Theme::Catppuccin);
     expect($catppuccinAccents)->toBeArray()
         ->toContain(ThemeAccent::Primary)
-        ->toContain(ThemeAccent::Blue)
-        ->toContain(ThemeAccent::Red)
-        ->toContain(ThemeAccent::Green)
-        ->and(count($catppuccinAccents))->toBe(4);
+        ->toContain(ThemeAccent::Secondary)
+        ->toContain(ThemeAccent::Info)
+        ->toContain(ThemeAccent::Warning)
+        ->toContain(ThemeAccent::Error)
+        ->toContain(ThemeAccent::Success)
+        ->and(count($catppuccinAccents))->toBe(6);
 
     // Get available accents for Kanagawa
     $kanagawaAccents = $mapper->getAvailableAccents(Theme::Kanagawa);
     expect($kanagawaAccents)->toBeArray()
         ->toContain(ThemeAccent::Primary)
-        ->toContain(ThemeAccent::Blue)
-        ->toContain(ThemeAccent::Red)
-        ->toContain(ThemeAccent::Green)
-        ->and(count($kanagawaAccents))->toBe(4);
+        ->toContain(ThemeAccent::Secondary)
+        ->toContain(ThemeAccent::Info)
+        ->toContain(ThemeAccent::Warning)
+        ->toContain(ThemeAccent::Error)
+        ->toContain(ThemeAccent::Success)
+        ->and(count($kanagawaAccents))->toBe(6);
 });
 
 test('CSS variable name generation works correctly', function (): void {
@@ -74,7 +78,7 @@ test('CSS variable name generation works correctly', function (): void {
     $filamentVariable = $mapper->getFilamentVariableName(
         Theme::Kanagawa,
         ThemeFlavor::Wave,
-        ThemeAccent::Blue
+        ThemeAccent::Secondary
     );
     expect($filamentVariable)->toBe('--accent-filament-gray-500');
 });

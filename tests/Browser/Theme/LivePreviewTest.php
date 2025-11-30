@@ -24,8 +24,8 @@ test('live preview updates html data attributes without reload', function (): vo
             ->assertScript('window.__lastThemeEvent ? window.__lastThemeEvent.theme : null', 'kanagawa')
             ->assertScript('document.documentElement.dataset.theme', 'kanagawa')
             ->assertScript('document.documentElement.dataset.flavor', 'wave')
-            ->click('[data-test="appearance-accent-blue"]')
+            ->click('[data-test="appearance-accent-secondary"]')
             ->waitForEvent('networkidle')
-            ->assertScript('document.documentElement.dataset.accent', 'blue')
+            ->assertScript('document.documentElement.dataset.accent', 'secondary')
     );
 });

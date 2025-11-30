@@ -24,7 +24,7 @@ test('filament dashboard renders theme script using authenticated preferences', 
         'settings' => new UserSettingsData(
             theme: Theme::Kanagawa,
             flavor: ThemeFlavor::Lotus,
-            accent: ThemeAccent::Blue,
+            accent: ThemeAccent::Secondary,
         ),
     ]);
 
@@ -66,7 +66,7 @@ test('filament resource pages apply themes correctly', function (): void {
         'settings' => new UserSettingsData(
             theme: Theme::Catppuccin,
             flavor: ThemeFlavor::Mocha,
-            accent: ThemeAccent::Blue,
+            accent: ThemeAccent::Secondary,
         ),
     ]);
 
@@ -87,7 +87,7 @@ test('filament components respect theme changes', function (): void {
         'settings' => new UserSettingsData(
             theme: Theme::Kanagawa,
             flavor: ThemeFlavor::Dragon,
-            accent: ThemeAccent::Red,
+            accent: ThemeAccent::Error,
         ),
     ]);
 

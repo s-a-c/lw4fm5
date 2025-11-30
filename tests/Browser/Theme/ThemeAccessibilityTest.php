@@ -34,9 +34,11 @@ test('theme information is not conveyed by color alone', function (): void {
             ->assertSee('Kanagawa')
             // All accent radio buttons should have visible text labels
             ->assertSee('Primary')
-            ->assertSee('Blue')
-            ->assertSee('Red')
-            ->assertSee('Green')
+            ->assertSee('Secondary')
+            ->assertSee('Info')
+            ->assertSee('Warning')
+            ->assertSee('Error')
+            ->assertSee('Success')
     );
 });
 

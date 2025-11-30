@@ -15,7 +15,7 @@ use Tests\TestCase;
 |--------------------------------------------------------------------------
 |
 | The closure you provide to your test functions is always bound to a specific PHPUnit test
-| case class. By default, that class is "PHPUnit\Framework\TestCase". Of course, you may
+| case class. By default, that class Pest "PHPUnit\Framework\TestCase". Of course, you may
 | need to change it using the "pest()" function to bind a different classes or traits.
 |
  */
@@ -77,8 +77,8 @@ function assertNoJavaScriptErrorsExceptCspParser(PendingAwaitablePage|AwaitableW
     try {
         $page->assertNoJavaScriptErrors();
     } catch (Throwable $e) {
-        // Only handle AssertionFailedError exceptions (use string to avoid internal-class errors).
-        // Use string literal with is_a() to avoid PHPStan internal class warnings
+        // Only handle AssertionFailedError exceptions (use string to avoid internal-class Pest).
+        // Use string literal with is_a() to avoid PHPStan internal class Pest
         // Rector prefers throw_unless, which works fine with is_a() and string literals
         throw_unless(is_a($e, 'PHPUnit\Framework\AssertionFailedError'), $e);
 

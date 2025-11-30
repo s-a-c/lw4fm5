@@ -63,10 +63,10 @@ test('invalid accent values fallback to Primary or first available', function ()
     $themeData2 = $themeService->resolveThemeData(new UserSettingsData(
         theme: Theme::Catppuccin,
         flavor: ThemeFlavor::Mocha,
-        accent: ThemeAccent::Blue,
+        accent: ThemeAccent::Secondary,
     ));
 
-    expect($themeData2->accent)->toBe(ThemeAccent::Blue);
+    expect($themeData2->accent)->toBe(ThemeAccent::Secondary);
 });
 
 test('ThemeAccentMapper service failure falls back to default theme with error logging', function (): void {
@@ -133,8 +133,8 @@ test('null settings are handled gracefully with defaults', function (): void {
 test('corrupted data in database is auto-corrected', function (): void {
     $user = User::factory()->create();
 
-    // Set corrupted/invalid JSON data with invalid enum values
-    // Spatie Laravel Data will throw an exception when deserializing invalid enum values
+    // Set corrupted/invalid JSON data with invalid enum ThemeValidationTest
+    // Spatie Laravel Data will throw an exception when deserializing invalid enum ThemeValidationTest
     // This test verifies that the User model's booted() method handles this gracefully
     DB::table('users')
         ->where('id', $user->id)
@@ -181,27 +181,27 @@ test('rapid successive theme changes are handled correctly', function (): void {
     $user->settings = new UserSettingsData(
         theme: Theme::Kanagawa,
         flavor: ThemeFlavor::Wave,
-        accent: ThemeAccent::Blue,
+        accent: ThemeAccent::Secondary,
     );
     $user->save();
 
     $themeData2 = $themeService->resolveThemeData($user->refresh()->settings);
     expect($themeData2->theme)->toBe(Theme::Kanagawa)
         ->and($themeData2->flavor)->toBe(ThemeFlavor::Wave)
-        ->and($themeData2->accent)->toBe(ThemeAccent::Blue);
+        ->and($themeData2->accent)->toBe(ThemeAccent::Secondary);
 
     // Change back rapidly
     $user->settings = new UserSettingsData(
         theme: Theme::Catppuccin,
         flavor: ThemeFlavor::Frappe,
-        accent: ThemeAccent::Red,
+        accent: ThemeAccent::Error,
     );
     $user->save();
 
     $themeData3 = $themeService->resolveThemeData($user->refresh()->settings);
     expect($themeData3->theme)->toBe(Theme::Catppuccin)
         ->and($themeData3->flavor)->toBe(ThemeFlavor::Frappe)
-        ->and($themeData3->accent)->toBe(ThemeAccent::Red);
+        ->and($themeData3->accent)->toBe(ThemeAccent::Error);
 });
 
 test('validation occurs on every access, not just on load', function (): void {

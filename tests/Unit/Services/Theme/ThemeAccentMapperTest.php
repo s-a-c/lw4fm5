@@ -13,9 +13,11 @@ test('returns available accents for Catppuccin theme', function (): void {
 
     expect($accents)->toBeArray()
         ->toContain(ThemeAccent::Primary)
-        ->toContain(ThemeAccent::Blue)
-        ->toContain(ThemeAccent::Red)
-        ->toContain(ThemeAccent::Green);
+        ->toContain(ThemeAccent::Secondary)
+        ->toContain(ThemeAccent::Info)
+        ->toContain(ThemeAccent::Warning)
+        ->toContain(ThemeAccent::Error)
+        ->toContain(ThemeAccent::Success);
 });
 
 test('returns available accents for Kanagawa theme', function (): void {
@@ -24,18 +26,20 @@ test('returns available accents for Kanagawa theme', function (): void {
 
     expect($accents)->toBeArray()
         ->toContain(ThemeAccent::Primary)
-        ->toContain(ThemeAccent::Blue)
-        ->toContain(ThemeAccent::Red)
-        ->toContain(ThemeAccent::Green);
+        ->toContain(ThemeAccent::Secondary)
+        ->toContain(ThemeAccent::Info)
+        ->toContain(ThemeAccent::Warning)
+        ->toContain(ThemeAccent::Error)
+        ->toContain(ThemeAccent::Success);
 });
 
 test('validates accent for theme correctly', function (): void {
     $mapper = new ThemeAccentMapper();
 
     expect($mapper->validateAccent(Theme::Catppuccin, ThemeAccent::Primary))->toBeTrue();
-    expect($mapper->validateAccent(Theme::Catppuccin, ThemeAccent::Blue))->toBeTrue();
+    expect($mapper->validateAccent(Theme::Catppuccin, ThemeAccent::Secondary))->toBeTrue();
     expect($mapper->validateAccent(Theme::Kanagawa, ThemeAccent::Primary))->toBeTrue();
-    expect($mapper->validateAccent(Theme::Kanagawa, ThemeAccent::Red))->toBeTrue();
+    expect($mapper->validateAccent(Theme::Kanagawa, ThemeAccent::Error))->toBeTrue();
 });
 
 test('generates Flux CSS variable name correctly', function (): void {
@@ -56,7 +60,7 @@ test('generates Filament CSS variable name correctly', function (): void {
     $variableName = $mapper->getFilamentVariableName(
         Theme::Kanagawa,
         ThemeFlavor::Wave,
-        ThemeAccent::Blue
+        ThemeAccent::Secondary
     );
 
     expect($variableName)->toBe('--accent-filament-gray-500');
@@ -66,7 +70,7 @@ test('generates different variable names for different accents', function (): vo
     $mapper = new ThemeAccentMapper();
 
     $primary = $mapper->getFluxVariableName(Theme::Catppuccin, ThemeFlavor::Mocha, ThemeAccent::Primary);
-    $blue = $mapper->getFluxVariableName(Theme::Catppuccin, ThemeFlavor::Mocha, ThemeAccent::Blue);
+    $blue = $mapper->getFluxVariableName(Theme::Catppuccin, ThemeFlavor::Mocha, ThemeAccent::Secondary);
 
     expect($primary)->toBe('--accent-flux-zinc-500');
     expect($blue)->toBe('--accent-flux-zinc-500');

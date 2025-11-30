@@ -17,7 +17,7 @@ export default {
     useTabs: false,
 
     // Specify the number of spaces per indentation level
-    tabWidth: 2,
+    tabWidth: 4,
 
     // Include parentheses around a sole arrow function parameter
     arrowParens: "always",
@@ -74,7 +74,7 @@ export default {
         {
             files: ["*.yml", "*.yaml"],
             options: {
-                tabWidth: 2,
+                tabWidth: 4,
             },
         },
         {

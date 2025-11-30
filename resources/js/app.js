@@ -56,14 +56,27 @@ const normalizePayload = (detail) => {
 const applyThemeToDom = ({ theme, flavor, accent, isLight }, preserveExisting = false) => {
   const root = document.documentElement;
 
-  // Handle 'none' theme (system default) - remove data-theme attribute
-  if (theme === 'none' || theme === null || theme === undefined) {
+  // Handle 'default' theme with System flavor - check OS preference
+  if (theme === 'default' && flavor === 'system') {
     if (!preserveExisting || root.dataset.theme) {
-      root.removeAttribute('data-theme');
-      root.removeAttribute('data-flavor');
-      root.removeAttribute('data-accent');
-      // For system default, let OS/browser preference control dark mode
-      // Don't force dark class - let prefers-color-scheme handle it
+      root.dataset.theme = 'default';
+      root.dataset.flavor = 'system';
+      root.dataset.accent = accent || 'primary';
+      // For system flavor, let OS/browser preference control dark mode
+      const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+      root.classList.toggle('dark', prefersDark);
+      return;
+    }
+  }
+
+  // Handle 'default' theme with explicit Light/Dark flavor
+  if (theme === 'default') {
+    if (!preserveExisting || root.dataset.theme) {
+      root.dataset.theme = 'default';
+      root.dataset.flavor = flavor || 'system';
+      root.dataset.accent = accent || 'primary';
+      // Apply dark class based on flavor
+      root.classList.toggle('dark', flavor === 'dark');
       return;
     }
   }

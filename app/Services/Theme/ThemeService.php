@@ -72,12 +72,26 @@ final readonly class ThemeService
             $wasCorrected = true;
         }
 
-        // Handle None theme (system default) - no flavors or accents
-        if ($theme === Theme::None) {
+        // Handle Default theme - validate flavor is one of Light, Dark, or System
+        if ($theme === Theme::Default) {
+            $availableFlavors = $theme->flavors();
+            if (! in_array($flavor, $availableFlavors, true)) {
+                // Default to System for Default theme
+                $flavor = ThemeFlavor::System;
+                $wasCorrected = true;
+            }
+
+            // Default theme uses accents like other themes
+            $accent ??= ThemeAccent::Primary;
+            if (! $this->accentMapper->validateAccent($theme, $accent)) {
+                $accent = ThemeAccent::Primary;
+                $wasCorrected = true;
+            }
+
             return new ThemeData(
-                theme: Theme::None,
-                flavor: ThemeFlavor::Default, // Placeholder, not used
-                accent: ThemeAccent::Primary, // Placeholder, not used
+                theme: Theme::Default,
+                flavor: $flavor,
+                accent: $accent,
             );
         }
 

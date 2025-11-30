@@ -6,8 +6,109 @@
 
 @layer theme {
   /* ====================================================
+       DEFAULT THEME (System Default with Light/Dark Variants)
+     ==================================================== */
+
+  /* Default Theme - Light Variant */
+  [data-theme='default'][data-flavor='light'] {
+    --color-zinc-50: #fafafa;
+    --color-zinc-100: #f4f4f5;
+    --color-zinc-200: #e4e4e7;
+    --color-zinc-300: #d4d4d8;
+    --color-zinc-400: #a1a1aa;
+    --color-zinc-500: #71717a;
+    --color-zinc-600: #52525b;
+    --color-zinc-700: #3f3f46;
+    --color-zinc-800: #27272a;
+    --color-zinc-900: #18181b;
+    --color-zinc-950: #09090b;
+    --accent-primary: #3b82f6;
+    --accent-secondary: #6366f1;
+    --accent-error: #ef4444;
+    --accent-success: #22c55e;
+    --accent-info: #06b6d4;
+    --accent-warning: #eab308;
+    --accent-content: #ffffff;
+  }
+
+  /* Default Theme - Dark Variant */
+  /* NOTE: Zinc scale stays CONSISTENT (50=lightest, 900=darkest) */
+  /* UI code uses dark: variants to pick appropriate colors */
+  [data-theme='default'][data-flavor='dark'] {
+    --color-zinc-50: #fafafa;
+    --color-zinc-100: #f4f4f5;
+    --color-zinc-200: #e4e4e7;
+    --color-zinc-300: #d4d4d8;
+    --color-zinc-400: #a1a1aa;
+    --color-zinc-500: #71717a;
+    --color-zinc-600: #52525b;
+    --color-zinc-700: #3f3f46;
+    --color-zinc-800: #27272a;
+    --color-zinc-900: #18181b;
+    --color-zinc-950: #09090b;
+    --accent-primary: #60a5fa;
+    --accent-secondary: #818cf8;
+    --accent-error: #f87171;
+    --accent-success: #4ade80;
+    --accent-info: #22d3ee;
+    --accent-warning: #fbbf24;
+    --accent-content: #ffffff;
+  }
+
+  /* Default Theme - System Variant (follows OS preference) */
+  [data-theme='default'][data-flavor='system'] {
+    /* System variant uses prefers-color-scheme media query */
+    /* Light mode colors */
+    --color-zinc-50: #fafafa;
+    --color-zinc-100: #f4f4f5;
+    --color-zinc-200: #e4e4e7;
+    --color-zinc-300: #d4d4d8;
+    --color-zinc-400: #a1a1aa;
+    --color-zinc-500: #71717a;
+    --color-zinc-600: #52525b;
+    --color-zinc-700: #3f3f46;
+    --color-zinc-800: #27272a;
+    --color-zinc-900: #18181b;
+    --color-zinc-950: #09090b;
+    --accent-primary: #3b82f6;
+    --accent-secondary: #6366f1;
+    --accent-error: #ef4444;
+    --accent-success: #22c55e;
+    --accent-info: #06b6d4;
+    --accent-warning: #eab308;
+    --accent-content: #ffffff;
+  }
+
+  /* Default Theme - System Variant Dark Mode Override */
+  /* NOTE: Zinc scale stays CONSISTENT - only accent brightness changes for dark mode */
+  @media (prefers-color-scheme: dark) {
+    [data-theme='default'][data-flavor='system'] {
+      --color-zinc-50: #fafafa;
+      --color-zinc-100: #f4f4f5;
+      --color-zinc-200: #e4e4e7;
+      --color-zinc-300: #d4d4d8;
+      --color-zinc-400: #a1a1aa;
+      --color-zinc-500: #71717a;
+      --color-zinc-600: #52525b;
+      --color-zinc-700: #3f3f46;
+      --color-zinc-800: #27272a;
+      --color-zinc-900: #18181b;
+      --color-zinc-950: #09090b;
+      --accent-primary: #60a5fa;
+      --accent-secondary: #818cf8;
+      --accent-error: #f87171;
+      --accent-success: #4ade80;
+      --accent-info: #22d3ee;
+      --accent-warning: #fbbf24;
+      --accent-content: #ffffff;
+    }
+  }
+
+  /* ====================================================
        GLOBAL DEVELOPER THEMES
      ==================================================== */
+
+  /* --- Catppuccin Family --- */
   [data-theme='catppuccin'][data-flavor='mocha'] {
     --color-zinc-50: #cdd6f4;
     --color-zinc-100: #bac2de;
@@ -21,9 +122,11 @@
     --color-zinc-900: #1e1e2e;
     --color-zinc-950: #11111b;
     --accent-primary: #cba6f7;
-    --accent-blue: #89b4fa;
-    --accent-red: #f38ba8;
-    --accent-green: #a6e3a1;
+    --accent-secondary: #89b4fa;
+    --accent-error: #f38ba8;
+    --accent-success: #a6e3a1;
+    --accent-info: #06b6d4;
+    --accent-warning: #eab308;
     --accent-content: #11111b;
   }
 
@@ -38,11 +141,13 @@
     --color-zinc-700: #6c6f85;
     --color-zinc-800: #5c5f77;
     --color-zinc-900: #4c4f69;
-    --color-zinc-950: #1e1e2e; /* Darker for better contrast on light backgrounds */
+    --color-zinc-950: #1e1e2e;
     --accent-primary: #8839ef;
-    --accent-blue: #1e66f5;
-    --accent-red: #d20f39;
-    --accent-green: #40a02b;
+    --accent-secondary: #1e66f5;
+    --accent-error: #d20f39;
+    --accent-success: #40a02b;
+    --accent-info: #0ea5e9;
+    --accent-warning: #f59e0b;
     --accent-content: #ffffff;
   }
 
@@ -59,9 +164,11 @@
     --color-zinc-900: #292c3c;
     --color-zinc-950: #232634;
     --accent-primary: #ca9ee6;
-    --accent-blue: #8caaee;
-    --accent-red: #e78284;
-    --accent-green: #a6d189;
+    --accent-secondary: #8caaee;
+    --accent-error: #e78284;
+    --accent-success: #a6d189;
+    --accent-info: #99d1db;
+    --accent-warning: #e5c890;
     --accent-content: #292c3c;
   }
 
@@ -78,12 +185,15 @@
     --color-zinc-900: #24273a;
     --color-zinc-950: #181926;
     --accent-primary: #c6a0f6;
-    --accent-blue: #8aadf4;
-    --accent-red: #ed8796;
-    --accent-green: #a6da95;
+    --accent-secondary: #8aadf4;
+    --accent-error: #ed8796;
+    --accent-success: #a6da95;
+    --accent-info: #91d7e3;
+    --accent-warning: #eed49f;
     --accent-content: #181926;
   }
 
+  /* --- Tokyo Night Family --- */
   [data-theme='tokyo-night'][data-flavor='night'] {
     --color-zinc-50: #c0caf5;
     --color-zinc-100: #a9b1d6;
@@ -97,31 +207,36 @@
     --color-zinc-900: #0a0a0c;
     --color-zinc-950: #040405;
     --accent-primary: #7aa2f7;
-    --accent-blue: #7dcfff;
-    --accent-red: #f7768e;
-    --accent-green: #9ece6a;
+    --accent-secondary: #bb9af7;
+    --accent-error: #f7768e;
+    --accent-success: #9ece6a;
+    --accent-info: #7dcfff;
+    --accent-warning: #e0af68;
     --accent-content: #040405;
   }
 
-  [data-theme='tokyo-night'][data-flavor='day'] {
-    --color-zinc-50: #e1e2e7;
-    --color-zinc-100: #d0d5e3;
-    --color-zinc-200: #b4b5b9;
-    --color-zinc-300: #9699a3;
-    --color-zinc-400: #6c6f7c;
-    --color-zinc-500: #3760bf;
-    --color-zinc-600: #2e3c64;
-    --color-zinc-700: #1a1b26;
-    --color-zinc-800: #0f0f14;
-    --color-zinc-900: #050505;
+  [data-theme='tokyo-night'][data-flavor='storm'] {
+    --color-zinc-50: #c0caf5;
+    --color-zinc-100: #a9b1d6;
+    --color-zinc-200: #7aa2f7;
+    --color-zinc-300: #565f89;
+    --color-zinc-400: #414868;
+    --color-zinc-500: #292e42;
+    --color-zinc-600: #24283b;
+    --color-zinc-700: #1f2335;
+    --color-zinc-800: #16161e;
+    --color-zinc-900: #0c0c0e;
     --color-zinc-950: #000000;
-    --accent-primary: #3760bf;
-    --accent-blue: #78a9ff;
-    --accent-red: #ff7a93;
-    --accent-green: #43bf6d;
-    --accent-content: #ffffff;
+    --accent-primary: #7dcfff;
+    --accent-secondary: #bb9af7;
+    --accent-error: #f7768e;
+    --accent-success: #9ece6a;
+    --accent-info: #2ac3de;
+    --accent-warning: #ff9e64;
+    --accent-content: #000000;
   }
 
+  /* --- Kanagawa Family --- */
   [data-theme='kanagawa'][data-flavor='wave'] {
     --color-zinc-50: #dcd7ba;
     --color-zinc-100: #c8c093;
@@ -135,9 +250,11 @@
     --color-zinc-900: #16161d;
     --color-zinc-950: #181616;
     --accent-primary: #7e9cd8;
-    --accent-blue: #7fb4ca;
-    --accent-red: #c34043;
-    --accent-green: #76946a;
+    --accent-secondary: #7fb4ca;
+    --accent-error: #c34043;
+    --accent-success: #76946a;
+    --accent-info: #658594;
+    --accent-warning: #ffa066;
     --accent-content: #16161d;
   }
 
@@ -154,9 +271,11 @@
     --color-zinc-900: #12120f;
     --color-zinc-950: #0d0c0c;
     --accent-primary: #8ba4b0;
-    --accent-blue: #8ba4b0;
-    --accent-red: #c4746e;
-    --accent-green: #8a9a7b;
+    --accent-secondary: #7aa89f;
+    --accent-error: #c4746e;
+    --accent-success: #8a9a7b;
+    --accent-info: #658594;
+    --accent-warning: #e6c384;
     --accent-content: #0d0c0c;
   }
 
@@ -171,15 +290,18 @@
     --color-zinc-700: #545464;
     --color-zinc-800: #43436c;
     --color-zinc-900: #1f1f28;
-    --color-zinc-950: #0d0c0c; /* Darker for better contrast on light backgrounds */
+    --color-zinc-950: #0d0c0c;
     --accent-primary: #5d57a3;
-    --accent-blue: #4d699b;
-    --accent-red: #c84053;
-    --accent-green: #6f894e;
+    --accent-secondary: #4d699b;
+    --accent-error: #c84053;
+    --accent-success: #6f894e;
+    --accent-info: #545464;
+    --accent-warning: #e98a00;
     --accent-content: #ffffff;
   }
 
-  [data-theme='dracula'][data-flavor='default'] {
+  /* --- Dracula --- */
+  [data-theme='dracula'][data-flavor='dark'] {
     --color-zinc-50: #f8f8f2;
     --color-zinc-100: #e2e2dc;
     --color-zinc-200: #b9b9b5;
@@ -192,13 +314,16 @@
     --color-zinc-900: #0c0c10;
     --color-zinc-950: #050507;
     --accent-primary: #bd93f9;
-    --accent-blue: #8be9fd;
-    --accent-red: #ff5555;
-    --accent-green: #50fa7b;
+    --accent-secondary: #ff79c6;
+    --accent-error: #ff5555;
+    --accent-success: #50fa7b;
+    --accent-info: #8be9fd;
+    --accent-warning: #f1fa8c;
     --accent-content: #0c0c10;
   }
 
-  [data-theme='nord'][data-flavor='default'] {
+  /* --- Nord --- */
+  [data-theme='nord'][data-flavor='dark'] {
     --color-zinc-50: #eceff4;
     --color-zinc-100: #e5e9f0;
     --color-zinc-200: #d8dee9;
@@ -211,13 +336,16 @@
     --color-zinc-900: #15181f;
     --color-zinc-950: #0c0e12;
     --accent-primary: #88c0d0;
-    --accent-blue: #81a1c1;
-    --accent-red: #bf616a;
-    --accent-green: #a3be8c;
+    --accent-secondary: #5e81ac;
+    --accent-error: #bf616a;
+    --accent-success: #a3be8c;
+    --accent-info: #81a1c1;
+    --accent-warning: #ebcb8b;
     --accent-content: #0c0e12;
   }
 
-  [data-theme='rose-pine'][data-flavor='default'] {
+  /* --- Rose Pine Family --- */
+  [data-theme='rose-pine'][data-flavor='dark'] {
     --color-zinc-50: #e0def4;
     --color-zinc-100: #908caa;
     --color-zinc-200: #6e6a86;
@@ -229,51 +357,123 @@
     --color-zinc-800: #110f19;
     --color-zinc-900: #09080d;
     --color-zinc-950: #050405;
-    --accent-primary: #eb6f92;
-    --accent-blue: #31748f;
-    --accent-red: #eb6f92;
-    --accent-green: #9ccfd8;
+    --accent-primary: #c4a7e7;
+    --accent-secondary: #9ccfd8;
+    --accent-error: #eb6f92;
+    --accent-success: #31748f;
+    --accent-info: #9ccfd8;
+    --accent-warning: #f6c177;
     --accent-content: #050405;
   }
 
-  [data-theme='one-dark-pro'][data-flavor='default'] {
+  [data-theme='rose-pine'][data-flavor='moon'] {
+    --color-zinc-50: #e0def4;
+    --color-zinc-100: #908caa;
+    --color-zinc-200: #817c9c;
+    --color-zinc-300: #6e6a86;
+    --color-zinc-400: #44415a;
+    --color-zinc-500: #393552;
+    --color-zinc-600: #2a273f;
+    --color-zinc-700: #232136;
+    --color-zinc-800: #1d1b29;
+    --color-zinc-900: #14121d;
+    --color-zinc-950: #0b0a0f;
+    --accent-primary: #c4a7e7;
+    --accent-secondary: #ea9a97;
+    --accent-error: #eb6f92;
+    --accent-success: #3e8fb0;
+    --accent-info: #9ccfd8;
+    --accent-warning: #f6c177;
+    --accent-content: #0b0a0f;
+  }
+
+  [data-theme='rose-pine'][data-flavor='dawn'] {
+    --color-zinc-50: #faf4ed;
+    --color-zinc-100: #fffaf3;
+    --color-zinc-200: #f2e9e1;
+    --color-zinc-300: #9893a5;
+    --color-zinc-400: #797593;
+    --color-zinc-500: #575279;
+    --color-zinc-600: #286983;
+    --color-zinc-700: #cecacd;
+    --color-zinc-800: #575279;
+    --color-zinc-900: #232136;
+    --color-zinc-950: #1f1d2e;
+    --accent-primary: #907aa9;
+    --accent-secondary: #d7827e;
+    --accent-error: #b4637a;
+    --accent-success: #286983;
+    --accent-info: #56949f;
+    --accent-warning: #ea9d34;
+    --accent-content: #ffffff;
+  }
+
+  /* --- One Dark/Light --- */
+  [data-theme='one-dark-pro'][data-flavor='dark'] {
     --color-zinc-50: #d7dae0;
     --color-zinc-100: #c2c7d0;
     --color-zinc-200: #abb3c0;
     --color-zinc-300: #949faf;
     --color-zinc-400: #7d8a9f;
-    --color-zinc-500: #5a6375;
-    --color-zinc-600: #484f5d;
-    --color-zinc-700: #373f4a;
-    --color-zinc-800: #292f3a;
-    --color-zinc-900: #1f2530;
-    --color-zinc-950: #161b24;
-    --accent-primary: #c678dd;
-    --accent-blue: #61afef;
-    --accent-red: #e06c75;
-    --accent-green: #98c379;
-    --accent-content: #0d1016;
+    --color-zinc-500: #5c6370;
+    --color-zinc-600: #4b5263;
+    --color-zinc-700: #3e4451;
+    --color-zinc-800: #282c34;
+    --color-zinc-900: #21252b;
+    --color-zinc-950: #181a1f;
+    --accent-primary: #61afef;
+    --accent-secondary: #c678dd;
+    --accent-error: #e06c75;
+    --accent-success: #98c379;
+    --accent-info: #56b6c2;
+    --accent-warning: #e5c07b;
+    --accent-content: #282c34;
   }
 
-  [data-theme='monokai-pro'][data-flavor='default'] {
-    --color-zinc-50: #f9f8f5;
-    --color-zinc-100: #edeadf;
-    --color-zinc-200: #dcd7c6;
-    --color-zinc-300: #cfc5ad;
-    --color-zinc-400: #b3a88b;
-    --color-zinc-500: #8f7f5b;
-    --color-zinc-600: #6f5f3f;
-    --color-zinc-700: #574931;
-    --color-zinc-800: #3f3524;
-    --color-zinc-900: #2a2418;
-    --color-zinc-950: #1d170f;
-    --accent-primary: #fc9867;
-    --accent-blue: #78dce8;
-    --accent-red: #ff6188;
-    --accent-green: #a9dc76;
-    --accent-content: #1d150d;
+  [data-theme='one-light'][data-flavor='light'] {
+    --color-zinc-50: #fafafa;
+    --color-zinc-100: #f0f0f0;
+    --color-zinc-200: #e5e5e6;
+    --color-zinc-300: #d0d0d0;
+    --color-zinc-400: #a0a1a7;
+    --color-zinc-500: #696c77;
+    --color-zinc-600: #383a42;
+    --color-zinc-700: #202227;
+    --color-zinc-800: #090a0b;
+    --color-zinc-900: #000000;
+    --color-zinc-950: #000000;
+    --accent-primary: #4078f2;
+    --accent-secondary: #a626a4;
+    --accent-error: #e45649;
+    --accent-success: #50a14f;
+    --accent-info: #0184bc;
+    --accent-warning: #c18401;
+    --accent-content: #ffffff;
   }
 
+  /* --- Monokai --- */
+  [data-theme='monokai'][data-flavor='classic'] {
+    --color-zinc-50: #f8f8f2;
+    --color-zinc-100: #e6e6e6;
+    --color-zinc-200: #cfcfc2;
+    --color-zinc-300: #75715e;
+    --color-zinc-400: #49483e;
+    --color-zinc-500: #3e3d32;
+    --color-zinc-600: #272822;
+    --color-zinc-700: #1e1f1c;
+    --color-zinc-800: #171814;
+    --color-zinc-900: #0f100d;
+    --color-zinc-950: #080806;
+    --accent-primary: #a6e22e;
+    --accent-secondary: #ae81ff;
+    --accent-error: #f92672;
+    --accent-success: #a6e22e;
+    --accent-info: #66d9ef;
+    --accent-warning: #fd971f;
+    --accent-content: #272822;
+  }
+
+  /* --- Gruvbox Family --- */
   [data-theme='gruvbox'][data-flavor='dark'] {
     --color-zinc-50: #ebdbb2;
     --color-zinc-100: #d5c4a1;
@@ -287,9 +487,11 @@
     --color-zinc-900: #141617;
     --color-zinc-950: #0b0d0c;
     --accent-primary: #fabd2f;
-    --accent-blue: #458588;
-    --accent-red: #fb4934;
-    --accent-green: #b8bb26;
+    --accent-secondary: #83a598;
+    --accent-error: #fb4934;
+    --accent-success: #b8bb26;
+    --accent-info: #83a598;
+    --accent-warning: #fe8019;
     --accent-content: #0b0d0c;
   }
 
@@ -306,54 +508,555 @@
     --color-zinc-900: #1d2021;
     --color-zinc-950: #0f1112;
     --accent-primary: #b57614;
-    --accent-blue: #076678;
-    --accent-red: #9d0006;
-    --accent-green: #79740e;
+    --accent-secondary: #076678;
+    --accent-error: #9d0006;
+    --accent-success: #79740e;
+    --accent-info: #427b58;
+    --accent-warning: #af3a03;
     --accent-content: #1d2021;
   }
 
+  /* --- Solarized Family --- */
   [data-theme='solarized'][data-flavor='dark'] {
     --color-zinc-50: #fdf6e3;
     --color-zinc-100: #eee8d5;
-    --color-zinc-200: #d8cfc0;
-    --color-zinc-300: #c2b89d;
-    --color-zinc-400: #9d9879;
-    --color-zinc-500: #657b83;
-    --color-zinc-600: #586e75;
-    --color-zinc-700: #455a63;
-    --color-zinc-800: #2f3a40;
-    --color-zinc-900: #1a2528;
-    --color-zinc-950: #0b1216;
+    --color-zinc-200: #93a1a1;
+    --color-zinc-300: #839496;
+    --color-zinc-400: #657b83;
+    --color-zinc-500: #586e75;
+    --color-zinc-600: #073642;
+    --color-zinc-700: #002b36;
+    --color-zinc-800: #00212b;
+    --color-zinc-900: #00181f;
+    --color-zinc-950: #000e12;
     --accent-primary: #268bd2;
-    --accent-blue: #268bd2;
-    --accent-red: #dc322f;
-    --accent-green: #859900;
-    --accent-content: #0b1216;
+    --accent-secondary: #6c71c4;
+    --accent-error: #dc322f;
+    --accent-success: #859900;
+    --accent-info: #2aa198;
+    --accent-warning: #b58900;
+    --accent-content: #000e12;
   }
 
   [data-theme='solarized'][data-flavor='light'] {
     --color-zinc-50: #fdf6e3;
     --color-zinc-100: #eee8d5;
-    --color-zinc-200: #e4ddc4;
-    --color-zinc-300: #d4c8a4;
-    --color-zinc-400: #c0b18a;
-    --color-zinc-500: #928b6a;
-    --color-zinc-600: #6e6852;
-    --color-zinc-700: #4c4838;
-    --color-zinc-800: #323026;
-    --color-zinc-900: #1c1a15;
-    --color-zinc-950: #0f0d0a;
+    --color-zinc-200: #93a1a1;
+    --color-zinc-300: #839496;
+    --color-zinc-400: #657b83;
+    --color-zinc-500: #586e75;
+    --color-zinc-600: #073642;
+    --color-zinc-700: #002b36;
+    --color-zinc-800: #001e26;
+    --color-zinc-900: #001116;
+    --color-zinc-950: #000506;
     --accent-primary: #268bd2;
-    --accent-blue: #2aa198;
-    --accent-red: #cb4b16;
-    --accent-green: #859900;
-    --accent-content: #0f0d0a;
+    --accent-secondary: #2aa198;
+    --accent-error: #cb4b16;
+    --accent-success: #859900;
+    --accent-info: #2aa198;
+    --accent-warning: #b58900;
+    --accent-content: #ffffff;
+  }
+
+  /* --- GitHub Family --- */
+  [data-theme='github'][data-flavor='dark'] {
+    --color-zinc-50: #c9d1d9;
+    --color-zinc-100: #b1bac4;
+    --color-zinc-200: #8b949e;
+    --color-zinc-300: #6e7681;
+    --color-zinc-400: #484f58;
+    --color-zinc-500: #30363d;
+    --color-zinc-600: #21262d;
+    --color-zinc-700: #161b22;
+    --color-zinc-800: #0d1117;
+    --color-zinc-900: #010409;
+    --color-zinc-950: #000000;
+    --accent-primary: #58a6ff;
+    --accent-secondary: #1f6feb;
+    --accent-error: #da3633;
+    --accent-success: #238636;
+    --accent-info: #3fb950;
+    --accent-warning: #d29922;
+    --accent-content: #0d1117;
+  }
+
+  [data-theme='github'][data-flavor='light'] {
+    --color-zinc-50: #ffffff;
+    --color-zinc-100: #f6f8fa;
+    --color-zinc-200: #eaeef2;
+    --color-zinc-300: #d0d7de;
+    --color-zinc-400: #afb8c1;
+    --color-zinc-500: #8c959f;
+    --color-zinc-600: #6e7781;
+    --color-zinc-700: #57606a;
+    --color-zinc-800: #424a53;
+    --color-zinc-900: #24292f;
+    --color-zinc-950: #000000;
+    --accent-primary: #0969da;
+    --accent-secondary: #bf3989;
+    --accent-error: #cf222e;
+    --accent-success: #1a7f37;
+    --accent-info: #2da44e;
+    --accent-warning: #bf8700;
+    --accent-content: #ffffff;
+  }
+
+  /* --- High Contrast --- */
+  [data-theme='high-contrast'][data-flavor='dark'] {
+    --color-zinc-50: #ffffff;
+    --color-zinc-100: #ffffff;
+    --color-zinc-200: #ffffff;
+    --color-zinc-300: #ffffff;
+    --color-zinc-400: #ffffff;
+    --color-zinc-500: #ffffff;
+    --color-zinc-600: #000000;
+    --color-zinc-700: #000000;
+    --color-zinc-800: #000000;
+    --color-zinc-900: #000000;
+    --color-zinc-950: #000000;
+    --accent-primary: #ffff00;
+    --accent-secondary: #00ffff;
+    --accent-error: #ff0000;
+    --accent-success: #00ff00;
+    --accent-info: #0000ff;
+    --accent-warning: #ff8800;
+    --accent-content: #000000;
+  }
+
+  [data-theme='high-contrast'][data-flavor='light'] {
+    --color-zinc-50: #ffffff;
+    --color-zinc-100: #ffffff;
+    --color-zinc-200: #ffffff;
+    --color-zinc-300: #ffffff;
+    --color-zinc-400: #000000;
+    --color-zinc-500: #000000;
+    --color-zinc-600: #000000;
+    --color-zinc-700: #000000;
+    --color-zinc-800: #000000;
+    --color-zinc-900: #000000;
+    --color-zinc-950: #000000;
+    --accent-primary: #0000ff;
+    --accent-secondary: #0088ff;
+    --accent-error: #ff0000;
+    --accent-success: #008800;
+    --accent-info: #0066cc;
+    --accent-warning: #ff8800;
+    --accent-content: #ffffff;
+  }
+
+  /* --- Ayu Family --- */
+  [data-theme='ayu'][data-flavor='dark'] {
+    --color-zinc-50: #e6e1cf;
+    --color-zinc-100: #d4d0c2;
+    --color-zinc-200: #bfbab0;
+    --color-zinc-300: #5c6773;
+    --color-zinc-400: #3e4b59;
+    --color-zinc-500: #1f2633;
+    --color-zinc-600: #131721;
+    --color-zinc-700: #0f1419;
+    --color-zinc-800: #0b0e12;
+    --color-zinc-900: #060709;
+    --color-zinc-950: #000000;
+    --accent-primary: #39bae6;
+    --accent-secondary: #ff8f40;
+    --accent-error: #ff3333;
+    --accent-success: #b8cc52;
+    --accent-info: #95e6cb;
+    --accent-warning: #e6b450;
+    --accent-content: #0f1419;
+  }
+
+  [data-theme='ayu'][data-flavor='mirage'] {
+    --color-zinc-50: #cccac2;
+    --color-zinc-100: #b8b6af;
+    --color-zinc-200: #a6a39d;
+    --color-zinc-300: #707a8c;
+    --color-zinc-400: #5c6773;
+    --color-zinc-500: #2b3243;
+    --color-zinc-600: #242936;
+    --color-zinc-700: #1f2430;
+    --color-zinc-800: #171b24;
+    --color-zinc-900: #0f1218;
+    --color-zinc-950: #06070a;
+    --accent-primary: #73d0ff;
+    --accent-secondary: #ffd173;
+    --accent-error: #f28779;
+    --accent-success: #d5ff80;
+    --accent-info: #95e6cb;
+    --accent-warning: #ffcc66;
+    --accent-content: #1f2430;
+  }
+
+  [data-theme='ayu'][data-flavor='light'] {
+    --color-zinc-50: #fafafa;
+    --color-zinc-100: #f3f4f5;
+    --color-zinc-200: #e7e7e8;
+    --color-zinc-300: #d8d9da;
+    --color-zinc-400: #abb0b6;
+    --color-zinc-500: #828a95;
+    --color-zinc-600: #6c737c;
+    --color-zinc-700: #5c6773;
+    --color-zinc-800: #3c4148;
+    --color-zinc-900: #1a1c1f;
+    --color-zinc-950: #000000;
+    --accent-primary: #55b4fa;
+    --accent-secondary: #f29718;
+    --accent-error: #ff3333;
+    --accent-success: #86b300;
+    --accent-info: #4cbf99;
+    --accent-warning: #fa8d3e;
+    --accent-content: #ffffff;
+  }
+
+  /* --- Material Family --- */
+  [data-theme='material'][data-flavor='dark'] {
+    --color-zinc-50: #e0e0e0;
+    --color-zinc-100: #bdbdbd;
+    --color-zinc-200: #9e9e9e;
+    --color-zinc-300: #757575;
+    --color-zinc-400: #616161;
+    --color-zinc-500: #424242;
+    --color-zinc-600: #2c2c2c;
+    --color-zinc-700: #212121;
+    --color-zinc-800: #1e1e1e;
+    --color-zinc-900: #121212;
+    --color-zinc-950: #000000;
+    --accent-primary: #bb86fc;
+    --accent-secondary: #03dac6;
+    --accent-error: #cf6679;
+    --accent-success: #03dac6;
+    --accent-info: #bb86fc;
+    --accent-warning: #ffb74d;
+    --accent-content: #121212;
+  }
+
+  [data-theme='material'][data-flavor='light'] {
+    --color-zinc-50: #ffffff;
+    --color-zinc-100: #f5f5f5;
+    --color-zinc-200: #e0e0e0;
+    --color-zinc-300: #bdbdbd;
+    --color-zinc-400: #9e9e9e;
+    --color-zinc-500: #757575;
+    --color-zinc-600: #616161;
+    --color-zinc-700: #424242;
+    --color-zinc-800: #212121;
+    --color-zinc-900: #202124;
+    --color-zinc-950: #000000;
+    --accent-primary: #6200ee;
+    --accent-secondary: #018786;
+    --accent-error: #b00020;
+    --accent-success: #2e7d32;
+    --accent-info: #0288d1;
+    --accent-warning: #ed6c02;
+    --accent-content: #ffffff;
+  }
+
+  /* --- Night Owl/Palenight --- */
+  [data-theme='night-owl'][data-flavor='dark'] {
+    --color-zinc-50: #d6deeb;
+    --color-zinc-100: #adbed6;
+    --color-zinc-200: #8aa4c4;
+    --color-zinc-300: #698ab0;
+    --color-zinc-400: #5f7e97;
+    --color-zinc-500: #405e78;
+    --color-zinc-600: #263e54;
+    --color-zinc-700: #0b2a45;
+    --color-zinc-800: #051d34;
+    --color-zinc-900: #011627;
+    --color-zinc-950: #000c17;
+    --accent-primary: #82aaff;
+    --accent-secondary: #7fdbca;
+    --accent-error: #ef5350;
+    --accent-success: #22da6e;
+    --accent-info: #21c7a8;
+    --accent-warning: #ffeb95;
+    --accent-content: #011627;
+  }
+
+  [data-theme='palenight'][data-flavor='dark'] {
+    --color-zinc-50: #bfc7d5;
+    --color-zinc-100: #acb6c8;
+    --color-zinc-200: #95a3ba;
+    --color-zinc-300: #676e95;
+    --color-zinc-400: #4e5579;
+    --color-zinc-500: #3a3f58;
+    --color-zinc-600: #32374d;
+    --color-zinc-700: #2f334d;
+    --color-zinc-800: #292d3e;
+    --color-zinc-900: #1e212e;
+    --color-zinc-950: #14161f;
+    --accent-primary: #82aaff;
+    --accent-secondary: #c792ea;
+    --accent-error: #f07178;
+    --accent-success: #c3e88d;
+    --accent-info: #89ddff;
+    --accent-warning: #ffcb6b;
+    --accent-content: #292d3e;
+  }
+
+  /* --- Cobalt2 --- */
+  [data-theme='cobalt2'][data-flavor='dark'] {
+    --color-zinc-50: #fff8e1;
+    --color-zinc-100: #d6e2ee;
+    --color-zinc-200: #aec5db;
+    --color-zinc-300: #8da1b9;
+    --color-zinc-400: #647d96;
+    --color-zinc-500: #3a5c7a;
+    --color-zinc-600: #1f4662;
+    --color-zinc-700: #1b3b54;
+    --color-zinc-800: #15232d;
+    --color-zinc-900: #193549;
+    --color-zinc-950: #0e1e2a;
+    --accent-primary: #ffc600;
+    --accent-secondary: #ff9d00;
+    --accent-error: #ff628c;
+    --accent-success: #3ad900;
+    --accent-info: #0088ff;
+    --accent-warning: #ff9d00;
+    --accent-content: #0e1e2a;
+  }
+
+  /* --- Everforest --- */
+  [data-theme='everforest'][data-flavor='dark'] {
+    --color-zinc-50: #d3c6aa;
+    --color-zinc-100: #c9bb9e;
+    --color-zinc-200: #a7c080;
+    --color-zinc-300: #859289;
+    --color-zinc-400: #555f58;
+    --color-zinc-500: #4f5b58;
+    --color-zinc-600: #3a454a;
+    --color-zinc-700: #333c43;
+    --color-zinc-800: #2d353b;
+    --color-zinc-900: #2b3339;
+    --color-zinc-950: #232a2e;
+    --accent-primary: #a7c080;
+    --accent-secondary: #d699b6;
+    --accent-error: #e67e80;
+    --accent-success: #a7c080;
+    --accent-info: #7fbbb3;
+    --accent-warning: #dbbc7f;
+    --accent-content: #2b3339;
+  }
+
+  [data-theme='everforest'][data-flavor='light'] {
+    --color-zinc-50: #f8f5e4;
+    --color-zinc-100: #f3ead3;
+    --color-zinc-200: #eae0c8;
+    --color-zinc-300: #d3c6aa;
+    --color-zinc-400: #aeb8b0;
+    --color-zinc-500: #8da3a6;
+    --color-zinc-600: #6c787a;
+    --color-zinc-700: #5c6a72;
+    --color-zinc-800: #424c52;
+    --color-zinc-900: #3a4146;
+    --color-zinc-950: #222629;
+    --accent-primary: #8da101;
+    --accent-secondary: #d3869b;
+    --accent-error: #f85552;
+    --accent-success: #35a77c;
+    --accent-info: #3a94c5;
+    --accent-warning: #dfa000;
+    --accent-content: #3a4146;
+  }
+
+  /* --- Papercolor --- */
+  [data-theme='papercolor'][data-flavor='light'] {
+    --color-zinc-50: #ffffff;
+    --color-zinc-100: #eeeeee;
+    --color-zinc-200: #d0d0d0;
+    --color-zinc-300: #b2b2b2;
+    --color-zinc-400: #808080;
+    --color-zinc-500: #5f5f5f;
+    --color-zinc-600: #444444;
+    --color-zinc-700: #1c1c1c;
+    --color-zinc-800: #101010;
+    --color-zinc-900: #050505;
+    --color-zinc-950: #000000;
+    --accent-primary: #005faf;
+    --accent-secondary: #d75f00;
+    --accent-error: #d70000;
+    --accent-success: #5f8700;
+    --accent-info: #0087af;
+    --accent-warning: #d75f00;
+    --accent-content: #ffffff;
+  }
+
+  [data-theme='papercolor'][data-flavor='dark'] {
+    --color-zinc-50: #eeeeee;
+    --color-zinc-100: #d0d0d0;
+    --color-zinc-200: #b2b2b2;
+    --color-zinc-300: #808080;
+    --color-zinc-400: #5f5f5f;
+    --color-zinc-500: #444444;
+    --color-zinc-600: #333333;
+    --color-zinc-700: #262626;
+    --color-zinc-800: #1c1c1c;
+    --color-zinc-900: #101010;
+    --color-zinc-950: #080808;
+    --accent-primary: #5fafd7;
+    --accent-secondary: #af87d7;
+    --accent-error: #d7005f;
+    --accent-success: #afd700;
+    --accent-info: #00afaf;
+    --accent-warning: #ffaf00;
+    --accent-content: #1c1c1c;
+  }
+
+  /* --- Synthwave/Cyberpunk Styles --- */
+  [data-theme='synthwave'][data-flavor='84'] {
+    --color-zinc-50: #f4f4f4;
+    --color-zinc-100: #e0d0f0;
+    --color-zinc-200: #bba0d8;
+    --color-zinc-300: #9979c1;
+    --color-zinc-400: #6f5898;
+    --color-zinc-500: #493b6e;
+    --color-zinc-600: #3a2f55;
+    --color-zinc-700: #34294f;
+    --color-zinc-800: #2b213a;
+    --color-zinc-900: #241b31;
+    --color-zinc-950: #1a1324;
+    --accent-primary: #ff7edb;
+    --accent-secondary: #36f9f6;
+    --accent-error: #fe4450;
+    --accent-success: #72f1b8;
+    --accent-info: #36f9f6;
+    --accent-warning: #fede5d;
+    --accent-content: #2b213a;
+  }
+
+  [data-theme='cyberpunk'][data-flavor='neon'] {
+    --color-zinc-50: #f0f0f0;
+    --color-zinc-100: #d4d4d4;
+    --color-zinc-200: #b0b0b0;
+    --color-zinc-300: #8c8c8c;
+    --color-zinc-400: #636363;
+    --color-zinc-500: #404040;
+    --color-zinc-600: #292929;
+    --color-zinc-700: #151515;
+    --color-zinc-800: #0a0a0f;
+    --color-zinc-900: #050508;
+    --color-zinc-950: #000000;
+    --accent-primary: #00e5ff;
+    --accent-secondary: #ff6ec7;
+    --accent-error: #ff0055;
+    --accent-success: #7cffcb;
+    --accent-info: #00e5ff;
+    --accent-warning: #fcee0a;
+    --accent-content: #0a0a0f;
+  }
+
+  /* --- Nature/Earthy Themes --- */
+  [data-theme='forest'][data-flavor='dark'] {
+    --color-zinc-50: #e0f4ea;
+    --color-zinc-100: #c1e0d0;
+    --color-zinc-200: #a3ccb8;
+    --color-zinc-300: #7aa290;
+    --color-zinc-400: #588070;
+    --color-zinc-500: #3e5e50;
+    --color-zinc-600: #29473a;
+    --color-zinc-700: #1c3a2e;
+    --color-zinc-800: #12281f;
+    --color-zinc-900: #0b1d16;
+    --color-zinc-950: #050f0b;
+    --accent-primary: #2d6a4f;
+    --accent-secondary: #95d5b2;
+    --accent-error: #e63946;
+    --accent-success: #52b788;
+    --accent-info: #40916c;
+    --accent-warning: #ffb703;
+    --accent-content: #e0f4ea;
+  }
+
+  [data-theme='oceanic'][data-flavor='next'] {
+    --color-zinc-50: #d8dee9;
+    --color-zinc-100: #c0c5ce;
+    --color-zinc-200: #a7adba;
+    --color-zinc-300: #65737e;
+    --color-zinc-400: #4f5b66;
+    --color-zinc-500: #343d46;
+    --color-zinc-600: #2a3b46;
+    --color-zinc-700: #243949;
+    --color-zinc-800: #1b2b34;
+    --color-zinc-900: #16242c;
+    --color-zinc-950: #0e171c;
+    --accent-primary: #6699cc;
+    --accent-secondary: #c594c5;
+    --accent-error: #ec5f67;
+    --accent-success: #99c794;
+    --accent-info: #5fb3b3;
+    --accent-warning: #fac863;
+    --accent-content: #1b2b34;
+  }
+
+  [data-theme='sandstorm'][data-flavor='dark'] {
+    --color-zinc-50: #e7dfc6;
+    --color-zinc-100: #d5ccb2;
+    --color-zinc-200: #bcae96;
+    --color-zinc-300: #9f8f76;
+    --color-zinc-400: #80705a;
+    --color-zinc-500: #605545;
+    --color-zinc-600: #453e35;
+    --color-zinc-700: #3a3334;
+    --color-zinc-800: #2b2627;
+    --color-zinc-900: #221e1f;
+    --color-zinc-950: #161314;
+    --accent-primary: #d4a373;
+    --accent-secondary: #e76f51;
+    --accent-error: #bc4749;
+    --accent-success: #a7c957;
+    --accent-info: #6a994e;
+    --accent-warning: #f2e8cf;
+    --accent-content: #221e1f;
+  }
+
+  /* --- Minimal/Clean Themes --- */
+  [data-theme='minimal'][data-flavor='light'] {
+    --color-zinc-50: #ffffff;
+    --color-zinc-100: #f7f7f8;
+    --color-zinc-200: #e5e7eb;
+    --color-zinc-300: #d1d5db;
+    --color-zinc-400: #9ca3af;
+    --color-zinc-500: #6b7280;
+    --color-zinc-600: #4b5563;
+    --color-zinc-700: #374151;
+    --color-zinc-800: #1f2937;
+    --color-zinc-900: #111113;
+    --color-zinc-950: #000000;
+    --accent-primary: #2563eb;
+    --accent-secondary: #000000;
+    --accent-error: #ef4444;
+    --accent-success: #10b981;
+    --accent-info: #3b82f6;
+    --accent-warning: #f59e0b;
+    --accent-content: #ffffff;
+  }
+
+  [data-theme='poimandres'][data-flavor='dark'] {
+    --color-zinc-50: #a6accd;
+    --color-zinc-100: #9398b7;
+    --color-zinc-200: #767c9d;
+    --color-zinc-300: #5a5f80;
+    --color-zinc-400: #464b66;
+    --color-zinc-500: #303550;
+    --color-zinc-600: #252b45;
+    --color-zinc-700: #1a2040;
+    --color-zinc-800: #0f1533;
+    --color-zinc-900: #0b1021;
+    --color-zinc-950: #060914;
+    --accent-primary: #5de4c7;
+    --accent-secondary: #89ddff;
+    --accent-error: #d0679d;
+    --accent-success: #5de4c7;
+    --accent-info: #add7ff;
+    --accent-warning: #fffac2;
+    --accent-content: #0b1021;
   }
 
   /* ====================================================
-       UK AUTHENTIC DESIGN SYSTEMS
+       UK AUTHENTIC DESIGN SYSTEMS (Preserved)
      ==================================================== */
-  [data-theme='gov-uk'][data-flavor='default'] {
+  [data-theme='gov-uk'][data-flavor='light'] {
     --color-zinc-50: #ffffff;
     --color-zinc-100: #f3f2f1;
     --color-zinc-200: #e5e5e5;
@@ -366,13 +1069,15 @@
     --color-zinc-900: #050505;
     --color-zinc-950: #010101;
     --accent-primary: #1d70b8;
-    --accent-blue: #003078;
-    --accent-red: #d4351c;
-    --accent-green: #00703c;
+    --accent-secondary: #003078;
+    --accent-error: #d4351c;
+    --accent-success: #00703c;
+    --accent-info: #0ea5e9;
+    --accent-warning: #f59e0b;
     --accent-content: #ffffff;
   }
 
-  [data-theme='transport-for-london'][data-flavor='default'] {
+  [data-theme='transport-for-london'][data-flavor='light'] {
     --color-zinc-50: #f5f7ff;
     --color-zinc-100: #e1e5ff;
     --color-zinc-200: #c8cff6;
@@ -385,13 +1090,15 @@
     --color-zinc-900: #0d1430;
     --color-zinc-950: #050a1a;
     --accent-primary: #0019a8;
-    --accent-blue: #0057b7;
-    --accent-red: #e21836;
-    --accent-green: #00a77e;
+    --accent-secondary: #0057b7;
+    --accent-error: #e21836;
+    --accent-success: #00a77e;
+    --accent-info: #0ea5e9;
+    --accent-warning: #f59e0b;
     --accent-content: #ffffff;
   }
 
-  [data-theme='nhs-digital'][data-flavor='default'] {
+  [data-theme='nhs-digital'][data-flavor='light'] {
     --color-zinc-50: #ffffff;
     --color-zinc-100: #f0f4f5;
     --color-zinc-200: #d8dde0;
@@ -404,13 +1111,15 @@
     --color-zinc-900: #003087;
     --color-zinc-950: #002f5c;
     --accent-primary: #005eb8;
-    --accent-blue: #0072ce;
-    --accent-red: #da291c;
-    --accent-green: #007f3b;
+    --accent-secondary: #0072ce;
+    --accent-error: #da291c;
+    --accent-success: #007f3b;
+    --accent-info: #0ea5e9;
+    --accent-warning: #f59e0b;
     --accent-content: #ffffff;
   }
 
-  [data-theme='financial-times'][data-flavor='default'] {
+  [data-theme='financial-times'][data-flavor='light'] {
     --color-zinc-50: #fff1e5;
     --color-zinc-100: #f2dfce;
     --color-zinc-200: #e9decf;
@@ -423,13 +1132,15 @@
     --color-zinc-900: #1a1716;
     --color-zinc-950: #0d0b0a;
     --accent-primary: #990f3d;
-    --accent-blue: #0d7680;
-    --accent-red: #cc3d27;
-    --accent-green: #4a7b5c;
+    --accent-secondary: #0d7680;
+    --accent-error: #cc3d27;
+    --accent-success: #4a7b5c;
+    --accent-info: #0ea5e9;
+    --accent-warning: #f59e0b;
     --accent-content: #ffffff;
   }
 
-  [data-theme='the-guardian'][data-flavor='default'] {
+  [data-theme='the-guardian'][data-flavor='light'] {
     --color-zinc-50: #ffffff;
     --color-zinc-100: #f6f6f6;
     --color-zinc-200: #ededed;
@@ -442,9 +1153,11 @@
     --color-zinc-900: #041f4a;
     --color-zinc-950: #021029;
     --accent-primary: #052962;
-    --accent-blue: #1144a6;
-    --accent-red: #c70000;
-    --accent-green: #00a957;
+    --accent-secondary: #1144a6;
+    --accent-error: #c70000;
+    --accent-success: #00a957;
+    --accent-info: #0ea5e9;
+    --accent-warning: #f59e0b;
     --accent-content: #ffe500;
   }
 
@@ -458,25 +1171,39 @@
     --accent-filament-gray-500: var(--accent-primary);
   }
 
-  [data-accent='blue'] {
-    --color-accent: var(--accent-blue);
+  [data-accent='secondary'] {
+    --color-accent: var(--accent-secondary);
     --color-accent-foreground: var(--accent-content);
-    --accent-flux-zinc-500: var(--accent-blue);
-    --accent-filament-gray-500: var(--accent-blue);
+    --accent-flux-zinc-500: var(--accent-secondary);
+    --accent-filament-gray-500: var(--accent-secondary);
   }
 
-  [data-accent='red'] {
-    --color-accent: var(--accent-red);
+  [data-accent='info'] {
+    --color-accent: var(--accent-info);
     --color-accent-foreground: var(--accent-content);
-    --accent-flux-zinc-500: var(--accent-red);
-    --accent-filament-gray-500: var(--accent-red);
+    --accent-flux-zinc-500: var(--accent-info);
+    --accent-filament-gray-500: var(--accent-info);
   }
 
-  [data-accent='green'] {
-    --color-accent: var(--accent-green);
+  [data-accent='warning'] {
+    --color-accent: var(--accent-warning);
     --color-accent-foreground: var(--accent-content);
-    --accent-flux-zinc-500: var(--accent-green);
-    --accent-filament-gray-500: var(--accent-green);
+    --accent-flux-zinc-500: var(--accent-warning);
+    --accent-filament-gray-500: var(--accent-warning);
+  }
+
+  [data-accent='error'] {
+    --color-accent: var(--accent-error);
+    --color-accent-foreground: var(--accent-content);
+    --accent-flux-zinc-500: var(--accent-error);
+    --accent-filament-gray-500: var(--accent-error);
+  }
+
+  [data-accent='success'] {
+    --color-accent: var(--accent-success);
+    --color-accent-foreground: var(--accent-content);
+    --accent-flux-zinc-500: var(--accent-success);
+    --accent-filament-gray-500: var(--accent-success);
   }
 
   :root {
@@ -485,91 +1212,221 @@
     --color-accent-content: var(--accent-content);
   }
 
-  /* Light mode overrides - dark text on light backgrounds for WCAG AA contrast */
-  /* These selectors have higher specificity than :root, so they override the default dark theme colors */
+  /* ====================================================
+       LIGHT MODE CONTRAST OVERRIDES
+     ==================================================== */
+  /*
+     All light-flavor themes must be listed here to ensure correct
+     text contrast on light backgrounds.
+  */
+  [data-theme='default'][data-flavor='light'],
   [data-theme='catppuccin'][data-flavor='latte'],
-  [data-theme='kanagawa'][data-flavor='lotus'] {
+  [data-theme='kanagawa'][data-flavor='lotus'],
+  [data-theme='gruvbox'][data-flavor='light'],
+  [data-theme='solarized'][data-flavor='light'],
+  [data-theme='github'][data-flavor='light'],
+  [data-theme='ayu'][data-flavor='light'],
+  [data-theme='material'][data-flavor='light'],
+  [data-theme='everforest'][data-flavor='light'],
+  [data-theme='papercolor'][data-flavor='light'],
+  [data-theme='one-light'][data-flavor='light'],
+  [data-theme='minimal'][data-flavor='light'],
+  [data-theme='rose-pine'][data-flavor='dawn'],
+  [data-theme='gov-uk'][data-flavor='light'],
+  [data-theme='transport-for-london'][data-flavor='light'],
+  [data-theme='nhs-digital'][data-flavor='light'],
+  [data-theme='financial-times'][data-flavor='light'],
+  [data-theme='the-guardian'][data-flavor='light'] {
     background-color: var(--color-zinc-50);
-    color: var(--color-zinc-950); /* Use darkest color for maximum contrast */
-  }
-
-  /* Light mode text color overrides for common utility classes */
-  /* Override light text colors (50-300) to use dark colors for proper contrast */
-  [data-theme='catppuccin'][data-flavor='latte'] .text-gray-50,
-  [data-theme='kanagawa'][data-flavor='lotus'] .text-gray-50,
-  [data-theme='catppuccin'][data-flavor='latte'] .text-zinc-50,
-  [data-theme='kanagawa'][data-flavor='lotus'] .text-zinc-50,
-  [data-theme='catppuccin'][data-flavor='latte'] .text-gray-100,
-  [data-theme='kanagawa'][data-flavor='lotus'] .text-gray-100,
-  [data-theme='catppuccin'][data-flavor='latte'] .text-zinc-100,
-  [data-theme='kanagawa'][data-flavor='lotus'] .text-zinc-100,
-  [data-theme='catppuccin'][data-flavor='latte'] .text-gray-200,
-  [data-theme='kanagawa'][data-flavor='lotus'] .text-gray-200,
-  [data-theme='catppuccin'][data-flavor='latte'] .text-zinc-200,
-  [data-theme='kanagawa'][data-flavor='lotus'] .text-zinc-200,
-  [data-theme='catppuccin'][data-flavor='latte'] .text-gray-300,
-  [data-theme='kanagawa'][data-flavor='lotus'] .text-gray-300,
-  [data-theme='catppuccin'][data-flavor='latte'] .text-zinc-300,
-  [data-theme='kanagawa'][data-flavor='lotus'] .text-zinc-300 {
     color: var(--color-zinc-950);
   }
 
-  /* Medium text colors (400-500) - use darker shades for better contrast */
-  [data-theme='catppuccin'][data-flavor='latte'] .text-gray-400,
-  [data-theme='kanagawa'][data-flavor='lotus'] .text-gray-400,
-  [data-theme='catppuccin'][data-flavor='latte'] .text-zinc-400,
-  [data-theme='kanagawa'][data-flavor='lotus'] .text-zinc-400 {
-    color: var(--color-zinc-700);
+  /* Utility class text color swaps for light themes */
+  /* Selectors must include all light themes from above */
+  :is(
+    [data-theme='default'][data-flavor='light'],
+    [data-theme='catppuccin'][data-flavor='latte'],
+    [data-theme='kanagawa'][data-flavor='lotus'],
+    [data-theme='gruvbox'][data-flavor='light'],
+    [data-theme='solarized'][data-flavor='light'],
+    [data-theme='github'][data-flavor='light'],
+    [data-theme='ayu'][data-flavor='light'],
+    [data-theme='material'][data-flavor='light'],
+    [data-theme='everforest'][data-flavor='light'],
+    [data-theme='papercolor'][data-flavor='light'],
+    [data-theme='one-light'][data-flavor='light'],
+    [data-theme='minimal'][data-flavor='light'],
+    [data-theme='rose-pine'][data-flavor='dawn'],
+    [data-theme='gov-uk'][data-flavor='light'],
+    [data-theme='transport-for-london'][data-flavor='light'],
+    [data-theme='nhs-digital'][data-flavor='light'],
+    [data-theme='financial-times'][data-flavor='light'],
+    [data-theme='the-guardian'][data-flavor='light']
+  ) {
+    /* Swap light text (50-300) to dark */
+    & .text-gray-50,
+    & .text-zinc-50,
+    & .text-gray-100,
+    & .text-zinc-100,
+    & .text-gray-200,
+    & .text-zinc-200,
+    & .text-gray-300,
+    & .text-zinc-300 {
+      color: var(--color-zinc-950);
+    }
+
+    /* Swap medium text (400) to semi-dark */
+    & .text-gray-400,
+    & .text-zinc-400 {
+      color: var(--color-zinc-700);
+    }
+
+    /* Swap medium text (500) to darker */
+    & .text-gray-500,
+    & .text-zinc-500 {
+      color: var(--color-zinc-800);
+    }
+
+    /* Swap dark text (600) to darkest */
+    & .text-gray-600,
+    & .text-zinc-600 {
+      color: var(--color-zinc-900);
+    }
+
+    /* Ensure Dark Mode text classes still work if .dark class is missing but needed */
+    &:not(.dark) {
+      & .dark\:text-gray-400,
+      & .dark\:text-zinc-400 {
+        color: var(--color-zinc-700);
+      }
+    }
+
+    /* Element resets */
+    & h1,
+    & h2,
+    & h3,
+    & label:not([class*='text-']),
+    & span:not([class*='text-']) {
+      color: var(--color-zinc-950);
+    }
   }
 
-  [data-theme='catppuccin'][data-flavor='latte'] .text-gray-500,
-  [data-theme='kanagawa'][data-flavor='lotus'] .text-gray-500,
-  [data-theme='catppuccin'][data-flavor='latte'] .text-zinc-500,
-  [data-theme='kanagawa'][data-flavor='lotus'] .text-zinc-500 {
-    color: var(--color-zinc-800);
+  /* Accent Button Styling */
+  /* Accent button styling - uses CSS variables to avoid CSP issues with inline styles */
+  /* These styles are defined within @layer theme so they inherit CSS variables from theme selectors */
+  .accent-button {
+    background-color: var(--accent-primary, #cba6f7) !important;
+    border-color: var(--accent-primary, #cba6f7) !important;
   }
 
-  /* Dark text colors (600+) - already dark, but ensure they're dark enough */
-  [data-theme='catppuccin'][data-flavor='latte'] .text-gray-600,
-  [data-theme='kanagawa'][data-flavor='lotus'] .text-gray-600,
-  [data-theme='catppuccin'][data-flavor='latte'] .text-zinc-600,
-  [data-theme='kanagawa'][data-flavor='lotus'] .text-zinc-600 {
-    color: var(--color-zinc-900);
+  .accent-button[data-accent-type='primary'] {
+    background-color: var(--accent-primary, #cba6f7) !important;
+    border-color: var(--accent-primary, #cba6f7) !important;
   }
 
-  /* Override dark: variants for light themes - these should not apply when .dark class is removed */
-  /* But we add these as a safety net in case dark class is still present */
-  [data-theme='catppuccin'][data-flavor='latte']:not(.dark) .dark\:text-gray-400,
-  [data-theme='kanagawa'][data-flavor='lotus']:not(.dark) .dark\:text-gray-400,
-  [data-theme='catppuccin'][data-flavor='latte']:not(.dark) .dark\:text-zinc-400,
-  [data-theme='kanagawa'][data-flavor='lotus']:not(.dark) .dark\:text-zinc-400 {
-    color: var(--color-zinc-700);
+  .accent-button[data-accent-type='secondary'] {
+    background-color: var(--accent-secondary, #89b4fa) !important;
+    border-color: var(--accent-secondary, #89b4fa) !important;
   }
 
-  /* Ensure headings and common text elements use dark colors in light mode */
-  [data-theme='catppuccin'][data-flavor='latte'] h1,
-  [data-theme='kanagawa'][data-flavor='lotus'] h1,
-  [data-theme='catppuccin'][data-flavor='latte'] h2,
-  [data-theme='kanagawa'][data-flavor='lotus'] h2,
-  [data-theme='catppuccin'][data-flavor='latte'] h3,
-  [data-theme='kanagawa'][data-flavor='lotus'] h3 {
-    color: var(--color-zinc-950);
+  .accent-button[data-accent-type='info'] {
+    background-color: var(--accent-info, #06b6d4) !important;
+    border-color: var(--accent-info, #06b6d4) !important;
   }
 
-  /* Ensure labels and spans without explicit color classes use dark text */
-  [data-theme='catppuccin'][data-flavor='latte'] label:not([class*='text-']),
-  [data-theme='kanagawa'][data-flavor='lotus'] label:not([class*='text-']),
-  [data-theme='catppuccin'][data-flavor='latte'] span:not([class*='text-']),
-  [data-theme='kanagawa'][data-flavor='lotus'] span:not([class*='text-']) {
-    color: var(--color-zinc-950);
+  .accent-button[data-accent-type='warning'] {
+    background-color: var(--accent-warning, #eab308) !important;
+    border-color: var(--accent-warning, #eab308) !important;
   }
 
-  /* Accent selection button selected state - use accent color for border and background */
-  [data-accent='primary'] label[data-accent-option='primary'].accent-selected,
-  [data-accent='blue'] label[data-accent-option='blue'].accent-selected,
-  [data-accent='red'] label[data-accent-option='red'].accent-selected,
-  [data-accent='green'] label[data-accent-option='green'].accent-selected {
-    border-color: var(--color-accent);
-    background-color: color-mix(in srgb, var(--color-accent) 20%, transparent);
+  .accent-button[data-accent-type='error'] {
+    background-color: var(--accent-error, #f38ba8) !important;
+    border-color: var(--accent-error, #f38ba8) !important;
+  }
+
+  .accent-button[data-accent-type='success'] {
+    background-color: var(--accent-success, #a6e3a1) !important;
+    border-color: var(--accent-success, #a6e3a1) !important;
+  }
+
+  .accent-button-text {
+    color: var(--accent-content, #ffffff);
+  }
+
+  .accent-button.accent-selected {
+    ring-color: var(--accent-primary, #cba6f7);
+  }
+
+  .accent-button[data-accent-type='primary'].accent-selected {
+    ring-color: var(--accent-primary, #cba6f7);
+  }
+
+  .accent-button[data-accent-type='secondary'].accent-selected {
+    ring-color: var(--accent-secondary, #89b4fa);
+  }
+
+  .accent-button[data-accent-type='info'].accent-selected {
+    ring-color: var(--accent-info, #06b6d4);
+  }
+
+  .accent-button[data-accent-type='warning'].accent-selected {
+    ring-color: var(--accent-warning, #eab308);
+  }
+
+  .accent-button[data-accent-type='error'].accent-selected {
+    ring-color: var(--accent-error, #f38ba8);
+  }
+
+  .accent-button[data-accent-type='success'].accent-selected {
+    ring-color: var(--accent-success, #a6e3a1);
+  }
+
+  /* ====================================================
+     FLAVOR BUTTON STYLING
+     Uses hardcoded colors following Tailwind standard pattern:
+     - Light mode: light background (#fafafa), dark text (#18181b)
+     - Dark mode: dark background (#3f3f46), light text (#fafafa)
+     This avoids issues with themes that redefine zinc scale.
+     ==================================================== */
+
+  /* Light mode - explicit selector to prevent CSS optimizer merging */
+  html:not(.dark) .flavor-button {
+    border-color: #d4d4d8; /* zinc-300 */
+    background-color: #fafafa; /* zinc-50 - always light */
+  }
+
+  html:not(.dark) .flavor-button-text {
+    color: #18181b; /* zinc-900 - always dark text on light bg */
+  }
+
+  /* Selected state - light mode */
+  html:not(.dark) .flavor-button.flavor-selected {
+    border-color: var(--accent-primary, #3b82f6);
+    background-color: color-mix(in srgb, var(--accent-primary, #3b82f6) 15%, #fafafa);
+    ring-color: var(--accent-primary, #3b82f6);
+  }
+
+  html:not(.dark) .flavor-button.flavor-selected .flavor-button-text {
+    color: #18181b; /* dark text on light accent-tinted bg */
+  }
+
+  /* Dark mode - explicit selector */
+  html.dark .flavor-button {
+    border-color: #52525b; /* zinc-600 */
+    background-color: #3f3f46; /* zinc-700 - always dark */
+  }
+
+  html.dark .flavor-button-text {
+    color: #fafafa; /* zinc-50 - always light text on dark bg */
+  }
+
+  html.dark .flavor-button.flavor-selected {
+    border-color: var(--accent-primary, #3b82f6);
+    background-color: color-mix(in srgb, var(--accent-primary, #3b82f6) 20%, #27272a);
+    ring-color: var(--accent-primary, #3b82f6);
+  }
+
+  html.dark .flavor-button.flavor-selected .flavor-button-text {
+    color: #fafafa; /* light text on dark accent-tinted bg */
   }
 }

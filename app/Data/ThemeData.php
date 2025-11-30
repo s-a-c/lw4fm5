@@ -19,9 +19,16 @@ final class ThemeData extends Data
 
     public function isLight(): bool
     {
-        // None theme (system default) - let OS/browser preference control
-        if ($this->theme === Theme::None) {
-            return false; // Default to dark, but OS preference will override
+        // Default theme with System flavor - check OS/browser preference
+        if ($this->theme === Theme::Default && $this->flavor === ThemeFlavor::System) {
+            // Check prefers-color-scheme media query via JavaScript
+            // For server-side rendering, default to false (dark) but JavaScript will override
+            return false;
+        }
+
+        // Default theme with explicit Light/Dark flavor
+        if ($this->theme === Theme::Default) {
+            return $this->flavor === ThemeFlavor::Light;
         }
 
         // Light-only themes (single-flavor themes that are always light)

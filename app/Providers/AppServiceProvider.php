@@ -22,6 +22,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
@@ -67,16 +68,26 @@ final class AppServiceProvider extends ServiceProvider
                 $sessionFlavor = $request->query('flavor') ?? session('preview_flavor');
                 $sessionAccent = $request->query('accent') ?? session('preview_accent');
 
-                // Handle 'none' theme specially - it doesn't require flavor/accent
+                // Handle 'default' theme - it has Light, Dark, System flavors and accents
                 if ($sessionTheme) {
                     $theme = Theme::tryFrom($sessionTheme);
 
-                    if ($theme === Theme::None) {
-                        // None theme doesn't need flavor/accent
+                    if ($theme === Theme::Default) {
+                        // Default theme has Light, Dark, System flavors
+                        // Default to System if no flavor specified
+                        $defaultFlavor = $sessionFlavor ? ThemeFlavor::tryFrom($sessionFlavor) : ThemeFlavor::System;
+                        if (! $defaultFlavor || ! in_array($defaultFlavor, Theme::Default->flavors(), true)) {
+                            $defaultFlavor = ThemeFlavor::System;
+                        }
+                        // Default theme uses accents like other themes
+                        $defaultAccent = $sessionAccent ? ThemeAccent::tryFrom($sessionAccent) : ThemeAccent::Primary;
+                        if (! $defaultAccent) {
+                            $defaultAccent = ThemeAccent::Primary;
+                        }
                         $settings = new UserSettingsData(
-                            theme: Theme::None,
-                            flavor: ThemeFlavor::Default, // Placeholder, not used
-                            accent: ThemeAccent::Primary, // Placeholder, not used
+                            theme: Theme::Default,
+                            flavor: $defaultFlavor,
+                            accent: $defaultAccent,
                         );
                     } elseif ($sessionFlavor && $sessionAccent) {
                         // Other themes require flavor and accent
@@ -96,9 +107,9 @@ final class AppServiceProvider extends ServiceProvider
 
             $themeData = $themeService->resolveThemeData($settings);
 
-            // DEBUG: Log for 'none' theme in testing
-            if (app()->environment('testing') && $themeData->theme === Theme::None) {
-                \Log::info('View Composer - None theme resolved', [
+            // DEBUG: Log for 'default' theme in testing
+            if (app()->environment('testing') && $themeData->theme === Theme::Default) {
+                Log::info('View Composer - Default theme resolved', [
                     'theme' => $themeData->theme->value,
                     'flavor' => $themeData->flavor->value,
                     'accent' => $themeData->accent->value,

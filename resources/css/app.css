@@ -1,125 +1,199 @@
 /**
- * trunk-ignore-all(prettier)
- *
- * @format
- */
+* trunk-ignore-all(prettier)
+*
+* @format
+*/
 
 @import 'tailwindcss';
 @import '../../vendor/livewire/flux/dist/flux.css';
-/* 1. THEME EXTRAS (Animations, Gradients) */
+
+/* Filament base theme (required for Filament panels) */
+@import '../../vendor/filament/filament/resources/css/theme.css';
+
+/* 1. THEMES */
+@import './themes/all-themes.css';
+
+/* 2. THEME EXTRAS (Animations, Gradients) */
 @import './catppuccin.css';
 @import './kanagawa.css';
-@import './themes/all-themes.css';
-/* 2. TAILWIND PLUGINS (Catppuccin) */
-/* Kanagawa is defined manually below as there is no standard v4 plugin yet */
+
+/* 3. TAILWIND PLUGINS (Catppuccin) */
 @import '@catppuccin/tailwindcss/frappe.css';
 @import '@catppuccin/tailwindcss/macchiato.css';
 @import '@catppuccin/tailwindcss/mocha.css';
-/* 3. SOURCES (JIT Detection) */
+
+/* 4. SOURCES (JIT Detection) */
 @source "../views";
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
 @source "../../vendor/livewire/flux-pro/stubs/**/*.blade.php";
 @source "../../vendor/livewire/flux/stubs/**/*.blade.php";
 @source "../../vendor/filament/**/*.blade.php";
-/* Essential for Filament v4/v5 */
+
+/* 5. Filament-specific sources */
+@source "../../app/Filament/Admin/**/*";
+@source "../../app/Filament/Filament/**/*";
+@source "../views/filament/admin/**/*";
+@source "../views/filament/filament/**/*";
+
+/* 6. Essential for Filament v4/v5 */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* 7. TRANSITIONS */
 :root {
-  transition:
-    background-color 150ms ease-out,
-    color 150ms ease-out;
+    transition:
+        background-color 150ms ease-out,
+        color 150ms ease-out;
 }
 
 .theme-transition {
-  @apply transition-colors duration-150 ease-out;
+    @apply transition-colors duration-150 ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :root {
-    transition-duration: 500ms !important;
-    transition-timing-function: ease-in-out !important;
-  }
+    :root {
+        transition-duration: 500ms !important;
+        transition-timing-function: ease-in-out !important;
+    }
 
-  .theme-transition {
-    @apply duration-500 ease-in-out;
-  }
+    .theme-transition {
+        @apply duration-500 ease-in-out;
+    }
 }
 
 @theme {
-  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
-  /* ====================================================
-       THE ZINC BRIDGE
-       ====================================================
-       Flux uses 'zinc'. Filament uses 'gray'.
-       We map 'gray' to 'zinc', then we map 'zinc' to the
-       active theme colors. This syncs both frameworks.
-    */
-  --color-gray-50: var(--color-zinc-50);
-  --color-gray-100: var(--color-zinc-100);
-  --color-gray-200: var(--color-zinc-200);
-  --color-gray-300: var(--color-zinc-300);
-  --color-gray-400: var(--color-zinc-400);
-  --color-gray-500: var(--color-zinc-500);
-  --color-gray-600: var(--color-zinc-600);
-  --color-gray-700: var(--color-zinc-700);
-  --color-gray-800: var(--color-zinc-800);
-  --color-gray-900: var(--color-zinc-900);
-  --color-gray-950: var(--color-zinc-950);
-  /* Filament v4 Specific Background Variables */
-  --color-gray-950: var(--color-zinc-950);
-  /* Main Background */
-  --color-gray-900: var(--color-zinc-900);
-  /* Sidebar/Component Background */
-  /* Default Zinc Fallback (Standard Tailwind Zinc) */
-  --color-zinc-50: #fafafa;
-  --color-zinc-100: #f5f5f5;
-  --color-zinc-200: #e5e5e5;
-  --color-zinc-300: #d4d4d4;
-  --color-zinc-400: #a3a3a3;
-  --color-zinc-500: #737373;
-  --color-zinc-600: #525252;
-  --color-zinc-700: #404040;
-  --color-zinc-800: #262626;
-  --color-zinc-900: #171717;
-  --color-zinc-950: #0a0a0a;
-  /* Generic Accent Variable (Default) */
-  --color-accent: var(--color-zinc-900);
-  --color-accent-content: #ffffff;
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    /* ====================================================
+THE ZINC BRIDGE
+====================================================
+Flux uses 'zinc'. Filament uses 'gray'.
+We map 'gray' to 'zinc', then we map 'zinc' to the
+active theme colors. This syncs both frameworks.
+*/
+    --color-gray-50: var(--color-zinc-50);
+    --color-gray-100: var(--color-zinc-100);
+    --color-gray-200: var(--color-zinc-200);
+    --color-gray-300: var(--color-zinc-300);
+    --color-gray-400: var(--color-zinc-400);
+    --color-gray-500: var(--color-zinc-500);
+    --color-gray-600: var(--color-zinc-600);
+    --color-gray-700: var(--color-zinc-700);
+    --color-gray-800: var(--color-zinc-800);
+    --color-gray-900: var(--color-zinc-900); /* Main Background */
+    --color-gray-950: var(--color-zinc-950);
+
+    /* Sidebar/Component Background */
+    /* Default Zinc Fallback (Standard Tailwind Zinc) */
+    --color-zinc-50: #fafafa;
+    --color-zinc-100: #f5f5f5;
+    --color-zinc-200: #e5e5e5;
+    --color-zinc-300: #d4d4d4;
+    --color-zinc-400: #a3a3a3;
+    --color-zinc-500: #737373;
+    --color-zinc-600: #525252;
+    --color-zinc-700: #404040;
+    --color-zinc-800: #262626;
+    --color-zinc-900: #171717;
+    --color-zinc-950: #0a0a0a;
+
+    /* Generic Accent Variable (Default) */
+    --color-accent: var(--color-zinc-900);
+    --color-accent-content: #ffffff;
 }
 
 /* Helper utilities for Flux components */
 [data-flux-field]:not(ui-radio, ui-checkbox) {
-  @apply grid gap-2;
+    @apply grid gap-2;
 }
 
 [data-flux-label] {
-  @apply mb-0 !leading-tight;
+    @apply mb-0 !leading-tight;
 }
 
 [data-theme-choice] {
-  @apply min-h-[44px] min-w-[44px];
+    @apply min-h-[44px] min-w-[44px];
 }
 
 /* Focus visibility for theme controls (T013f, FR-024) */
 [data-theme-choice]:focus-visible {
-  @apply outline-2 outline-offset-2 outline-accent ring-2 ring-accent ring-offset-2;
+    @apply outline-2 outline-offset-2 outline-accent ring-2 ring-accent ring-offset-2;
+}
+
+/* Enhanced visual feedback for selected theme options on appearance settings page */
+/* Theme selection - add ring and background highlight for selected theme */
+[data-theme-choice='theme'][data-checked] {
+    @apply ring-2 ring-offset-2 bg-zinc-100 dark:bg-zinc-800 font-semibold;
+    --tw-ring-color: var(--color-accent, var(--accent-primary, #3b82f6));
+    --tw-ring-width: 2px;
+}
+
+/* Flavor selection - add ring and background highlight for selected flavor */
+[data-theme-choice='flavor'][data-checked] {
+    @apply ring-2 ring-offset-2 bg-zinc-100 dark:bg-zinc-800 font-semibold;
+    --tw-ring-color: var(--color-accent, var(--accent-primary, #3b82f6));
+    --tw-ring-width: 2px;
+}
+
+/* Accent selection - enhance selected accent button with ring */
+[data-theme-choice='accent'][data-checked] {
+    @apply ring-2 ring-offset-2 font-semibold;
+    --tw-ring-color: var(--color-accent, var(--accent-primary, #3b82f6));
+    --tw-ring-width: 2px;
+}
+
+/* Enhanced styling for accent color swatches in cards */
+[data-theme-choice='accent'] [style*='background-color'] {
+    @apply shadow-sm;
+}
+
+[data-theme-choice='accent'][data-checked] [style*='background-color'] {
+    @apply ring-2 ring-offset-1;
+    --tw-ring-color: var(--color-accent, var(--accent-primary, #3b82f6));
+    --tw-ring-width: 2px;
+}
+
+/* Ensure logo animations run continuously in preview */
+svg[viewBox='0 0 512 512'] {
+    --animation-duration: 3s;
+}
+
+svg[viewBox='0 0 512 512'] .is-animated,
+svg[viewBox='0 0 512 512'] .is-animated-kg {
+    animation-play-state: running !important;
+    animation-iteration-count: infinite !important;
+    animation-timing-function: linear !important;
+}
+
+/* Secondary Action button uses Secondary accent */
+[data-secondary-action] {
+    background-color: var(--accent-secondary, var(--color-accent, #6366f1)) !important;
+    color: var(--accent-content, #ffffff) !important;
+    border-color: var(--accent-secondary, var(--color-accent, #6366f1)) !important;
+}
+
+[data-secondary-action]:hover {
+    background-color: var(--accent-secondary, var(--color-accent, #6366f1)) !important;
+    opacity: 0.9;
+}
+
+[data-secondary-action]:focus-visible {
+    --tw-ring-color: var(--accent-secondary, var(--color-accent, #6366f1)) !important;
 }
 
 input:focus[data-flux-control],
 textarea:focus[data-flux-control],
 select:focus[data-flux-control] {
-  @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
 
 /* Screen reader only class for ARIA live region (T013e) */
 .sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
 }

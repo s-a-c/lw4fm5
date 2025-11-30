@@ -33,8 +33,8 @@ final class FilamentPanelProvider extends PanelProvider
             // -----------------------------------------------------------
             // 1. LOAD THEME ENGINE CSS
             // -----------------------------------------------------------
-            // This loads the CSS file containing the "Zinc Bridge" and
-            // the Catppuccin/Kanagawa definitions.
+            // This loads the unified app.css which includes Filament base theme,
+            // theme engine, Zinc Bridge, and all theme definitions.
             ->viteTheme('resources/css/app.css')
 
             // FALLBACK COLORS:

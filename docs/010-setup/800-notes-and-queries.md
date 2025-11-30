@@ -22,6 +22,7 @@ Compliant with [AI-GUIDELINES.md](../../.ai/AI-GUIDELINES.md) v0921d4cfab198af14
 - [2.8 PHPStan Configuration for Test-Specific Patterns](#28-phpstan-configuration-for-test-specific-patterns)
 - [2.9 DependencyCatalogueTest PHPStan Null Safety Fix](#29-dependencycataloguetest-phpstan-null-safety-fix)
 - [2.10 Browser Test Fixes: Undefined Variable Errors and CSP False Positives](#210-browser-test-fixes-undefined-variable-errors-and-csp-false-positives)
+- [2.11 Theme Preview Variant Buttons Displaying Incorrect Colors on Initial Load](#211-theme-preview-variant-buttons-displaying-incorrect-colors-on-initial-load)
   - [3 Additional Notes](#3-additional-notes)
     - [3.1 Document Maintenance](#31-document-maintenance)
     - [3.2 Related Documentation](#32-related-documentation)
@@ -756,6 +757,96 @@ php artisan test --testsuite=Browser
 - Verifying functionality via database checks is more reliable than checking UI feedback messages
 - The `flux:radio.group` component's server-side variable resolution is a known behavior that requires workarounds when using Alpine.js bindings
 - This pattern (using `name`, `:value`, and `x-on:change` instead of `x-model`) can be used for other Flux components that have similar issues
+
+### 2.11 Theme Preview Variant Buttons Displaying Incorrect Colors on Initial Load
+
+**Date**: 2025-01-XX
+
+**Issue**: Variant buttons on the theme preview page (`/themes/preview`) were displaying dark backgrounds even when a light theme/flavor was selected on initial page load. After clicking a variant button, the buttons would update correctly, but on initial load they showed incorrect colors.
+
+**Symptoms**:
+
+- Variant buttons (Dark, Mirage, Light) displayed dark gray backgrounds with white text even when "Light" variant was selected for a light theme (e.g., Ayu Light)
+- The issue only occurred on initial page load; clicking a variant button would correct the styling
+- Browser console showed CSP errors: `Refused to execute inline script because it violates the following Content Security Policy directive`
+- CSS rules were correct (`html:not(.dark) .flavor-button{background-color:#fafafa;...}`), but weren't being applied
+- HTML had `class=""` (no `dark` class) on the `<html>` element, which should have matched the `html:not(.dark)` selector
+
+**Root Cause**:
+
+The theme script in `resources/views/partials/theme-script.blade.php` was being blocked by Content Security Policy (CSP) because it was an inline script without a nonce. This prevented the script from executing, so:
+
+1. The `dark` class wasn't being set correctly on the `<html>` element based on the theme's light/dark mode setting
+2. CSS selectors like `html:not(.dark) .flavor-button` couldn't match correctly because the script that should have toggled the `dark` class never ran
+3. The browser rendered with default styles, which appeared to favor dark mode styling
+
+The issue occurred because:
+- Laravel's CSP policy requires inline scripts to have a nonce attribute
+- The theme script was defined as `<script>` without the `@cspNonce` directive
+- CSP blocked the script execution, preventing theme initialization
+- Without the script running, the `dark` class wasn't toggled, causing CSS selectors to fail
+
+**Solution**:
+
+Added the `@cspNonce` Blade directive to the theme script's `<script>` tag, allowing it to execute with the CSP nonce:
+
+**Before**:
+```blade
+<script>
+    (function () {
+        // Theme initialization code
+    })();
+</script>
+```
+
+**After**:
+```blade
+<script @cspNonce>
+    (function () {
+        // Theme initialization code
+    })();
+</script>
+```
+
+Additionally, removed the `@fluxAppearance` directive from `resources/views/partials/head.blade.php` since our custom theming system handles dark mode toggling and syncs with Flux's localStorage.
+
+**Files Changed**:
+
+- `resources/views/partials/theme-script.blade.php` (line 23): Added `@cspNonce` directive to `<script>` tag
+- `resources/views/partials/head.blade.php` (line 18): Removed `@fluxAppearance` directive and added explanatory comment
+
+**Verification**:
+
+``` bash
+# Clear view cache to ensure changes are applied
+php artisan view:clear
+
+# Verify theme preview page loads correctly
+# Navigate to: https://lw4fm5.test/themes/preview?theme=ayu&flavor=light
+# Expected: Variant buttons have light backgrounds (white/light gray)
+# Navigate to: https://lw4fm5.test/themes/preview?theme=ayu&flavor=dark
+# Expected: Variant buttons have dark backgrounds (dark gray)
+
+# Run feature tests
+php artisan test tests/Feature/ThemePreview/ThemePreviewPageTest.php
+
+# All 10 tests pass
+```
+
+**References**:
+
+- [Content Security Policy Documentation](https://laravel.com/docs/12.x/security#content-security-policy)
+- [Theme Preview Implementation](../../specs/006-theming-engine/tasks.md)
+- [Theme Script Source](../../resources/views/partials/theme-script.blade.php)
+
+**Notes**:
+
+- The `@cspNonce` directive is a Laravel Blade helper that automatically adds the CSP nonce to inline scripts
+- This is required for all inline scripts when CSP is enabled in the application
+- The theme script must run early in the page load to prevent FOUC (Flash of Unstyled Content)
+- Removing `@fluxAppearance` prevents conflicts between Flux's appearance system and our custom theming system
+- Our theme script syncs with Flux's localStorage (`flux.appearance`) to prevent conflicts
+- This fix ensures variant buttons display correct colors on initial page load for both light and dark themes
 
 ---
 

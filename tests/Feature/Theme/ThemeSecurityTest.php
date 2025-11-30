@@ -27,7 +27,7 @@ test('XSS attacks are prevented in theme values', function (): void {
     $themeValue = $component->get('theme');
 
     // Theme should be validated - invalid values are corrected to default
-    // The value should not contain XSS payload (it should be a valid theme enum value)
+    // The value should not contain XSS payload (it should be a valid theme enum ThemeSecurityTest)
     expect($themeValue)->not->toContain('<script>')
         ->and($themeValue)->not->toContain('alert')
         ->and($themeValue)->toBeIn([Theme::Catppuccin->value, Theme::Kanagawa->value]);

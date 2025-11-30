@@ -25,14 +25,14 @@ test('appearance settings persist theme preferences inside a database transactio
     Livewire::test('settings.appearance')
         ->set('theme', Theme::Kanagawa->value)
         ->set('flavor', ThemeFlavor::Wave->value)
-        ->set('accent', ThemeAccent::Blue->value);
+        ->set('accent', ThemeAccent::Secondary->value);
 
     $settings = $user->refresh()->settings;
     assert($settings instanceof UserSettingsData);
 
     expect($settings->theme)->toBe(Theme::Kanagawa)
         ->and($settings->flavor)->toBe(ThemeFlavor::Wave)
-        ->and($settings->accent)->toBe(ThemeAccent::Blue);
+        ->and($settings->accent)->toBe(ThemeAccent::Secondary);
 });
 
 test('reset button visibility toggles based on whether the theme differs from defaults', function (): void {
@@ -51,7 +51,7 @@ test('reset button visibility toggles based on whether the theme differs from de
         'settings' => new UserSettingsData(
             theme: Theme::Kanagawa,
             flavor: ThemeFlavor::Wave,
-            accent: ThemeAccent::Blue,
+            accent: ThemeAccent::Secondary,
         ),
     ]);
 
@@ -68,7 +68,7 @@ test('reset button restores default theme values in the database', function (): 
         'settings' => new UserSettingsData(
             theme: Theme::Kanagawa,
             flavor: ThemeFlavor::Wave,
-            accent: ThemeAccent::Blue,
+            accent: ThemeAccent::Secondary,
         ),
     ]);
 

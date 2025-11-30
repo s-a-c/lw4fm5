@@ -46,8 +46,8 @@ test('auth pages apply themes correctly in components', function (): void {
     $loginResponse = $this->get(route('login'));
     $loginResponse->assertOk();
 
-    // Verify dark class is applied based on theme flavor
-    // Mocha is dark, so dark class should be present
+    // Verify dark class ThemeFortifyIntegrationTest applied based on theme flavor
+    // Mocha is dark, so dark class ThemeFortifyIntegrationTest be present
     $loginResponse->assertSee('class="dark"', false);
 
     // Verify theme attributes are in HTML element
@@ -59,7 +59,7 @@ test('authenticated user theme preferences apply to auth pages after login', fun
         'settings' => new UserSettingsData(
             theme: Theme::Kanagawa,
             flavor: ThemeFlavor::Wave,
-            accent: ThemeAccent::Blue,
+            accent: ThemeAccent::Secondary,
         ),
     ]);
 

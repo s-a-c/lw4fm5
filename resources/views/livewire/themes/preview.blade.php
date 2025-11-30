@@ -134,13 +134,23 @@ new class extends Component
         // Resolve theme data from raw values or use defaults
         $themeData = null;
 
-        // Special handling for 'none' theme - it doesn't require valid flavor/accent
-        if ($rawTheme === 'none') {
+        // Special handling for 'default' theme - it has Light, Dark, System flavors
+        if ($rawTheme === 'default') {
+            // Use System as default if no flavor specified
+            $defaultFlavor = $rawFlavor ? ThemeFlavor::tryFrom($rawFlavor) : ThemeFlavor::System;
+            if (! $defaultFlavor || ! in_array($defaultFlavor, Theme::Default->flavors(), true)) {
+                $defaultFlavor = ThemeFlavor::System;
+            }
+            // Default theme uses accents like other themes
+            $defaultAccent = $rawAccent ? ThemeAccent::tryFrom($rawAccent) : ThemeAccent::Primary;
+            if (! $defaultAccent) {
+                $defaultAccent = ThemeAccent::Primary;
+            }
             $themeData = $this->themeService->resolveThemeData(
                 new UserSettingsData(
-                    theme: Theme::None,
-                    flavor: ThemeFlavor::Default, // Placeholder
-                    accent: ThemeAccent::Primary, // Placeholder
+                    theme: Theme::Default,
+                    flavor: $defaultFlavor,
+                    accent: $defaultAccent,
                 )
             );
         } elseif ($rawTheme && $rawFlavor && $rawAccent) {
@@ -166,23 +176,21 @@ new class extends Component
 
         // Set component properties from resolved theme data
         $this->theme = $themeData->theme->value;
-        error_log('MOUNT - Set this->theme to: '.$this->theme);
-        // For None theme, use placeholder values (not used but required for component state)
-        $this->flavor = $themeData->theme === Theme::None ? 'default' : $themeData->flavor->value;
-        $this->accent = $themeData->theme === Theme::None ? 'primary' : $themeData->accent->value;
-        error_log('MOUNT - Set this->flavor to: '.$this->flavor.', this->accent to: '.$this->accent);
+        $this->flavor = $themeData->flavor->value;
+        $this->accent = $themeData->accent->value; // Default theme uses accents like other themes
 
         // CRITICAL: Refresh available options IMMEDIATELY after setting theme
         // This ensures availableFlavors and availableAccents match the current theme
         $this->refreshAvailableOptions();
 
-        // Validate and correct flavor/accent after refreshing options (skip for 'none' theme)
-        if ($this->theme !== 'none') {
-            $flavorValues = array_map(fn ($f) => $f->value, $this->availableFlavors);
-            if (! in_array($this->flavor, $flavorValues, true) && ! empty($flavorValues)) {
-                $this->flavor = $flavorValues[0];
-            }
+        // Validate and correct flavor/accent after refreshing options
+        $flavorValues = array_map(fn ($f) => $f->value, $this->availableFlavors);
+        if (! in_array($this->flavor, $flavorValues, true) && ! empty($flavorValues)) {
+            $this->flavor = $flavorValues[0];
+        }
 
+        // Only validate accent for non-None themes
+        if ($this->theme !== 'default') {
             $accentValues = array_map(fn ($a) => $a->value, $this->availableAccents);
             if (! in_array($this->accent, $accentValues, true) && ! empty($accentValues)) {
                 $this->accent = $accentValues[0];
@@ -241,9 +249,9 @@ new class extends Component
             // Set flavor/accent from query params or use placeholders for 'none'
             $queryFlavor = $request->query('flavor');
             $queryAccent = $request->query('accent');
-            if ($this->theme === 'none') {
-                $this->flavor = 'default';
-                $this->accent = 'primary';
+            if ($this->theme === 'default') {
+                $this->flavor = $queryFlavor ?? 'system';
+                $this->accent = $queryAccent ?? 'primary';
             } else {
                 $this->flavor = $queryFlavor ?? $this->flavor;
                 $this->accent = $queryAccent ?? $this->accent;
@@ -353,14 +361,14 @@ new class extends Component
             // If no query params and component properties are uninitialized, use defaults
             $defaultThemeData = $this->themeService->resolveThemeData(null);
             $this->theme = $defaultThemeData->theme->value;
-            $this->flavor = $defaultThemeData->theme === Theme::None ? 'default' : $defaultThemeData->flavor->value;
-            $this->accent = $defaultThemeData->theme === Theme::None ? 'primary' : $defaultThemeData->accent->value;
+            $this->flavor = $defaultThemeData->flavor->value;
+            $this->accent = $defaultThemeData->accent->value;
             $this->refreshAvailableOptions();
         }
 
         // FINAL CHECK: Ensure availableFlavors matches current theme before rendering
         // This is a safety check in case something went wrong earlier
-        if (! empty($this->theme) && $this->theme !== 'none') {
+        if (! empty($this->theme) && $this->theme !== 'default') {
             $finalThemeEnum = Theme::tryFrom($this->theme);
             if ($finalThemeEnum) {
                 $expectedFlavors = $finalThemeEnum->flavors();
@@ -404,8 +412,8 @@ new class extends Component
             'availableAccents' => $this->availableAccents,
         ];
 
-        // DEBUG: Log final component state for 'none' theme
-        if ($this->theme === 'none') {
+        // DEBUG: Log final component state for 'default' theme
+        if ($this->theme === 'default') {
             file_put_contents(storage_path('logs/theme-none-render.log'),
                 "FINAL COMPONENT STATE (render method end):\n".
                 "  theme: {$this->theme}\n".
@@ -444,8 +452,26 @@ new class extends Component
             FILE_APPEND
         );
 
-        // Handle None theme or invalid theme
-        if ($this->theme === 'none' || empty($this->theme)) {
+        // Handle Default theme - has Light, Dark, System flavors and accents
+        if ($this->theme === 'default') {
+            $this->availableFlavors = Theme::Default->flavors();
+            $this->availableAccents = $this->accentMapper->getAvailableAccents(Theme::Default);
+            // Default to System if current flavor is not valid
+            $flavorValues = array_map(fn ($f) => $f->value, $this->availableFlavors);
+            if (! in_array($this->flavor, $flavorValues, true)) {
+                $this->flavor = ThemeFlavor::System->value;
+            }
+            // Default theme uses accents - validate current accent
+            $accentValues = array_map(fn ($a) => $a->value, $this->availableAccents);
+            if (! in_array($this->accent, $accentValues, true) && ! empty($accentValues)) {
+                $this->accent = $accentValues[0];
+            }
+
+            return;
+        }
+
+        // Handle invalid/empty theme
+        if (empty($this->theme)) {
             $this->availableFlavors = [];
             $this->availableAccents = [];
             $this->flavor = 'default';
@@ -488,10 +514,10 @@ new class extends Component
             ]);
         }
 
-        // Handle None theme - no flavors or accents
-        if ($themeEnum === Theme::None) {
-            $this->flavor = 'default';
-            $this->accent = 'primary';
+        // Handle Default theme - has Light, Dark, System flavors and accents
+        if ($themeEnum === Theme::Default) {
+            $this->flavor = $this->flavor ?? 'system';
+            $this->accent = $this->accent ?? 'primary';
 
             return;
         }
@@ -523,8 +549,8 @@ new class extends Component
 
         // Calculate isLight state
         $themeEnum = Theme::from($this->theme);
-        $flavorEnum = $this->theme === 'none' ? ThemeFlavor::Default : ThemeFlavor::from($this->flavor);
-        $accentEnum = $this->theme === 'none' ? ThemeAccent::Primary : ThemeAccent::from($this->accent);
+        $flavorEnum = ThemeFlavor::from($this->flavor);
+        $accentEnum = ThemeAccent::from($this->accent);
         $themeData = new ThemeData(
             theme: $themeEnum,
             flavor: $flavorEnum,
@@ -533,14 +559,13 @@ new class extends Component
         $isLight = $themeData->isLight();
 
         // Update DOM immediately using $this->js() for SPA behavior (no page reload)
-        // For None theme, pass null to remove data attributes
         $this->js(
             sprintf(
                 'if (typeof window !== "undefined" && window.__liveThemePreview) { window.__liveThemePreview(%s); }',
                 Js::from([
-                    'theme' => $this->theme === 'none' ? null : $this->theme,
-                    'flavor' => $this->theme === 'none' ? null : $this->flavor,
-                    'accent' => $this->theme === 'none' ? null : $this->accent,
+                    'theme' => $this->theme,
+                    'flavor' => $this->flavor,
+                    'accent' => $this->accent,
                     'isLight' => $isLight,
                 ])
             )
@@ -549,9 +574,9 @@ new class extends Component
         // Also dispatch event for consistency with other theme updates
         $this->dispatch(
             'theme-updated',
-            theme: $this->theme === 'none' ? null : $this->theme,
-            flavor: $this->theme === 'none' ? null : $this->flavor,
-            accent: $this->theme === 'none' ? null : $this->accent,
+            theme: $this->theme,
+            flavor: $this->flavor,
+            accent: $this->accent,
             isLight: $isLight,
         );
     }
@@ -588,9 +613,14 @@ new class extends Component
 
     private function valueWithinFlavors(string $value): string
     {
-        // None theme has no flavors
-        if ($this->theme === 'none') {
-            return 'default';
+        // Default theme has Light, Dark, System flavors
+        if ($this->theme === 'default') {
+            // Return the value if it's valid, otherwise default to 'system'
+            $flavorValues = array_map(fn ($f) => $f->value, $this->availableFlavors);
+            if (in_array($value, $flavorValues, true)) {
+                return $value;
+            }
+            return 'system';
         }
 
         $flavorValues = array_map(fn ($f) => $f->value, $this->availableFlavors);
@@ -603,10 +633,8 @@ new class extends Component
 
     private function valueWithinAccents(string $value): string
     {
-        // None theme has no accents
-        if ($this->theme === 'none') {
-            return 'primary';
-        }
+        // Default theme uses accents like other themes
+        // No special handling needed
 
         $accentValues = array_map(fn ($a) => $a->value, $this->availableAccents);
         if (in_array($value, $accentValues, true)) {
@@ -626,14 +654,16 @@ new class extends Component
         $queryTheme = request()->query('theme');
         $queryFlavor = request()->query('flavor');
         $queryAccent = request()->query('accent');
-        
-        if ($queryTheme === 'none') {
-            // Special case: 'none' theme has no flavors or accents
-            $theme = 'none';
-            $flavor = 'default';
-            $accent = 'primary';
-            $availableFlavors = [];
-            $availableAccents = [];
+
+        if ($queryTheme === 'default') {
+            // Special case: 'default' theme has Light, Dark, System flavors
+            $theme = 'default';
+            // Default to System if no flavor specified
+            $flavor = $queryFlavor ?? 'system';
+            $accent = $queryAccent ?? 'primary'; // Default theme uses accents like other themes
+            $availableFlavors = \App\Enums\Theme::Default->flavors();
+            $accentMapper = app(\App\Contracts\ThemeAccentMapperInterface::class);
+            $availableAccents = $accentMapper->getAvailableAccents(\App\Enums\Theme::Default);
         } elseif ($queryTheme && $queryFlavor && $queryAccent) {
             // Override component state with query parameters
             $themeEnum = \App\Enums\Theme::tryFrom($queryTheme);
@@ -665,18 +695,19 @@ new class extends Component
 
         <div class="space-y-8">
             <div>
-                <h1 class="text-3xl font-bold mb-2">Theme Preview</h1>
-                <p class="text-gray-600 dark:text-gray-400">Try out different themes and see how they look.</p>
+                <h1 class="text-3xl font-bold mb-2" style="color: var(--color-zinc-900, rgb(24 24 27));">Theme Preview</h1>
+                <p style="color: var(--color-zinc-600, rgb(82 82 91));">Try out different themes and see how they look.</p>
             </div>
 
             <!-- Theme Selection -->
             <div>
-                <h2 class="text-xl font-semibold mb-2">Theme Family</h2>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Choose your preferred aesthetic.</p>
+                    <h2 class="text-xl font-semibold mb-2" style="color: var(--color-zinc-900, rgb(24 24 27));">Theme Family</h2>
+                <p class="text-sm mb-4" style="color: var(--color-zinc-600, rgb(82 82 91));">Choose your preferred aesthetic.</p>
 
                 <select
                     wire:model.live="theme"
-                    class="w-full sm:w-auto min-w-[200px] px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent theme-transition"
+                    class="w-full sm:w-auto min-w-[200px] px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent theme-transition"
+                    style="border-color: var(--color-zinc-300, rgb(212 212 216)); background-color: var(--color-zinc-50, rgb(250 250 250)); color: var(--color-zinc-900, rgb(24 24 27));"
                     aria-label="Theme family selection"
                 >
                     @foreach(Theme::cases() as $themeCase)
@@ -686,33 +717,23 @@ new class extends Component
             </div>
 
             <!-- Flavor Selection (T020b, FR-007, FR-011) -->
-            @php
-                // DEBUG: Dump for 'none' theme troubleshooting
-                if (app()->environment('testing') && request()->query('theme') === 'none') {
-                    file_put_contents(storage_path('logs/blade-template-debug.log'),
-                        "BLADE TEMPLATE - Flavor Section:\n" .
-                        "  \$theme: " . var_export($theme, true) . "\n" .
-                        "  count(\$availableFlavors): " . count($availableFlavors) . "\n" .
-                        "  condition result: " . var_export(($theme !== 'none' && count($availableFlavors) > 1), true) . "\n\n",
-                        FILE_APPEND
-                    );
-                }
-            @endphp
-            @if($theme !== 'none' && count($availableFlavors) > 1)
+            @if(count($availableFlavors) > 0)
                 <div class="transition-all duration-300 ease-in-out">
-                    <h2 class="text-xl font-semibold mb-2">Variant</h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Select a flavor for the chosen theme.</p>
+                    <h2 class="text-xl font-semibold mb-2" style="color: var(--color-zinc-900, rgb(24 24 27));">Variant</h2>
+                    <p class="text-sm mb-4" style="color: var(--color-zinc-600, rgb(82 82 91));">Select a flavor for the chosen theme.</p>
 
                     <div class="grid gap-4 sm:grid-cols-4" role="radiogroup" aria-label="Theme variant selection">
                         @foreach($availableFlavors as $flavorEnum)
-                            <label class="flex items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 theme-transition
-                                {{ $flavor === $flavorEnum->value ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 dark:border-gray-700' }}">
+                            <label class="flavor-button flex items-center gap-3 p-4 border rounded-lg cursor-pointer theme-transition
+                                {{ $flavor === $flavorEnum->value ? 'flavor-selected ring-2 ring-offset-2' : '' }}"
+                            >
                                 <input
                                     type="radio"
                                     wire:model.live="flavor"
                                     value="{{ $flavorEnum->value }}"
+                                    class="sr-only"
                                 />
-                                <span>{{ $flavorEnum->label() }}</span>
+                                <span class="flavor-button-text">{{ $flavorEnum->label() }}</span>
                             </label>
                         @endforeach
                     </div>
@@ -720,86 +741,52 @@ new class extends Component
             @endif
 
             <!-- Accent Selection (T020b, FR-007, FR-011) -->
-            @if($theme !== 'none' && count($availableAccents) > 0)
+            @if(count($availableAccents) > 0)
 <div>
-                    <h2 class="text-xl font-semibold mb-2">Accent Colors</h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Choose accent colors for different UI elements.</p>
+                    <h2 class="text-xl font-semibold mb-2" style="color: var(--color-zinc-900, rgb(24 24 27));">Accent Colors</h2>
+                    <p class="text-sm mb-4" style="color: var(--color-zinc-600, rgb(82 82 91));">Choose accent colors for different UI elements.</p>
 
-                    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" role="radiogroup" aria-label="Accent color selection">
+                    <div class="grid grid-cols-6 gap-3" role="radiogroup" aria-label="Accent color selection">
                         @foreach($availableAccents as $accentEnum)
                             @php
                                 $isSelected = $accent === $accentEnum->value;
 
-                                // Define preview element and description for each accent
-                                // Use direct CSS variable names so each card shows its own accent color
-                                $previewConfig = match($accentEnum) {
-                                    ThemeAccent::Primary => [
-                                        'element' => 'button',
-                                        'label' => 'Theme',
-                                        'description' => 'Brand/Default',
-                                        'cssVar' => '--accent-primary',
-                                    ],
-                                    ThemeAccent::Blue => [
-                                        'element' => 'badge',
-                                        'label' => 'Blue',
-                                        'description' => 'Information',
-                                        'cssVar' => '--accent-blue',
-                                    ],
-                                    ThemeAccent::Red => [
-                                        'element' => 'error',
-                                        'label' => 'Red',
-                                        'description' => 'Destructive/Error',
-                                        'cssVar' => '--accent-red',
-                                    ],
-                                    ThemeAccent::Green => [
-                                        'element' => 'success',
-                                        'label' => 'Green',
-                                        'description' => 'Success',
-                                        'cssVar' => '--accent-green',
-                                    ],
+                                // Define CSS variable name for each accent
+                                $cssVar = match($accentEnum) {
+                                    ThemeAccent::Primary => '--accent-primary',
+                                    ThemeAccent::Secondary => '--accent-secondary',
+                                    ThemeAccent::Info => '--accent-info',
+                                    ThemeAccent::Warning => '--accent-warning',
+                                    ThemeAccent::Error => '--accent-error',
+                                    ThemeAccent::Success => '--accent-success',
+                                };
+                            @endphp
+                            @php
+                                // Define fallback colors for each accent
+                                $fallbackColor = match($accentEnum) {
+                                    ThemeAccent::Primary => '#cba6f7',
+                                    ThemeAccent::Secondary => '#89b4fa',
+                                    ThemeAccent::Info => '#06b6d4',
+                                    ThemeAccent::Warning => '#eab308',
+                                    ThemeAccent::Error => '#f38ba8',
+                                    ThemeAccent::Success => '#a6e3a1',
                                 };
                             @endphp
                             <label
-                                class="flex flex-col gap-3 p-4 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 theme-transition transition-transform hover:scale-105 active:scale-95
-                                    {{ $isSelected ? 'accent-selected ring-2 ring-opacity-50' : 'border-gray-300 dark:border-gray-700' }}"
+                                class="accent-button flex flex-col items-center justify-center gap-2 p-3 border-2 rounded-lg cursor-pointer theme-transition transition-all hover:scale-105 active:scale-95
+                                    {{ $isSelected ? 'accent-selected ring-2 ring-offset-2' : '' }}"
+                                data-accent-type="{{ $accentEnum->value }}"
                                 data-accent-option="{{ $accentEnum->value }}"
                                 wire:key="accent-{{ $accentEnum->value }}-{{ $accent }}"
-                                style="{{ $isSelected ? 'border-color: var(' . $previewConfig['cssVar'] . '); background-color: color-mix(in srgb, var(' . $previewConfig['cssVar'] . ') 20%, transparent); ring-color: var(' . $previewConfig['cssVar'] . ');' : '' }}"
+                            >
                                 <input
                                     type="radio"
                                     wire:model.live="accent"
                                     value="{{ $accentEnum->value }}"
                                     class="sr-only"
                                 />
-                                <div class="flex justify-center" data-accent-preview="{{ $accentEnum->value }}">
-                                    @if($previewConfig['element'] === 'button')
-                                        <button class="px-4 py-2 rounded-lg text-white font-medium text-sm" style="background-color: var({{ $previewConfig['cssVar'] }});">Button</button>
-                                    @elseif($previewConfig['element'] === 'badge')
-                                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium text-white" style="background-color: var({{ $previewConfig['cssVar'] }});">
-                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                                            </svg>
-                                            Info
-                                        </span>
-                                    @elseif($previewConfig['element'] === 'error')
-                                        <div class="flex items-center gap-2 text-sm">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style="color: var({{ $previewConfig['cssVar'] }});">
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                                            </svg>
-                                            <span style="color: var({{ $previewConfig['cssVar'] }});">Error</span>
-                                        </div>
-                                    @elseif($previewConfig['element'] === 'success')
-                                        <div class="flex items-center gap-2 text-sm">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style="color: var({{ $previewConfig['cssVar'] }});">
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                            </svg>
-                                            <span style="color: var({{ $previewConfig['cssVar'] }});">Success</span>
-                                        </div>
-                                    @endif
-                                </div>
                                 <div class="text-center">
-                                    <div class="font-semibold text-gray-900 dark:text-gray-100">{{ $previewConfig['label'] }}</div>
-                                    <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">{{ $previewConfig['description'] }}</div>
+                                    <div class="accent-button-text font-semibold text-sm">{{ $accentEnum->label() }}</div>
                                 </div>
                             </label>
                         @endforeach

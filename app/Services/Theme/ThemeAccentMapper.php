@@ -14,23 +14,20 @@ final class ThemeAccentMapper implements ThemeAccentMapperInterface
     /**
      * Get available accent colors for a given theme.
      *
-     * All themes offer 4 accent options: Primary (Theme), Blue, Red, and Green.
+     * All themes offer 6 accent options: Primary, Secondary, Info, Warning, Error, and Success.
      *
      * @return array<int, ThemeAccent>
      */
     public function getAvailableAccents(Theme $theme): array
     {
-        // None theme has no accents (system default)
-        if ($theme === Theme::None) {
-            return [];
-        }
-
-        // All other themes offer all 4 accent options
+        // All themes (including Default) offer all 6 accent options
         return [
             ThemeAccent::Primary,
-            ThemeAccent::Blue,
-            ThemeAccent::Red,
-            ThemeAccent::Green,
+            ThemeAccent::Secondary,
+            ThemeAccent::Info,
+            ThemeAccent::Warning,
+            ThemeAccent::Error,
+            ThemeAccent::Success,
         ];
     }
 
@@ -76,13 +73,15 @@ final class ThemeAccentMapper implements ThemeAccentMapperInterface
      */
     private function getAccentShade(ThemeAccent $accent): int
     {
-        // Default mapping: Primary = 500, Blue = 500, Red = 500, Green = 500
+        // Default mapping: All accents use shade 500
         // This can be customized per theme/flavor/accent combination
         return match ($accent) {
             ThemeAccent::Primary => 500,
-            ThemeAccent::Blue => 500,
-            ThemeAccent::Red => 500,
-            ThemeAccent::Green => 500,
+            ThemeAccent::Secondary => 500,
+            ThemeAccent::Info => 500,
+            ThemeAccent::Warning => 500,
+            ThemeAccent::Error => 500,
+            ThemeAccent::Success => 500,
         };
     }
 }

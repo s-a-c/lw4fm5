@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 @php
     $theme = $themeData->theme ?? \App\Enums\Theme::Catppuccin;
-    $isNoneTheme = ($theme === \App\Enums\Theme::None) || ($theme->value === 'none');
-    // For 'none' theme, set flavor and accent to 'none' explicitly
-    $flavorValue = $isNoneTheme ? 'none' : ($themeData->flavor->value ?? 'mocha');
-    $accentValue = $isNoneTheme ? 'none' : ($themeData->accent->value ?? 'primary');
+    $isDefaultTheme = ($theme === \App\Enums\Theme::Default) || ($theme->value === 'default');
+    // Default theme has Light, Dark, System flavors and uses accents like other themes
+    $flavorValue = $themeData->flavor->value ?? 'mocha';
+    $accentValue = $themeData->accent->value ?? 'primary';
 
     // DEBUG: Always log in testing for troubleshooting
     if (app()->environment('testing')) {
         file_put_contents(storage_path('logs/layout-debug.log'),
             "Layout Header Render:\n" .
             "  theme_value: {$theme->value}\n" .
-            "  is_none_strict: " . var_export($theme === \App\Enums\Theme::None, true) . "\n" .
-            "  is_none_value: " . var_export($theme->value === 'none', true) . "\n" .
-            "  isNoneTheme: " . var_export($isNoneTheme, true) . "\n" .
+            "  is_default_strict: " . var_export($theme === \App\Enums\Theme::Default, true) . "\n" .
+            "  is_default_value: " . var_export($theme->value === 'default', true) . "\n" .
+            "  isDefaultTheme: " . var_export($isDefaultTheme, true) . "\n" .
             "  flavorValue: {$flavorValue}\n" .
             "  accentValue: {$accentValue}\n" .
             "  themeData_flavor: {$themeData->flavor->value}\n" .
@@ -28,6 +28,7 @@
     data-flavor="{{ $flavorValue }}"
     data-accent="{{ $accentValue }}"
     @class(['dark' => !($themeData->isLight() ?? false)])
+>
   <head>
     @include('partials.head')
   </head>

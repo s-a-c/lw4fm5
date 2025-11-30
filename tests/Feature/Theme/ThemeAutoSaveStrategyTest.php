@@ -38,7 +38,7 @@ test('auto-save triggers immediately in test mode (debounce bypassed for testing
     // This is intentional to make tests faster and more predictable
     $component->set('theme', Theme::Kanagawa->value)
         ->set('flavor', ThemeFlavor::Wave->value)
-        ->set('accent', ThemeAccent::Blue->value);
+        ->set('accent', ThemeAccent::Secondary->value);
 
     // In test mode, each set() triggers queueSave() which immediately calls performSave()
     // So we expect at least 1 save (component may batch or save each change)
@@ -49,7 +49,7 @@ test('auto-save triggers immediately in test mode (debounce bypassed for testing
     assert($settings instanceof UserSettingsData);
     expect($settings->theme)->toBe(Theme::Kanagawa)
         ->and($settings->flavor)->toBe(ThemeFlavor::Wave)
-        ->and($settings->accent)->toBe(ThemeAccent::Blue);
+        ->and($settings->accent)->toBe(ThemeAccent::Secondary);
 });
 
 test('auto-save triggers consistently for all theme preference changes', function (): void {
@@ -74,10 +74,10 @@ test('auto-save triggers consistently for all theme preference changes', functio
     expect($settings->flavor)->toBe(ThemeFlavor::Wave);
 
     // Test accent change triggers save
-    $component->set('accent', ThemeAccent::Blue->value);
+    $component->set('accent', ThemeAccent::Secondary->value);
     $settings = $user->refresh()->settings;
     assert($settings instanceof UserSettingsData);
-    expect($settings->accent)->toBe(ThemeAccent::Blue);
+    expect($settings->accent)->toBe(ThemeAccent::Secondary);
 });
 
 test('retry mechanism schedules retries with exponential backoff delays', function (): void {

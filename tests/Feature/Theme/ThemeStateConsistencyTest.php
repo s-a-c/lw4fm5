@@ -31,14 +31,14 @@ test('theme state is consistent between User model and Livewire component', func
     // Update via Livewire component
     $component->set('theme', Theme::Kanagawa->value)
         ->set('flavor', ThemeFlavor::Wave->value)
-        ->set('accent', ThemeAccent::Blue->value);
+        ->set('accent', ThemeAccent::Secondary->value);
 
     // Verify User model is updated
     $settings = $user->refresh()->settings;
     assert($settings instanceof UserSettingsData);
     expect($settings->theme)->toBe(Theme::Kanagawa)
         ->and($settings->flavor)->toBe(ThemeFlavor::Wave)
-        ->and($settings->accent)->toBe(ThemeAccent::Blue);
+        ->and($settings->accent)->toBe(ThemeAccent::Secondary);
 });
 
 test('theme state is consistent between User model and View Composer', function (): void {
@@ -64,7 +64,7 @@ test('theme state is consistent between User model and View Composer', function 
     $user->settings = new UserSettingsData(
         theme: Theme::Kanagawa,
         flavor: ThemeFlavor::Wave,
-        accent: ThemeAccent::Blue,
+        accent: ThemeAccent::Secondary,
     );
     $user->save();
 
@@ -72,7 +72,7 @@ test('theme state is consistent between User model and View Composer', function 
     $themeData = $themeService->resolveThemeData($user->refresh()->settings);
     expect($themeData->theme)->toBe(Theme::Kanagawa)
         ->and($themeData->flavor)->toBe(ThemeFlavor::Wave)
-        ->and($themeData->accent)->toBe(ThemeAccent::Blue);
+        ->and($themeData->accent)->toBe(ThemeAccent::Secondary);
 });
 
 test('theme state synchronization is immediate when updated via Livewire component', function (): void {
@@ -119,7 +119,7 @@ test('theme state is consistent when updated via multiple paths', function (): v
     $user->settings = new UserSettingsData(
         theme: Theme::Catppuccin,
         flavor: ThemeFlavor::Frappe,
-        accent: ThemeAccent::Red,
+        accent: ThemeAccent::Error,
     );
     $user->save();
 
@@ -128,17 +128,17 @@ test('theme state is consistent when updated via multiple paths', function (): v
     assert($settings instanceof UserSettingsData);
     expect($settings->theme)->toBe(Theme::Catppuccin)
         ->and($settings->flavor)->toBe(ThemeFlavor::Frappe)
-        ->and($settings->accent)->toBe(ThemeAccent::Red);
+        ->and($settings->accent)->toBe(ThemeAccent::Error);
 
     // View Composer should see the same state
     $themeData = $themeService->resolveThemeData($user->settings);
     expect($themeData->theme)->toBe(Theme::Catppuccin)
         ->and($themeData->flavor)->toBe(ThemeFlavor::Frappe)
-        ->and($themeData->accent)->toBe(ThemeAccent::Red);
+        ->and($themeData->accent)->toBe(ThemeAccent::Error);
 
     // Livewire component should see updated state on next render
     $component = Livewire::test('settings.appearance');
     expect($component->get('theme'))->toBe(Theme::Catppuccin->value)
         ->and($component->get('flavor'))->toBe(ThemeFlavor::Frappe->value)
-        ->and($component->get('accent'))->toBe(ThemeAccent::Red->value);
+        ->and($component->get('accent'))->toBe(ThemeAccent::Error->value);
 });

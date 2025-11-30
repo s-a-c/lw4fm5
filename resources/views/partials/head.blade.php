@@ -15,6 +15,7 @@
 @livewireStyles
 @filamentStyles
 
-@fluxAppearance
-
 @include('partials.theme-script')
+
+{{-- Note: @fluxAppearance is intentionally omitted as we use our own theming system --}}
+{{-- Our theme-script.blade.php handles dark mode toggling and syncs with Flux localStorage --}}

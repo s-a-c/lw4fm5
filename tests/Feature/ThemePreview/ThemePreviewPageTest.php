@@ -46,14 +46,14 @@ test('session storage isolates theme preferences per session', function (): void
     $session2 = $this->withSession([
         'preview_theme' => Theme::Catppuccin->value,
         'preview_flavor' => ThemeFlavor::Mocha->value,
-        'preview_accent' => ThemeAccent::Blue->value,
+        'preview_accent' => ThemeAccent::Secondary->value,
     ])->get('/themes/preview');
 
     $session2->assertOk();
     // Check that Catppuccin theme is selected in the HTML
     $session2->assertSee('data-theme="catppuccin"', false);
     $session2->assertSee('data-flavor="mocha"', false);
-    $session2->assertSee('data-accent="blue"', false);
+    $session2->assertSee('data-accent="secondary"', false);
 });
 
 test('theme changes reset on navigation away from preview page', function (): void {
@@ -129,10 +129,10 @@ test('all themes and variants are selectable on preview page', function (): void
     }
 
     // Test all accent colors for each theme (skip None theme as it has no flavors)
-    $accents = [ThemeAccent::Primary, ThemeAccent::Blue, ThemeAccent::Red, ThemeAccent::Green];
+    $accents = [ThemeAccent::Primary, ThemeAccent::Secondary, ThemeAccent::Error, ThemeAccent::Success];
     foreach (Theme::cases() as $theme) {
-        // Skip None theme - it has no flavors or accents
-        if ($theme === Theme::None) {
+        // Skip Default theme - it has flavors and accents, but we'll test it separately
+        if ($theme === Theme::Default) {
             continue;
         }
 
@@ -189,47 +189,50 @@ test('catppuccin theme shows correct flavors via query parameters', function ():
     expect($content)->not->toContain('value="lotus"');
 });
 
-test('none theme removes all data attributes and hides flavor/accent selection', function (): void {
-    // Test None theme - should remove all theme data attributes and hide flavor/accent selection
-    $response = $this->withSession([])->get('/themes/preview?theme=none&flavor=default&accent=primary');
+test('default theme shows light dark system flavors and accent selection', function (): void {
+    // Test Default theme - should show Light, Dark, System flavors and accent selection
+    $response = $this->withSession([])->get('/themes/preview?theme=default&flavor=system&accent=primary');
     $response->assertOk();
     $content = $response->getContent();
 
-    // Verify 'None' option is available in the theme dropdown
-    expect($content)->toContain('None (System Default)');
-    expect($content)->toContain('value="none"');
+    // Verify 'Default' option is available in the theme dropdown
+    expect($content)->toContain('Default');
+    expect($content)->toContain('value="default"');
 
-    // Verify data-theme, data-flavor, and data-accent are all set to "none" (explicit values for system default)
-    expect($content)->toMatch('/data-theme=["\']none["\']/');
-    expect($content)->toMatch('/data-flavor=["\']none["\']/');
-    expect($content)->toMatch('/data-accent=["\']none["\']/');
+    // Verify data-theme is set to "default"
+    expect($content)->toMatch('/data-theme=["\']default["\']/');
+    // Verify data-flavor is set (should be system, light, or dark)
+    expect($content)->toMatch('/data-flavor=["\'](system|light|dark)["\']/');
+    // Verify data-accent is set (Default theme uses accents like other themes)
+    expect($content)->toMatch('/data-accent=["\'](primary|secondary|info|warning|error|success)["\']/');
 
-    // Verify flavor selection section is hidden (None theme has no flavors)
-    // The flavor section should be wrapped in @if($theme !== 'none' && count($availableFlavors) > 1)
-    // So we should NOT see flavor radio buttons
-    expect($content)->not->toContain('wire:model.live="flavor"');
+    // Verify flavor selection section is visible (Default theme has Light, Dark, System flavors)
+    expect($content)->toContain('wire:model.live="flavor"');
+    expect($content)->toContain('value="light"');
+    expect($content)->toContain('value="dark"');
+    expect($content)->toContain('value="system"');
 
-    // Verify accent selection section is hidden (None theme has no accents)
-    // The accent section should be wrapped in @if($theme !== 'none' && count($availableAccents) > 0)
-    // So we should NOT see accent selection
-    expect($content)->not->toContain('wire:model.live="accent"');
+    // Verify accent selection section is visible (Default theme uses accents like other themes)
+    expect($content)->toContain('wire:model.live="accent"');
 
     // Verify the page still renders correctly (has preview content)
     expect($content)->toContain('Preview Mode');
 });
 
-test('none theme can be selected via query parameters', function (): void {
-    // Test that None theme works with just theme parameter (flavor/accent are ignored for None)
-    // Note: View Composer requires flavor/accent even for 'none', so we pass placeholder values
-    $response = $this->withSession([])->get('/themes/preview?theme=none&flavor=default&accent=primary');
+test('default theme can be selected via query parameters', function (): void {
+    // Test that Default theme works with theme, flavor, and accent parameters
+    // Default flavor should be 'system' if not specified
+    $response = $this->withSession([])->get('/themes/preview?theme=default&flavor=system&accent=primary');
     $response->assertOk();
     $content = $response->getContent();
 
-    // Verify 'None' is selected in the dropdown
-    expect($content)->toContain('value="none"');
+    // Verify 'Default' is selected in the dropdown
+    expect($content)->toContain('value="default"');
 
-    // Verify data-theme, data-flavor, and data-accent are all set to "none" (explicit values for system default)
-    expect($content)->toMatch('/data-theme=["\']none["\']/');
-    expect($content)->toMatch('/data-flavor=["\']none["\']/');
-    expect($content)->toMatch('/data-accent=["\']none["\']/');
+    // Verify data-theme is set to "default"
+    expect($content)->toMatch('/data-theme=["\']default["\']/');
+    // Verify data-flavor is set (should be system, light, or dark)
+    expect($content)->toMatch('/data-flavor=["\'](system|light|dark)["\']/');
+    // Verify data-accent is set (Default theme uses accents like other themes)
+    expect($content)->toMatch('/data-accent=["\'](primary|secondary|info|warning|error|success)["\']/');
 });
